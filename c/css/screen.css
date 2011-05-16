@@ -1,0 +1,151 @@
+
+h1.compress {
+	letter-spacing: -0.1em;
+}
+
+.json_input {
+	width: 100%;
+	height: 300px;
+	margin: 0;
+	background-color: #EEEEEE;
+	border: 1px solid #EEEEEE;
+	padding: 0 !important;
+}
+
+.json_input:focus {
+	border-width: 0;
+	outline: none;
+	background-color: #EEEEEE;
+}
+
+.unimportant {
+	color: #999;
+	font-size: .9em;
+	font-weight: 	normal;
+}
+
+.invisible {
+        /*
+                This ugly opacity stuff has to be
+                here so that fadeTo works properly
+        */
+        filter:alpha(opacity=0);
+        -moz-opacity:.0;
+        opacity:.0;
+} 
+
+.verifyButtons { margin: .5em 0 1.5em 0; line-height: 1.75em; }
+
+#labLink img {
+        vertical-align: middle;
+        margin-bottom: 1em;
+} 
+
+.bold {
+	font-weight: bold;
+}
+
+.center {
+	text-align: center;
+}
+
+.big {
+	font-size: 2.5em;
+}
+
+.bigBorder {
+	border-width: 2px !important;
+}
+
+a:hover { cursor: pointer; }
+
+
+/* Overriding of wacky blueprint CSS attributes */
+
+a {
+	text-decoration: none;
+	color: #36C;
+}
+
+em {
+	background-color: transparent !important;
+}
+
+input.text, input.title {
+	width: auto;
+}
+
+#faq {
+	border: 2px solid #CCC;
+	padding: 1em;
+	height: 20em;
+	overflow: auto;
+	margin-top: 1em;
+}
+#faqAccordion div {
+	margin-left: 2em;
+}
+
+#faqAccordion dd {
+	margin-bottom: 1em;
+}
+
+#reformat, #validate, #compress {
+	font-size: 1.65em;
+	color: #333;
+	padding-left: .5em;
+	padding-right: .5em;
+}
+
+.greenBorder {
+	border: 1px solid green !important;
+}
+
+.redBorder {
+	border: 1px solid red !important;
+}
+
+#results_header {
+	padding-top: 1em;
+}
+
+.sayHello {
+	width: 85%;
+	text-align: center;
+	color: #009900;
+	background-color: white;
+	font-weight: bold;
+}
+
+.kindling {
+	width: 85%;
+	text-align: center;
+	color: #999;
+	background-color: white;
+	font-weight: bold;
+	line-height: 1.4;
+}
+
+.kindling a {
+	color: #999;
+}
+
+.kindling a:hover {
+	color: #36C;
+	
+}
+
+.linedwrap {
+	margin-bottom: 10px;
+	background-color: #EEEEEE;
+	padding: 0;
+}
+
+
+.linedwrap .codelines {
+	padding: 0;
+}
+
+.light {
+    color: #AAA;
+}
