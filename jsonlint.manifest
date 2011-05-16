@@ -2,6 +2,7 @@ CACHE MANIFEST
 CACHE:
 
 # version: 1
+c/js/jquery-1.6.1.min.js 
 c/js/jsl.interactions.js
 c/css/blueprint/compressed/screen.css
 c/css/blueprint/plugins/css-classes/css-classes.css
@@ -9,6 +10,8 @@ c/css/screen.css
 c/images/logo_arc90.png
 c/images/kindling_250px_light_trans.png
 c/images/loadspinner.gif
+c/js/jquery-linedtextarea/jquery-linedtextarea.js 
+c/js/jquery-linedtextarea/jquery-linedtextarea.css 
 
 FALLBACK:
 
