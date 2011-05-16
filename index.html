@@ -117,22 +117,18 @@
                     <div>
                         <dl>
                             <dt>
-                                <code>syntax error, unexpected '}', expecting TSTRING at line X</code>
+                                <code>Expecting 'STRING'</code>
                             </dt>
                             <dd>
                                 You probably have an extra comma at the end of your collection. Something like: <code>{ "a": "b"<span class="highlight">,</span> }</code>
                             </dd>
                             <dt>
-                                <code>syntax error, unexpected ']' at line X</code>
+                                <code>Expecting 'STRING', 'NUMBER', 'NULL', 'TRUE', 'FALSE', '{', '['</code>
                             </dt>
                             <dd>
                                 You probably have an extra comma at the end of your list. Something like: <code>[ "a", "b"<span class="highlight">,</span> ]</code>
-                            </dd>
-                            <dt>
-                                <code>syntax error, unexpected TINVALID, expecting TSTRING or '}' at line X</code>
-                            </dt>
-                            <dd>
-                                You may have not enclosed your collection keys in quotes. Proper format for a collection is: <code>{ "key": "value" }</code>
+                                <br />
+                                You also may have not enclosed your collection keys in quotes. Proper format for a collection is: <code>{ "key": "value" }</code>
                             </dd>
                         </dl>
                         <p>
