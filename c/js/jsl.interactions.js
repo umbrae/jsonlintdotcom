@@ -107,7 +107,7 @@ jsl.interactions = (function () {
             result;
             
         jsonVal = $('#json_input').val();
-            
+
         try {
             result = jsl.parser.parse(jsonVal);
 
@@ -117,11 +117,11 @@ jsl.interactions = (function () {
                 $('#results').text('Valid JSON');
 
                 if (reformat) {
-                    $('#json_input').val(JSON.stringify(result, null, "    "));
+                    $('#json_input').val(JSON.stringify(JSON.parse(jsonVal), null, "    "));
                 }
 
                 if (compress) {
-                    $('#json_input').val(JSON.stringify(result, null, ""));
+                    $('#json_input').val(JSON.stringify(JSON.parse(jsonVal), null, ""));
                 }
             } else {
                 alert("An unknown error occurred. Please contact Arc90.");
