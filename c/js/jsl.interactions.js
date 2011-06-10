@@ -86,11 +86,13 @@ jsl.interactions = (function () {
      * @return string the url parameter's value, if any
     **/
     function getURLParameter(name) {
-        return decodeURI(
-            (new RegExp(name + '=' + '(.+?)(&|$)').exec(location.search) || ['', null])[1]
-        );
+        param = (new RegExp(name + '=' + '(.+?)(&|$)').exec(location.search) || ['', null])[1];
+        if (param) {
+            return decodeURI(param);
+        } else {
+            return null;
+        }
     }
-
 
     /******* INTERACTION METHODS *******/
 
@@ -163,8 +165,9 @@ jsl.interactions = (function () {
     function init() {
         reformatParam = getURLParameter('reformat');
         reformat      = reformatParam !== '0' && reformatParam !== 'no';
-        compress      = reformatParam === 'compress';
-
+        compress      = reformatParam === 'compress',
+        jsonParam     = getURLParameter('json');
+        
         if (compress) {
             $('#headerText').html('JSONLint<span class="light">Compressor</span>');
         }
@@ -203,6 +206,11 @@ jsl.interactions = (function () {
         $('#faqButton').click(function () {
             $('#faq').slideToggle();
         });
+
+        if (jsonParam) {
+            $('#json_input').val(jsonParam);
+            $('#validate').click();
+        }
     }
 
     return {
