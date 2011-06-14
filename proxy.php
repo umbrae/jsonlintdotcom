@@ -1,10 +1,15 @@
 <?php
 
-$url = filter_var($_POST['url'], FILTER_VALIDATE_URL);
+$url = filter_var($_POST['url'], FILTER_VALIDATE_URL, FILTER_FLAG_SCHEME_REQUIRED);
+
+if (!$url || !preg_match("/^https?:/i", $url)) {
+    echo '{ "result": "Invalid URL. Please check your URL and try again.", "error": true }';
+}
 
 $ch = curl_init($url);
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 $data = curl_exec($ch);
 $info = curl_getinfo($ch);
 curl_close($ch);
