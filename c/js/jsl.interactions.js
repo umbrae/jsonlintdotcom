@@ -128,9 +128,24 @@ jsl.interactions = (function () {
             } else {
                 alert("An unknown error occurred. Please contact Arc90.");
             }
-        } catch (e) {
+        } catch (parseException) {
 
-            lineMatches = e.message.match(/line ([0-9]*)/);
+            /** 
+             * If we failed to validate, run our manual formatter and then re-validate so that we
+             * can get a better line number. On a successful validate, we don't want to run our
+             * manual formatter because the automatic one is faster and probably more reliable.
+            **/
+            try {
+                if (reformat) {
+                    jsonVal = jsl.format.formatJson($('#json_input').val());
+                    $('#json_input').val(jsonVal);
+                    result = jsl.parser.parse($('#json_input').val());
+                }
+            } catch(e) {
+                parseException = e;
+            }
+
+            lineMatches = parseException.message.match(/line ([0-9]*)/);
             if (lineMatches && typeof lineMatches === "object" && lineMatches.length > 1) {
                 lineNum = parseInt(lineMatches[1], 10);
 
@@ -148,7 +163,7 @@ jsl.interactions = (function () {
                 $('#json_input').focus().caret(lineStart, lineEnd);
             }
 
-            $('#results').text(e.message);
+            $('#results').text(parseException.message);
 
             $('#results').removeClass('success').addClass('error');
             $('div.linedwrap').removeClass('greenBorder').addClass('redBorder');

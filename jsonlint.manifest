@@ -1,7 +1,7 @@
 CACHE MANIFEST
 CACHE:
 
-# version: 4
+# version: 5
 c/css/blueprint/compressed/screen.css
 c/css/blueprint/plugins/css-classes/css-classes.css
 c/css/screen.css
@@ -13,6 +13,7 @@ c/js/jquery-linedtextarea/jquery-linedtextarea.css
 c/js/jquery-linedtextarea/jquery-linedtextarea.js
 c/js/jsl.interactions.js
 c/js/jsl.parser.js
+c/js/jsl.format.js
 
 FALLBACK:
 
