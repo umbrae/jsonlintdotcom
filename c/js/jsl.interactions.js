@@ -212,7 +212,7 @@ jsl.interactions = (function () {
             $('div.linedwrap').removeClass('greenBorder').removeClass('redBorder');
         }).linedtextarea({
             selectedClass: 'lineselect'
-        });
+        }).focus();
 
         $('#reset').click(function () {
             $('#json_input').val('').focus();
