@@ -4,6 +4,8 @@
  *
  * Copyright (c) 2010 Alan Williamson
  * 
+ * Contributions done by Ryan Zielke (NeoAlchemy@gmail.com)
+ *
  * Version: 
  *    $Id: jquery-linedtextarea.js 464 2010-01-08 10:36:33Z alan $
  *
@@ -22,6 +24,7 @@
  *   });
  *
  * History:
+ *   - 2011.12.08: Changes to allow resizing and not affect styling of the outer div
  *   - 2010.01.08: Fixed a Google Chrome layout problem
  *   - 2010.01.07: Refactored code for speed/readability; Fixed horizontal sizing
  *   - 2010.01.06: Initial Release
@@ -61,18 +64,16 @@
 			
 			/* Turn off the wrapping of as we don't want to screw up the line numbers */
 			textarea.attr("wrap", "off");
-			textarea.css({resize:'none'});
+			textarea.css({resize:'both'});
 			var originalTextAreaWidth	= textarea.outerWidth();
 
 			/* Wrap the text area in the elements we need */
-			textarea.wrap("<div class='linedtextarea'></div>");
-			var linedTextAreaDiv	= textarea.parent().wrap("<div class='linedwrap' style='width:" + originalTextAreaWidth + "px'></div>");
+			var linedTextAreaDiv	= textarea.wrap("<div class='linedwrap'></div>");
 			var linedWrapDiv 			= linedTextAreaDiv.parent();
 			
 			linedWrapDiv.prepend("<div class='lines' style='width:50px'></div>");
 			
 			var linesDiv	= linedWrapDiv.find(".lines");
-			linesDiv.height( textarea.height() );
 			
 			
 			/* Draw the number bar; filling it out where necessary */
@@ -94,8 +95,8 @@
 			var linedWrapDivNewWidth 	= originalTextAreaWidth - paddingHorizontal;
 			var textareaNewWidth		= originalTextAreaWidth - sidebarWidth - paddingHorizontal;
 
-			textarea.width( textareaNewWidth );
-			linedWrapDiv.width( linedWrapDivNewWidth );
+			textarea.width( textareaNewWidth);
+			textarea.css({maxWidth: textareaNewWidth - 6}); //TODO make this calculated
 			
 
 			
@@ -114,7 +115,16 @@
 				var domTextArea	= $(this)[0];
 				linesDiv.height( domTextArea.clientHeight + 6 );
 			});
-
+			
+			
+			window.setInterval( function(tn) {
+				linesDiv.height(textarea.height());
+				var scrollTop 		= textarea[0].scrollTop;
+				var clientHeight 	= textarea[0].clientHeight;
+				codeLinesDiv.css( {'margin-top': (-1*scrollTop) + "px"} );
+				lineNo = fillOutLines( codeLinesDiv, scrollTop + clientHeight, lineNo );
+			},10);
+				
 		});
 	};
 

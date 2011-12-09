@@ -13,7 +13,7 @@ h1.compress {
 }
 
 .json_input:focus {
-	border-width: 0;
+	border-color: transparent;
 	outline: none;
 	background-color: #EEEEEE;
 }
