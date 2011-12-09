@@ -4,6 +4,8 @@
  *
  * Copyright (c) 2010 Alan Williamson
  *
+ * Contribution done by Ryan Zielke (neoalchemy@gmail.com)
+ *
  * Released under the MIT License:
  * http://www.opensource.org/licenses/mit-license.php
  * 
@@ -20,9 +22,12 @@
  *
  */
 
+textarea { resize:both; } 
+
 .linedwrap {
 	border: 1px solid #c0c0c0;
 	padding: 3px;
+	display: inline-block;
 }
 
 .linedtextarea {
