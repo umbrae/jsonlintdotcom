@@ -90,7 +90,7 @@ input.text, input.title {
 	margin-bottom: 1em;
 }
 
-#reformat, #validate, #compress {
+#reformat, #validate, #compress, #reset {
 	font-size: 1.65em;
 	color: #333;
 	padding-left: .5em;
