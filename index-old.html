@@ -1,0 +1,185 @@
+<!doctype html> 
+<html lang="en" manifest="jsonlint.manifest"> 
+    <head>
+        <meta charset="utf-8">
+        <meta name="description" content="JSON Lint is a web based validator and reformatter for JSON, a lightweight data-interchange format.">
+        <title>
+            JSONLint - The JSON Validator.
+        </title>
+        <script type="text/javascript">
+            if (typeof JSON === 'undefined') {
+                document.write('<sc' + 'ript type="text/javascript" src="c/js/json2.js"></sc' + 'ript>');
+            }
+        </script>
+	<script src="c/js/jquery-1.6.1.min.js" type="text/javascript"></script>
+        <script src="c/js/jquery-linedtextarea/jquery-linedtextarea.js" type="text/javascript"></script>
+        <link href="c/js/jquery-linedtextarea/jquery-linedtextarea.css" type="text/css" rel="stylesheet">
+        <script type="text/javascript" src="c/js/jsl.parser.js"></script>
+        <script type="text/javascript" src="c/js/jsl.format.js"></script>
+        <script type="text/javascript" src="c/js/jsl.interactions.js"></script>
+        <link rel="stylesheet" href="c/css/blueprint/compressed/screen.css" type="text/css" media="screen, projection">
+        <!--[if IE]><link rel="stylesheet" href="c/css/blueprint/lib/ie.css" type="text/css" media="screen, projection"><![endif]-->
+        <link rel="stylesheet" href="c/css/blueprint/plugins/css-classes/css-classes.css" type="text/css" media="screen, projection">
+        <link rel="stylesheet" href="c/css/screen.css" type="text/css" media="screen, projection">
+    </head>
+    <body>
+        <div class="container">
+            <div class="banner clear">
+                <div class="left">
+                    <h1 id="headerText">
+                        JSONLint
+                    </h1>
+                    <h3>
+                        The JSON Validator
+                    </h3>
+                    
+                    <p>Want more from JSONLint? Try <a href="http://pro.jsonlint.com">JSONLint Pro</a></p>
+                </div>
+                <div class="right span-12 unimportant" style="text-align: right;">
+                    <div>
+                        <a href="http://lab.arc90.com" id="labHint" onclick="javascript: pageTracker._trackPageview('/arc90LabLink');" name="labHint"><img style="margin-right: 9px;" src="c/images/logo_arc90.png"></a>
+                    </div>
+                    <div>
+                        A Tool from the Arc90 Lab. <a href="https://www.github.com/arc90/jsonlintdotcom" id="sourceLink" onclick="javascript: pageTracker._trackPageview('/sourceLink');" name="sourceLink">Source is on GitHub.</a><br>
+                        Props to <a href="http://www.crockford.com/">Douglas Crockford</a> of <a href="http://www.json.org">JSON</a> and <a href="http://www.jslint.com">JS Lint</a> and <br /><a href="http://zaa.ch/">Zach Carter</a>, who provided the <a href="https://github.com/zaach/jsonlint">pure JS implementation of jsonlint</a>.
+                    </div>
+                </div>
+            </div>
+            <hr>
+            <form id="JSONValidate" method="post" action="." name="JSONValidate">
+                <input type="hidden" id="reformat" value="1" />
+                <input type="hidden" id="compress" value="0" />
+                <div>
+                    <textarea id="json_input" name="json_input" class="json_input" rows="30" cols="100" spellcheck="false" placeholder="Enter JSON to validate, or a URL to JSON to validate."></textarea>
+                </div>
+                <div class="validateButtons clear">
+                    <div class="left">
+                        <button name="validate" id="validate" value="Validate" class="button left bold" onclick="javascript: pageTracker._trackPageview('/validate');">Validate</button>
+                    </div>
+                    <div class="right">
+                        <a href="#" id="faqButton" class="bold" onclick="javascript: pageTracker._trackPageview('/faq');" name="faqButton">FAQ</a>
+                    </div>
+                    <div class="right small kindling">
+                        JSON Lint is an idea from Arc90's Kindling<br/>
+                        <a href="http://www.kindlingapp.com" onclick="javascript: pageTracker._trackPageview('/outgoing/kindling');" title="Kindling">
+                        	<img style="margin: 0;" border="0" alt="Kindling" src="c/images/kindling.png">
+                        </a>
+                    </div>
+                </div>
+            </form>
+            <div id="results_header" class="hide">
+                <h3>
+                    Results <img title="Loading..." class="reset" alt="Loading" src="c/images/loadspinner.gif" id="loadSpinner" name="loadSpinner">
+                </h3>
+            </div>
+            <pre id="results"></pre>
+            <div id="faq" class="hide">
+                <h3>
+                    FAQ
+                </h3>
+                <hr>
+                <div id="faqAccordion">
+                    <h5>
+                        What is JSONLint?
+                    </h5>
+                    <div>
+                        <p>
+                            JSONLint is a validator and reformatter for <a href="http://www.json.org/">JSON</a>, a lightweight data-interchange format.
+                        </p>
+                    </div>
+                    <h5>
+                        Why 'Lint'?
+                    </h5>
+                    <div>
+                        <p>
+                            Essentially, I'm just riding on <a href="http://www.jslint.com">JSLint's</a> coattails. The name 'lint' was originally used to find problems in C source files. It's not really valid here because JSON is just a protocol. Shameless? You bet!
+                        </p>
+                    </div>
+                    <h5>
+                        Why does it reformat my JSON?
+                    </h5>
+                    <div>
+                        <p>
+                            Because your code is ugly! Trust me on this one. What's that you say? It's not? Ok, well then here's <a href="http://www.jsonlint.com/?reformat=no">JSON Lint without the reformatter.</a>
+                        </p>
+                    </div>
+                    <h5>
+                        Any secret features?
+                    </h5>
+                    <div>
+                        <p>
+                            Sure, a few. You can input a URL and it'll scrape it for JSON and parse that.<br>
+                            An example URL to test: <a href="#" onclick="pageTracker._trackPageview('/redditUrlInput'); $('#json_input').val('http://www.reddit.com/r/programming/comments/9szpc/jsonlint_a_handy_json_validator_and_reformatter.json');">http://www.reddit.com/r/programming/comments/9szpc/jsonlint_a_handy_json_validator_and_reformatter.json</a>
+                        </p>
+                        <p>
+                            You can also provide JSON to lint in the URL if you link to JSON Lint with the "json" parameter. <a href="http://www.jsonlint.com?json=%7B%22hello%22%3A%20%22world%22%7D">Here's an example URL to test.</a>
+                        </p>
+                        <p>
+                            Additionally, <a href="http://www.jsonlint.com/?reformat=compress">JSON Lint can also be used as a json compressor if you add ?reformat=compress to the URL.</a>
+                        </p>
+                    </div>
+                    <h5>
+                        What are some common errors?
+                    </h5>
+                    <div>
+                        <dl>
+                            <dt>
+                                <code>Expecting 'STRING'</code>
+                            </dt>
+                            <dd>
+                                You probably have an extra comma at the end of your collection. Something like: <code>{ "a": "b"<span class="highlight">,</span> }</code>
+                            </dd>
+                            <dt>
+                                <code>Expecting 'STRING', 'NUMBER', 'NULL', 'TRUE', 'FALSE', '{', '['</code>
+                            </dt>
+                            <dd>
+                                You probably have an extra comma at the end of your list. Something like: <code>[ "a", "b"<span class="highlight">,</span> ]</code>
+                                <br />
+                                You also may have not enclosed your collection keys in quotes. Proper format for a collection is: <code>{ "key": "value" }</code>
+                            </dd>
+                        </dl>
+                        <p>
+                            Be sure to follow <a href="http://www.json.org/">JSON's syntax</a> properly. For example, <strong>always use double quotes, always quotify your keys, and remove all callback functions</strong>.
+                        </p>
+                    </div>
+                    <h5>
+                        A friend and I pasted the same JSON in and got different results. Wat do?
+                    </h5>
+                    <div>
+                        <p>
+                            If you and your friend are on different systems (Win/Unix), this is possible due to the way windows handles newlines. Essentially, if you have just newline characters (\n) in your JSON and paste it into JSONLint from a windows machine, it can validate it as valid erroneously since Windows may need a carriage return (\r) as well to detect newlines properly.
+                        </p>
+                        <p>
+                            The solution: Either use direct URL input, or make sure your content's newlines match the architecture your system expects!
+                        </p>
+                    </div>
+                    <h5>
+                        Who made this?
+                    </h5>
+                    <div>
+                        <p>
+                            <a href="http://www.umbrae.net/">Chris Dary</a> built this for the <a href="http://lab.arc90.com">Arc90 Lab</a>. Much is owed to the community (this uses <a href="https://github.com/zaach/jsonlint">Zach Conner's javascript Pure JS JSON parser</a>, for example).
+                        </p>
+                    </div>
+                    <h5>
+                        I've got feedback!
+                    </h5>
+                    <div>
+                        Great - hit us up at contact@arc90.com.
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script type="text/javascript">
+
+        var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+        document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+        </script><script type="text/javascript">
+	if (typeof _gat !== "undefined" ) {
+            var pageTracker = _gat._getTracker("UA-2118091-3");
+            pageTracker._initData();
+            pageTracker._trackPageview();
+	}
+        </script>
+    </body>
+</html>

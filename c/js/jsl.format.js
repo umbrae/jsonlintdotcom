@@ -20,42 +20,42 @@ jsl.format = (function () {
             inString    = false,
             currentChar = null;
 
-        for (i = 0, il = json.length; i < il; i += 1) { 
+        for (i = 0, il = json.length; i < il; i += 1) {
             currentChar = json.charAt(i);
 
             switch (currentChar) {
-            case '{': 
-            case '[': 
-                if (!inString) { 
+            case '{':
+            case '[':
+                if (!inString) {
                     newJson += currentChar + "\n" + repeat(tab, indentLevel + 1);
-                    indentLevel += 1; 
-                } else { 
-                    newJson += currentChar; 
+                    indentLevel += 1;
+                } else {
+                    newJson += currentChar;
                 }
-                break; 
-            case '}': 
-            case ']': 
-                if (!inString) { 
-                    indentLevel -= 1; 
-                    newJson += "\n" + repeat(tab, indentLevel) + currentChar; 
-                } else { 
-                    newJson += currentChar; 
-                } 
-                break; 
-            case ',': 
-                if (!inString) { 
-                    newJson += ",\n" + repeat(tab, indentLevel); 
-                } else { 
-                    newJson += currentChar; 
-                } 
-                break; 
-            case ':': 
-                if (!inString) { 
-                    newJson += ": "; 
-                } else { 
-                    newJson += currentChar; 
-                } 
-                break; 
+                break;
+            case '}':
+            case ']':
+                if (!inString) {
+                    indentLevel -= 1;
+                    newJson += "\n" + repeat(tab, indentLevel) + currentChar;
+                } else {
+                    newJson += currentChar;
+                }
+                break;
+            case ',':
+                if (!inString) {
+                    newJson += ",\n" + repeat(tab, indentLevel);
+                } else {
+                    newJson += currentChar;
+                }
+                break;
+            case ':':
+                if (!inString) {
+                    newJson += ": ";
+                } else {
+                    newJson += currentChar;
+                }
+                break;
             case ' ':
             case "\n":
             case "\t":
@@ -63,19 +63,19 @@ jsl.format = (function () {
                     newJson += currentChar;
                 }
                 break;
-            case '"': 
+            case '"':
                 if (i > 0 && json.charAt(i - 1) !== '\\') {
-                    inString = !inString; 
+                    inString = !inString;
                 }
-                newJson += currentChar; 
+                newJson += currentChar;
                 break;
-            default: 
-                newJson += currentChar; 
-                break;                    
-            } 
-        } 
+            default:
+                newJson += currentChar;
+                break;
+            }
+        }
 
-        return newJson; 
+        return newJson;
     }
 
     return { "formatJson": formatJson };

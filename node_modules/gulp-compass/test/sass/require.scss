@@ -1,0 +1,5 @@
+@import "susy";
+
+.page {
+  @include container;
+}

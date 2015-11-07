@@ -1,0 +1,19 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  vertical-align: top;
+}
+
+:root {
+    font-size: 14px;
+}
+
+body {
+  font-family: arial,sans-serif;
+  padding: 2rem;
+  font-family: proxima-nova,"Helvetica Neue",Helvetica,Roboto,Arial,sans-serif;
+  line-height: 2rem;
+}
+
+@import "a.css";
