@@ -876,6 +876,126 @@
 
 (function(__global) {
   var loader = $__System;
+  var hasOwnProperty = Object.prototype.hasOwnProperty;
+  var indexOf = Array.prototype.indexOf || function(item) {
+    for (var i = 0, l = this.length; i < l; i++)
+      if (this[i] === item)
+        return i;
+    return -1;
+  }
+
+  function readMemberExpression(p, value) {
+    var pParts = p.split('.');
+    while (pParts.length)
+      value = value[pParts.shift()];
+    return value;
+  }
+
+  // bare minimum ignores for IE8
+  var ignoredGlobalProps = ['_g', 'sessionStorage', 'localStorage', 'clipboardData', 'frames', 'external', 'mozAnimationStartTime', 'webkitStorageInfo', 'webkitIndexedDB'];
+
+  var globalSnapshot;
+
+  function forEachGlobal(callback) {
+    if (Object.keys)
+      Object.keys(__global).forEach(callback);
+    else
+      for (var g in __global) {
+        if (!hasOwnProperty.call(__global, g))
+          continue;
+        callback(g);
+      }
+  }
+
+  function forEachGlobalValue(callback) {
+    forEachGlobal(function(globalName) {
+      if (indexOf.call(ignoredGlobalProps, globalName) != -1)
+        return;
+      try {
+        var value = __global[globalName];
+      }
+      catch (e) {
+        ignoredGlobalProps.push(globalName);
+      }
+      callback(globalName, value);
+    });
+  }
+
+  loader.set('@@global-helpers', loader.newModule({
+    prepareGlobal: function(moduleName, exportName, globals) {
+      // disable module detection
+      var curDefine = __global.define;
+       
+      __global.define = undefined;
+      __global.exports = undefined;
+      if (__global.module && __global.module.exports)
+        __global.module = undefined;
+
+      // set globals
+      var oldGlobals;
+      if (globals) {
+        oldGlobals = {};
+        for (var g in globals) {
+          oldGlobals[g] = globals[g];
+          __global[g] = globals[g];
+        }
+      }
+
+      // store a complete copy of the global object in order to detect changes
+      if (!exportName) {
+        globalSnapshot = {};
+
+        forEachGlobalValue(function(name, value) {
+          globalSnapshot[name] = value;
+        });
+      }
+
+      // return function to retrieve global
+      return function() {
+        var globalValue;
+
+        if (exportName) {
+          globalValue = readMemberExpression(exportName, __global);
+        }
+        else {
+          var singleGlobal;
+          var multipleExports;
+          var exports = {};
+
+          forEachGlobalValue(function(name, value) {
+            if (globalSnapshot[name] === value)
+              return;
+            if (typeof value == 'undefined')
+              return;
+            exports[name] = value;
+
+            if (typeof singleGlobal != 'undefined') {
+              if (!multipleExports && singleGlobal !== value)
+                multipleExports = true;
+            }
+            else {
+              singleGlobal = value;
+            }
+          });
+          globalValue = multipleExports ? exports : singleGlobal;
+        }
+
+        // revert globals
+        if (oldGlobals) {
+          for (var g in oldGlobals)
+            __global[g] = oldGlobals[g];
+        }
+        __global.define = curDefine;
+
+        return globalValue;
+      };
+    }
+  }));
+
+})(typeof self != 'undefined' ? self : global);
+
+(function(__global) {
+  var loader = $__System;
   var indexOf = Array.prototype.indexOf || function(item) {
     for (var i = 0, l = this.length; i < l; i++)
       if (this[i] === item)
@@ -1099,11 +1219,2953 @@
 "bundle";
 (function() {
 var _removeDefine = $__System.get("@@amd-helpers").createDefine();
+(function() {
+  var acorn = {};
+  (function(exports) {
+    var nonASCIIwhitespace = /[\u1680\u180e\u2000-\u200a\u202f\u205f\u3000\ufeff]/;
+    var nonASCIIidentifierStartChars = "\xaa\xb5\xba\xc0-\xd6\xd8-\xf6\xf8-\u02c1\u02c6-\u02d1\u02e0-\u02e4\u02ec\u02ee\u0370-\u0374\u0376\u0377\u037a-\u037d\u0386\u0388-\u038a\u038c\u038e-\u03a1\u03a3-\u03f5\u03f7-\u0481\u048a-\u0527\u0531-\u0556\u0559\u0561-\u0587\u05d0-\u05ea\u05f0-\u05f2\u0620-\u064a\u066e\u066f\u0671-\u06d3\u06d5\u06e5\u06e6\u06ee\u06ef\u06fa-\u06fc\u06ff\u0710\u0712-\u072f\u074d-\u07a5\u07b1\u07ca-\u07ea\u07f4\u07f5\u07fa\u0800-\u0815\u081a\u0824\u0828\u0840-\u0858\u08a0\u08a2-\u08ac\u0904-\u0939\u093d\u0950\u0958-\u0961\u0971-\u0977\u0979-\u097f\u0985-\u098c\u098f\u0990\u0993-\u09a8\u09aa-\u09b0\u09b2\u09b6-\u09b9\u09bd\u09ce\u09dc\u09dd\u09df-\u09e1\u09f0\u09f1\u0a05-\u0a0a\u0a0f\u0a10\u0a13-\u0a28\u0a2a-\u0a30\u0a32\u0a33\u0a35\u0a36\u0a38\u0a39\u0a59-\u0a5c\u0a5e\u0a72-\u0a74\u0a85-\u0a8d\u0a8f-\u0a91\u0a93-\u0aa8\u0aaa-\u0ab0\u0ab2\u0ab3\u0ab5-\u0ab9\u0abd\u0ad0\u0ae0\u0ae1\u0b05-\u0b0c\u0b0f\u0b10\u0b13-\u0b28\u0b2a-\u0b30\u0b32\u0b33\u0b35-\u0b39\u0b3d\u0b5c\u0b5d\u0b5f-\u0b61\u0b71\u0b83\u0b85-\u0b8a\u0b8e-\u0b90\u0b92-\u0b95\u0b99\u0b9a\u0b9c\u0b9e\u0b9f\u0ba3\u0ba4\u0ba8-\u0baa\u0bae-\u0bb9\u0bd0\u0c05-\u0c0c\u0c0e-\u0c10\u0c12-\u0c28\u0c2a-\u0c33\u0c35-\u0c39\u0c3d\u0c58\u0c59\u0c60\u0c61\u0c85-\u0c8c\u0c8e-\u0c90\u0c92-\u0ca8\u0caa-\u0cb3\u0cb5-\u0cb9\u0cbd\u0cde\u0ce0\u0ce1\u0cf1\u0cf2\u0d05-\u0d0c\u0d0e-\u0d10\u0d12-\u0d3a\u0d3d\u0d4e\u0d60\u0d61\u0d7a-\u0d7f\u0d85-\u0d96\u0d9a-\u0db1\u0db3-\u0dbb\u0dbd\u0dc0-\u0dc6\u0e01-\u0e30\u0e32\u0e33\u0e40-\u0e46\u0e81\u0e82\u0e84\u0e87\u0e88\u0e8a\u0e8d\u0e94-\u0e97\u0e99-\u0e9f\u0ea1-\u0ea3\u0ea5\u0ea7\u0eaa\u0eab\u0ead-\u0eb0\u0eb2\u0eb3\u0ebd\u0ec0-\u0ec4\u0ec6\u0edc-\u0edf\u0f00\u0f40-\u0f47\u0f49-\u0f6c\u0f88-\u0f8c\u1000-\u102a\u103f\u1050-\u1055\u105a-\u105d\u1061\u1065\u1066\u106e-\u1070\u1075-\u1081\u108e\u10a0-\u10c5\u10c7\u10cd\u10d0-\u10fa\u10fc-\u1248\u124a-\u124d\u1250-\u1256\u1258\u125a-\u125d\u1260-\u1288\u128a-\u128d\u1290-\u12b0\u12b2-\u12b5\u12b8-\u12be\u12c0\u12c2-\u12c5\u12c8-\u12d6\u12d8-\u1310\u1312-\u1315\u1318-\u135a\u1380-\u138f\u13a0-\u13f4\u1401-\u166c\u166f-\u167f\u1681-\u169a\u16a0-\u16ea\u16ee-\u16f0\u1700-\u170c\u170e-\u1711\u1720-\u1731\u1740-\u1751\u1760-\u176c\u176e-\u1770\u1780-\u17b3\u17d7\u17dc\u1820-\u1877\u1880-\u18a8\u18aa\u18b0-\u18f5\u1900-\u191c\u1950-\u196d\u1970-\u1974\u1980-\u19ab\u19c1-\u19c7\u1a00-\u1a16\u1a20-\u1a54\u1aa7\u1b05-\u1b33\u1b45-\u1b4b\u1b83-\u1ba0\u1bae\u1baf\u1bba-\u1be5\u1c00-\u1c23\u1c4d-\u1c4f\u1c5a-\u1c7d\u1ce9-\u1cec\u1cee-\u1cf1\u1cf5\u1cf6\u1d00-\u1dbf\u1e00-\u1f15\u1f18-\u1f1d\u1f20-\u1f45\u1f48-\u1f4d\u1f50-\u1f57\u1f59\u1f5b\u1f5d\u1f5f-\u1f7d\u1f80-\u1fb4\u1fb6-\u1fbc\u1fbe\u1fc2-\u1fc4\u1fc6-\u1fcc\u1fd0-\u1fd3\u1fd6-\u1fdb\u1fe0-\u1fec\u1ff2-\u1ff4\u1ff6-\u1ffc\u2071\u207f\u2090-\u209c\u2102\u2107\u210a-\u2113\u2115\u2119-\u211d\u2124\u2126\u2128\u212a-\u212d\u212f-\u2139\u213c-\u213f\u2145-\u2149\u214e\u2160-\u2188\u2c00-\u2c2e\u2c30-\u2c5e\u2c60-\u2ce4\u2ceb-\u2cee\u2cf2\u2cf3\u2d00-\u2d25\u2d27\u2d2d\u2d30-\u2d67\u2d6f\u2d80-\u2d96\u2da0-\u2da6\u2da8-\u2dae\u2db0-\u2db6\u2db8-\u2dbe\u2dc0-\u2dc6\u2dc8-\u2dce\u2dd0-\u2dd6\u2dd8-\u2dde\u2e2f\u3005-\u3007\u3021-\u3029\u3031-\u3035\u3038-\u303c\u3041-\u3096\u309d-\u309f\u30a1-\u30fa\u30fc-\u30ff\u3105-\u312d\u3131-\u318e\u31a0-\u31ba\u31f0-\u31ff\u3400-\u4db5\u4e00-\u9fcc\ua000-\ua48c\ua4d0-\ua4fd\ua500-\ua60c\ua610-\ua61f\ua62a\ua62b\ua640-\ua66e\ua67f-\ua697\ua6a0-\ua6ef\ua717-\ua71f\ua722-\ua788\ua78b-\ua78e\ua790-\ua793\ua7a0-\ua7aa\ua7f8-\ua801\ua803-\ua805\ua807-\ua80a\ua80c-\ua822\ua840-\ua873\ua882-\ua8b3\ua8f2-\ua8f7\ua8fb\ua90a-\ua925\ua930-\ua946\ua960-\ua97c\ua984-\ua9b2\ua9cf\uaa00-\uaa28\uaa40-\uaa42\uaa44-\uaa4b\uaa60-\uaa76\uaa7a\uaa80-\uaaaf\uaab1\uaab5\uaab6\uaab9-\uaabd\uaac0\uaac2\uaadb-\uaadd\uaae0-\uaaea\uaaf2-\uaaf4\uab01-\uab06\uab09-\uab0e\uab11-\uab16\uab20-\uab26\uab28-\uab2e\uabc0-\uabe2\uac00-\ud7a3\ud7b0-\ud7c6\ud7cb-\ud7fb\uf900-\ufa6d\ufa70-\ufad9\ufb00-\ufb06\ufb13-\ufb17\ufb1d\ufb1f-\ufb28\ufb2a-\ufb36\ufb38-\ufb3c\ufb3e\ufb40\ufb41\ufb43\ufb44\ufb46-\ufbb1\ufbd3-\ufd3d\ufd50-\ufd8f\ufd92-\ufdc7\ufdf0-\ufdfb\ufe70-\ufe74\ufe76-\ufefc\uff21-\uff3a\uff41-\uff5a\uff66-\uffbe\uffc2-\uffc7\uffca-\uffcf\uffd2-\uffd7\uffda-\uffdc";
+    var nonASCIIidentifierChars = "\u0300-\u036f\u0483-\u0487\u0591-\u05bd\u05bf\u05c1\u05c2\u05c4\u05c5\u05c7\u0610-\u061a\u0620-\u0649\u0672-\u06d3\u06e7-\u06e8\u06fb-\u06fc\u0730-\u074a\u0800-\u0814\u081b-\u0823\u0825-\u0827\u0829-\u082d\u0840-\u0857\u08e4-\u08fe\u0900-\u0903\u093a-\u093c\u093e-\u094f\u0951-\u0957\u0962-\u0963\u0966-\u096f\u0981-\u0983\u09bc\u09be-\u09c4\u09c7\u09c8\u09d7\u09df-\u09e0\u0a01-\u0a03\u0a3c\u0a3e-\u0a42\u0a47\u0a48\u0a4b-\u0a4d\u0a51\u0a66-\u0a71\u0a75\u0a81-\u0a83\u0abc\u0abe-\u0ac5\u0ac7-\u0ac9\u0acb-\u0acd\u0ae2-\u0ae3\u0ae6-\u0aef\u0b01-\u0b03\u0b3c\u0b3e-\u0b44\u0b47\u0b48\u0b4b-\u0b4d\u0b56\u0b57\u0b5f-\u0b60\u0b66-\u0b6f\u0b82\u0bbe-\u0bc2\u0bc6-\u0bc8\u0bca-\u0bcd\u0bd7\u0be6-\u0bef\u0c01-\u0c03\u0c46-\u0c48\u0c4a-\u0c4d\u0c55\u0c56\u0c62-\u0c63\u0c66-\u0c6f\u0c82\u0c83\u0cbc\u0cbe-\u0cc4\u0cc6-\u0cc8\u0cca-\u0ccd\u0cd5\u0cd6\u0ce2-\u0ce3\u0ce6-\u0cef\u0d02\u0d03\u0d46-\u0d48\u0d57\u0d62-\u0d63\u0d66-\u0d6f\u0d82\u0d83\u0dca\u0dcf-\u0dd4\u0dd6\u0dd8-\u0ddf\u0df2\u0df3\u0e34-\u0e3a\u0e40-\u0e45\u0e50-\u0e59\u0eb4-\u0eb9\u0ec8-\u0ecd\u0ed0-\u0ed9\u0f18\u0f19\u0f20-\u0f29\u0f35\u0f37\u0f39\u0f41-\u0f47\u0f71-\u0f84\u0f86-\u0f87\u0f8d-\u0f97\u0f99-\u0fbc\u0fc6\u1000-\u1029\u1040-\u1049\u1067-\u106d\u1071-\u1074\u1082-\u108d\u108f-\u109d\u135d-\u135f\u170e-\u1710\u1720-\u1730\u1740-\u1750\u1772\u1773\u1780-\u17b2\u17dd\u17e0-\u17e9\u180b-\u180d\u1810-\u1819\u1920-\u192b\u1930-\u193b\u1951-\u196d\u19b0-\u19c0\u19c8-\u19c9\u19d0-\u19d9\u1a00-\u1a15\u1a20-\u1a53\u1a60-\u1a7c\u1a7f-\u1a89\u1a90-\u1a99\u1b46-\u1b4b\u1b50-\u1b59\u1b6b-\u1b73\u1bb0-\u1bb9\u1be6-\u1bf3\u1c00-\u1c22\u1c40-\u1c49\u1c5b-\u1c7d\u1cd0-\u1cd2\u1d00-\u1dbe\u1e01-\u1f15\u200c\u200d\u203f\u2040\u2054\u20d0-\u20dc\u20e1\u20e5-\u20f0\u2d81-\u2d96\u2de0-\u2dff\u3021-\u3028\u3099\u309a\ua640-\ua66d\ua674-\ua67d\ua69f\ua6f0-\ua6f1\ua7f8-\ua800\ua806\ua80b\ua823-\ua827\ua880-\ua881\ua8b4-\ua8c4\ua8d0-\ua8d9\ua8f3-\ua8f7\ua900-\ua909\ua926-\ua92d\ua930-\ua945\ua980-\ua983\ua9b3-\ua9c0\uaa00-\uaa27\uaa40-\uaa41\uaa4c-\uaa4d\uaa50-\uaa59\uaa7b\uaae0-\uaae9\uaaf2-\uaaf3\uabc0-\uabe1\uabec\uabed\uabf0-\uabf9\ufb20-\ufb28\ufe00-\ufe0f\ufe20-\ufe26\ufe33\ufe34\ufe4d-\ufe4f\uff10-\uff19\uff3f";
+    var nonASCIIidentifierStart = new RegExp("[" + nonASCIIidentifierStartChars + "]");
+    var nonASCIIidentifier = new RegExp("[" + nonASCIIidentifierStartChars + nonASCIIidentifierChars + "]");
+    var newline = exports.newline = /[\n\r\u2028\u2029]/;
+    var lineBreak = exports.lineBreak = /\r\n|[\n\r\u2028\u2029]/g;
+    var isIdentifierStart = exports.isIdentifierStart = function(code) {
+      if (code < 65)
+        return code === 36;
+      if (code < 91)
+        return true;
+      if (code < 97)
+        return code === 95;
+      if (code < 123)
+        return true;
+      return code >= 0xaa && nonASCIIidentifierStart.test(String.fromCharCode(code));
+    };
+    var isIdentifierChar = exports.isIdentifierChar = function(code) {
+      if (code < 48)
+        return code === 36;
+      if (code < 58)
+        return true;
+      if (code < 65)
+        return false;
+      if (code < 91)
+        return true;
+      if (code < 97)
+        return code === 95;
+      if (code < 123)
+        return true;
+      return code >= 0xaa && nonASCIIidentifier.test(String.fromCharCode(code));
+    };
+  })(acorn);
+  function in_array(what, arr) {
+    for (var i = 0; i < arr.length; i += 1) {
+      if (arr[i] === what) {
+        return true;
+      }
+    }
+    return false;
+  }
+  function trim(s) {
+    return s.replace(/^\s+|\s+$/g, '');
+  }
+  function ltrim(s) {
+    return s.replace(/^\s+/g, '');
+  }
+  function rtrim(s) {
+    return s.replace(/\s+$/g, '');
+  }
+  function js_beautify(js_source_text, options) {
+    "use strict";
+    var beautifier = new Beautifier(js_source_text, options);
+    return beautifier.beautify();
+  }
+  var MODE = {
+    BlockStatement: 'BlockStatement',
+    Statement: 'Statement',
+    ObjectLiteral: 'ObjectLiteral',
+    ArrayLiteral: 'ArrayLiteral',
+    ForInitializer: 'ForInitializer',
+    Conditional: 'Conditional',
+    Expression: 'Expression'
+  };
+  function Beautifier(js_source_text, options) {
+    "use strict";
+    var output;
+    var tokens = [],
+        token_pos;
+    var Tokenizer;
+    var current_token;
+    var last_type,
+        last_last_text,
+        indent_string;
+    var flags,
+        previous_flags,
+        flag_store;
+    var prefix;
+    var handlers,
+        opt;
+    var baseIndentString = '';
+    handlers = {
+      'TK_START_EXPR': handle_start_expr,
+      'TK_END_EXPR': handle_end_expr,
+      'TK_START_BLOCK': handle_start_block,
+      'TK_END_BLOCK': handle_end_block,
+      'TK_WORD': handle_word,
+      'TK_RESERVED': handle_word,
+      'TK_SEMICOLON': handle_semicolon,
+      'TK_STRING': handle_string,
+      'TK_EQUALS': handle_equals,
+      'TK_OPERATOR': handle_operator,
+      'TK_COMMA': handle_comma,
+      'TK_BLOCK_COMMENT': handle_block_comment,
+      'TK_COMMENT': handle_comment,
+      'TK_DOT': handle_dot,
+      'TK_UNKNOWN': handle_unknown,
+      'TK_EOF': handle_eof
+    };
+    function create_flags(flags_base, mode) {
+      var next_indent_level = 0;
+      if (flags_base) {
+        next_indent_level = flags_base.indentation_level;
+        if (!output.just_added_newline() && flags_base.line_indent_level > next_indent_level) {
+          next_indent_level = flags_base.line_indent_level;
+        }
+      }
+      var next_flags = {
+        mode: mode,
+        parent: flags_base,
+        last_text: flags_base ? flags_base.last_text : '',
+        last_word: flags_base ? flags_base.last_word : '',
+        declaration_statement: false,
+        declaration_assignment: false,
+        multiline_frame: false,
+        if_block: false,
+        else_block: false,
+        do_block: false,
+        do_while: false,
+        in_case_statement: false,
+        in_case: false,
+        case_body: false,
+        indentation_level: next_indent_level,
+        line_indent_level: flags_base ? flags_base.line_indent_level : next_indent_level,
+        start_line_index: output.get_line_number(),
+        ternary_depth: 0
+      };
+      return next_flags;
+    }
+    options = options ? options : {};
+    opt = {};
+    if (options.braces_on_own_line !== undefined) {
+      opt.brace_style = options.braces_on_own_line ? "expand" : "collapse";
+    }
+    opt.brace_style = options.brace_style ? options.brace_style : (opt.brace_style ? opt.brace_style : "collapse");
+    if (opt.brace_style === "expand-strict") {
+      opt.brace_style = "expand";
+    }
+    opt.indent_size = options.indent_size ? parseInt(options.indent_size, 10) : 4;
+    opt.indent_char = options.indent_char ? options.indent_char : ' ';
+    opt.eol = options.eol ? options.eol : '\n';
+    opt.preserve_newlines = (options.preserve_newlines === undefined) ? true : options.preserve_newlines;
+    opt.break_chained_methods = (options.break_chained_methods === undefined) ? false : options.break_chained_methods;
+    opt.max_preserve_newlines = (options.max_preserve_newlines === undefined) ? 0 : parseInt(options.max_preserve_newlines, 10);
+    opt.space_in_paren = (options.space_in_paren === undefined) ? false : options.space_in_paren;
+    opt.space_in_empty_paren = (options.space_in_empty_paren === undefined) ? false : options.space_in_empty_paren;
+    opt.jslint_happy = (options.jslint_happy === undefined) ? false : options.jslint_happy;
+    opt.space_after_anon_function = (options.space_after_anon_function === undefined) ? false : options.space_after_anon_function;
+    opt.keep_array_indentation = (options.keep_array_indentation === undefined) ? false : options.keep_array_indentation;
+    opt.space_before_conditional = (options.space_before_conditional === undefined) ? true : options.space_before_conditional;
+    opt.unescape_strings = (options.unescape_strings === undefined) ? false : options.unescape_strings;
+    opt.wrap_line_length = (options.wrap_line_length === undefined) ? 0 : parseInt(options.wrap_line_length, 10);
+    opt.e4x = (options.e4x === undefined) ? false : options.e4x;
+    opt.end_with_newline = (options.end_with_newline === undefined) ? false : options.end_with_newline;
+    opt.comma_first = (options.comma_first === undefined) ? false : options.comma_first;
+    opt.test_output_raw = (options.test_output_raw === undefined) ? false : options.test_output_raw;
+    if (opt.jslint_happy) {
+      opt.space_after_anon_function = true;
+    }
+    if (options.indent_with_tabs) {
+      opt.indent_char = '\t';
+      opt.indent_size = 1;
+    }
+    opt.eol = opt.eol.replace(/\\r/, '\r').replace(/\\n/, '\n');
+    indent_string = '';
+    while (opt.indent_size > 0) {
+      indent_string += opt.indent_char;
+      opt.indent_size -= 1;
+    }
+    var preindent_index = 0;
+    if (js_source_text && js_source_text.length) {
+      while ((js_source_text.charAt(preindent_index) === ' ' || js_source_text.charAt(preindent_index) === '\t')) {
+        baseIndentString += js_source_text.charAt(preindent_index);
+        preindent_index += 1;
+      }
+      js_source_text = js_source_text.substring(preindent_index);
+    }
+    last_type = 'TK_START_BLOCK';
+    last_last_text = '';
+    output = new Output(indent_string, baseIndentString);
+    output.raw = opt.test_output_raw;
+    flag_store = [];
+    set_mode(MODE.BlockStatement);
+    this.beautify = function() {
+      var local_token,
+          sweet_code;
+      Tokenizer = new tokenizer(js_source_text, opt, indent_string);
+      tokens = Tokenizer.tokenize();
+      token_pos = 0;
+      while (local_token = get_token()) {
+        for (var i = 0; i < local_token.comments_before.length; i++) {
+          handle_token(local_token.comments_before[i]);
+        }
+        handle_token(local_token);
+        last_last_text = flags.last_text;
+        last_type = local_token.type;
+        flags.last_text = local_token.text;
+        token_pos += 1;
+      }
+      sweet_code = output.get_code();
+      if (opt.end_with_newline) {
+        sweet_code += '\n';
+      }
+      if (opt.eol != '\n') {
+        sweet_code = sweet_code.replace(/[\n]/g, opt.eol);
+      }
+      return sweet_code;
+    };
+    function handle_token(local_token) {
+      var newlines = local_token.newlines;
+      var keep_whitespace = opt.keep_array_indentation && is_array(flags.mode);
+      if (keep_whitespace) {
+        for (i = 0; i < newlines; i += 1) {
+          print_newline(i > 0);
+        }
+      } else {
+        if (opt.max_preserve_newlines && newlines > opt.max_preserve_newlines) {
+          newlines = opt.max_preserve_newlines;
+        }
+        if (opt.preserve_newlines) {
+          if (local_token.newlines > 1) {
+            print_newline();
+            for (var i = 1; i < newlines; i += 1) {
+              print_newline(true);
+            }
+          }
+        }
+      }
+      current_token = local_token;
+      handlers[current_token.type]();
+    }
+    function split_newlines(s) {
+      s = s.replace(/\x0d/g, '');
+      var out = [],
+          idx = s.indexOf("\n");
+      while (idx !== -1) {
+        out.push(s.substring(0, idx));
+        s = s.substring(idx + 1);
+        idx = s.indexOf("\n");
+      }
+      if (s.length) {
+        out.push(s);
+      }
+      return out;
+    }
+    function allow_wrap_or_preserved_newline(force_linewrap) {
+      force_linewrap = (force_linewrap === undefined) ? false : force_linewrap;
+      if (output.just_added_newline()) {
+        return;
+      }
+      if ((opt.preserve_newlines && current_token.wanted_newline) || force_linewrap) {
+        print_newline(false, true);
+      } else if (opt.wrap_line_length) {
+        var proposed_line_length = output.current_line.get_character_count() + current_token.text.length + (output.space_before_token ? 1 : 0);
+        if (proposed_line_length >= opt.wrap_line_length) {
+          print_newline(false, true);
+        }
+      }
+    }
+    function print_newline(force_newline, preserve_statement_flags) {
+      if (!preserve_statement_flags) {
+        if (flags.last_text !== ';' && flags.last_text !== ',' && flags.last_text !== '=' && last_type !== 'TK_OPERATOR') {
+          while (flags.mode === MODE.Statement && !flags.if_block && !flags.do_block) {
+            restore_mode();
+          }
+        }
+      }
+      if (output.add_new_line(force_newline)) {
+        flags.multiline_frame = true;
+      }
+    }
+    function print_token_line_indentation() {
+      if (output.just_added_newline()) {
+        if (opt.keep_array_indentation && is_array(flags.mode) && current_token.wanted_newline) {
+          output.current_line.push(current_token.whitespace_before);
+          output.space_before_token = false;
+        } else if (output.set_indent(flags.indentation_level)) {
+          flags.line_indent_level = flags.indentation_level;
+        }
+      }
+    }
+    function print_token(printable_token) {
+      if (output.raw) {
+        output.add_raw_token(current_token);
+        return;
+      }
+      if (opt.comma_first && last_type === 'TK_COMMA' && output.just_added_newline()) {
+        if (output.previous_line.last() === ',') {
+          output.previous_line.pop();
+          print_token_line_indentation();
+          output.add_token(',');
+          output.space_before_token = true;
+        }
+      }
+      printable_token = printable_token || current_token.text;
+      print_token_line_indentation();
+      output.add_token(printable_token);
+    }
+    function indent() {
+      flags.indentation_level += 1;
+    }
+    function deindent() {
+      if (flags.indentation_level > 0 && ((!flags.parent) || flags.indentation_level > flags.parent.indentation_level))
+        flags.indentation_level -= 1;
+    }
+    function set_mode(mode) {
+      if (flags) {
+        flag_store.push(flags);
+        previous_flags = flags;
+      } else {
+        previous_flags = create_flags(null, mode);
+      }
+      flags = create_flags(previous_flags, mode);
+    }
+    function is_array(mode) {
+      return mode === MODE.ArrayLiteral;
+    }
+    function is_expression(mode) {
+      return in_array(mode, [MODE.Expression, MODE.ForInitializer, MODE.Conditional]);
+    }
+    function restore_mode() {
+      if (flag_store.length > 0) {
+        previous_flags = flags;
+        flags = flag_store.pop();
+        if (previous_flags.mode === MODE.Statement) {
+          output.remove_redundant_indentation(previous_flags);
+        }
+      }
+    }
+    function start_of_object_property() {
+      return flags.parent.mode === MODE.ObjectLiteral && flags.mode === MODE.Statement && ((flags.last_text === ':' && flags.ternary_depth === 0) || (last_type === 'TK_RESERVED' && in_array(flags.last_text, ['get', 'set'])));
+    }
+    function start_of_statement() {
+      if ((last_type === 'TK_RESERVED' && in_array(flags.last_text, ['var', 'let', 'const']) && current_token.type === 'TK_WORD') || (last_type === 'TK_RESERVED' && flags.last_text === 'do') || (last_type === 'TK_RESERVED' && flags.last_text === 'return' && !current_token.wanted_newline) || (last_type === 'TK_RESERVED' && flags.last_text === 'else' && !(current_token.type === 'TK_RESERVED' && current_token.text === 'if')) || (last_type === 'TK_END_EXPR' && (previous_flags.mode === MODE.ForInitializer || previous_flags.mode === MODE.Conditional)) || (last_type === 'TK_WORD' && flags.mode === MODE.BlockStatement && !flags.in_case && !(current_token.text === '--' || current_token.text === '++') && last_last_text !== 'function' && current_token.type !== 'TK_WORD' && current_token.type !== 'TK_RESERVED') || (flags.mode === MODE.ObjectLiteral && ((flags.last_text === ':' && flags.ternary_depth === 0) || (last_type === 'TK_RESERVED' && in_array(flags.last_text, ['get', 'set']))))) {
+        set_mode(MODE.Statement);
+        indent();
+        if (last_type === 'TK_RESERVED' && in_array(flags.last_text, ['var', 'let', 'const']) && current_token.type === 'TK_WORD') {
+          flags.declaration_statement = true;
+        }
+        if (!start_of_object_property()) {
+          allow_wrap_or_preserved_newline(current_token.type === 'TK_RESERVED' && in_array(current_token.text, ['do', 'for', 'if', 'while']));
+        }
+        return true;
+      }
+      return false;
+    }
+    function all_lines_start_with(lines, c) {
+      for (var i = 0; i < lines.length; i++) {
+        var line = trim(lines[i]);
+        if (line.charAt(0) !== c) {
+          return false;
+        }
+      }
+      return true;
+    }
+    function each_line_matches_indent(lines, indent) {
+      var i = 0,
+          len = lines.length,
+          line;
+      for (; i < len; i++) {
+        line = lines[i];
+        if (line && line.indexOf(indent) !== 0) {
+          return false;
+        }
+      }
+      return true;
+    }
+    function is_special_word(word) {
+      return in_array(word, ['case', 'return', 'do', 'if', 'throw', 'else']);
+    }
+    function get_token(offset) {
+      var index = token_pos + (offset || 0);
+      return (index < 0 || index >= tokens.length) ? null : tokens[index];
+    }
+    function handle_start_expr() {
+      if (start_of_statement()) {}
+      var next_mode = MODE.Expression;
+      if (current_token.text === '[') {
+        if (last_type === 'TK_WORD' || flags.last_text === ')') {
+          if (last_type === 'TK_RESERVED' && in_array(flags.last_text, Tokenizer.line_starters)) {
+            output.space_before_token = true;
+          }
+          set_mode(next_mode);
+          print_token();
+          indent();
+          if (opt.space_in_paren) {
+            output.space_before_token = true;
+          }
+          return;
+        }
+        next_mode = MODE.ArrayLiteral;
+        if (is_array(flags.mode)) {
+          if (flags.last_text === '[' || (flags.last_text === ',' && (last_last_text === ']' || last_last_text === '}'))) {
+            if (!opt.keep_array_indentation) {
+              print_newline();
+            }
+          }
+        }
+      } else {
+        if (last_type === 'TK_RESERVED' && flags.last_text === 'for') {
+          next_mode = MODE.ForInitializer;
+        } else if (last_type === 'TK_RESERVED' && in_array(flags.last_text, ['if', 'while'])) {
+          next_mode = MODE.Conditional;
+        } else {}
+      }
+      if (flags.last_text === ';' || last_type === 'TK_START_BLOCK') {
+        print_newline();
+      } else if (last_type === 'TK_END_EXPR' || last_type === 'TK_START_EXPR' || last_type === 'TK_END_BLOCK' || flags.last_text === '.') {
+        allow_wrap_or_preserved_newline(current_token.wanted_newline);
+      } else if (!(last_type === 'TK_RESERVED' && current_token.text === '(') && last_type !== 'TK_WORD' && last_type !== 'TK_OPERATOR') {
+        output.space_before_token = true;
+      } else if ((last_type === 'TK_RESERVED' && (flags.last_word === 'function' || flags.last_word === 'typeof')) || (flags.last_text === '*' && last_last_text === 'function')) {
+        if (opt.space_after_anon_function) {
+          output.space_before_token = true;
+        }
+      } else if (last_type === 'TK_RESERVED' && (in_array(flags.last_text, Tokenizer.line_starters) || flags.last_text === 'catch')) {
+        if (opt.space_before_conditional) {
+          output.space_before_token = true;
+        }
+      }
+      if (current_token.text === '(' && last_type === 'TK_RESERVED' && flags.last_word === 'await') {
+        output.space_before_token = true;
+      }
+      if (current_token.text === '(') {
+        if (last_type === 'TK_EQUALS' || last_type === 'TK_OPERATOR') {
+          if (!start_of_object_property()) {
+            allow_wrap_or_preserved_newline();
+          }
+        }
+      }
+      set_mode(next_mode);
+      print_token();
+      if (opt.space_in_paren) {
+        output.space_before_token = true;
+      }
+      indent();
+    }
+    function handle_end_expr() {
+      while (flags.mode === MODE.Statement) {
+        restore_mode();
+      }
+      if (flags.multiline_frame) {
+        allow_wrap_or_preserved_newline(current_token.text === ']' && is_array(flags.mode) && !opt.keep_array_indentation);
+      }
+      if (opt.space_in_paren) {
+        if (last_type === 'TK_START_EXPR' && !opt.space_in_empty_paren) {
+          output.trim();
+          output.space_before_token = false;
+        } else {
+          output.space_before_token = true;
+        }
+      }
+      if (current_token.text === ']' && opt.keep_array_indentation) {
+        print_token();
+        restore_mode();
+      } else {
+        restore_mode();
+        print_token();
+      }
+      output.remove_redundant_indentation(previous_flags);
+      if (flags.do_while && previous_flags.mode === MODE.Conditional) {
+        previous_flags.mode = MODE.Expression;
+        flags.do_block = false;
+        flags.do_while = false;
+      }
+    }
+    function handle_start_block() {
+      var next_token = get_token(1);
+      var second_token = get_token(2);
+      if (second_token && ((second_token.text === ':' && in_array(next_token.type, ['TK_STRING', 'TK_WORD', 'TK_RESERVED'])) || (in_array(next_token.text, ['get', 'set']) && in_array(second_token.type, ['TK_WORD', 'TK_RESERVED'])))) {
+        if (!in_array(last_last_text, ['class', 'interface'])) {
+          set_mode(MODE.ObjectLiteral);
+        } else {
+          set_mode(MODE.BlockStatement);
+        }
+      } else {
+        set_mode(MODE.BlockStatement);
+      }
+      var empty_braces = !next_token.comments_before.length && next_token.text === '}';
+      var empty_anonymous_function = empty_braces && flags.last_word === 'function' && last_type === 'TK_END_EXPR';
+      if (opt.brace_style === "expand" || (opt.brace_style === "none" && current_token.wanted_newline)) {
+        if (last_type !== 'TK_OPERATOR' && (empty_anonymous_function || last_type === 'TK_EQUALS' || (last_type === 'TK_RESERVED' && is_special_word(flags.last_text) && flags.last_text !== 'else'))) {
+          output.space_before_token = true;
+        } else {
+          print_newline(false, true);
+        }
+      } else {
+        if (last_type !== 'TK_OPERATOR' && last_type !== 'TK_START_EXPR') {
+          if (last_type === 'TK_START_BLOCK') {
+            print_newline();
+          } else {
+            output.space_before_token = true;
+          }
+        } else {
+          if (is_array(previous_flags.mode) && flags.last_text === ',') {
+            if (last_last_text === '}') {
+              output.space_before_token = true;
+            } else {
+              print_newline();
+            }
+          }
+        }
+      }
+      print_token();
+      indent();
+    }
+    function handle_end_block() {
+      while (flags.mode === MODE.Statement) {
+        restore_mode();
+      }
+      var empty_braces = last_type === 'TK_START_BLOCK';
+      if (opt.brace_style === "expand") {
+        if (!empty_braces) {
+          print_newline();
+        }
+      } else {
+        if (!empty_braces) {
+          if (is_array(flags.mode) && opt.keep_array_indentation) {
+            opt.keep_array_indentation = false;
+            print_newline();
+            opt.keep_array_indentation = true;
+          } else {
+            print_newline();
+          }
+        }
+      }
+      restore_mode();
+      print_token();
+    }
+    function handle_word() {
+      if (current_token.type === 'TK_RESERVED' && flags.mode !== MODE.ObjectLiteral && in_array(current_token.text, ['set', 'get'])) {
+        current_token.type = 'TK_WORD';
+      }
+      if (current_token.type === 'TK_RESERVED' && flags.mode === MODE.ObjectLiteral) {
+        var next_token = get_token(1);
+        if (next_token.text == ':') {
+          current_token.type = 'TK_WORD';
+        }
+      }
+      if (start_of_statement()) {} else if (current_token.wanted_newline && !is_expression(flags.mode) && (last_type !== 'TK_OPERATOR' || (flags.last_text === '--' || flags.last_text === '++')) && last_type !== 'TK_EQUALS' && (opt.preserve_newlines || !(last_type === 'TK_RESERVED' && in_array(flags.last_text, ['var', 'let', 'const', 'set', 'get'])))) {
+        print_newline();
+      }
+      if (flags.do_block && !flags.do_while) {
+        if (current_token.type === 'TK_RESERVED' && current_token.text === 'while') {
+          output.space_before_token = true;
+          print_token();
+          output.space_before_token = true;
+          flags.do_while = true;
+          return;
+        } else {
+          print_newline();
+          flags.do_block = false;
+        }
+      }
+      if (flags.if_block) {
+        if (!flags.else_block && (current_token.type === 'TK_RESERVED' && current_token.text === 'else')) {
+          flags.else_block = true;
+        } else {
+          while (flags.mode === MODE.Statement) {
+            restore_mode();
+          }
+          flags.if_block = false;
+          flags.else_block = false;
+        }
+      }
+      if (current_token.type === 'TK_RESERVED' && (current_token.text === 'case' || (current_token.text === 'default' && flags.in_case_statement))) {
+        print_newline();
+        if (flags.case_body || opt.jslint_happy) {
+          deindent();
+          flags.case_body = false;
+        }
+        print_token();
+        flags.in_case = true;
+        flags.in_case_statement = true;
+        return;
+      }
+      if (current_token.type === 'TK_RESERVED' && current_token.text === 'function') {
+        if (in_array(flags.last_text, ['}', ';']) || (output.just_added_newline() && !in_array(flags.last_text, ['[', '{', ':', '=', ',']))) {
+          if (!output.just_added_blankline() && !current_token.comments_before.length) {
+            print_newline();
+            print_newline(true);
+          }
+        }
+        if (last_type === 'TK_RESERVED' || last_type === 'TK_WORD') {
+          if (last_type === 'TK_RESERVED' && in_array(flags.last_text, ['get', 'set', 'new', 'return', 'export', 'async'])) {
+            output.space_before_token = true;
+          } else if (last_type === 'TK_RESERVED' && flags.last_text === 'default' && last_last_text === 'export') {
+            output.space_before_token = true;
+          } else {
+            print_newline();
+          }
+        } else if (last_type === 'TK_OPERATOR' || flags.last_text === '=') {
+          output.space_before_token = true;
+        } else if (!flags.multiline_frame && (is_expression(flags.mode) || is_array(flags.mode))) {} else {
+          print_newline();
+        }
+      }
+      if (last_type === 'TK_COMMA' || last_type === 'TK_START_EXPR' || last_type === 'TK_EQUALS' || last_type === 'TK_OPERATOR') {
+        if (!start_of_object_property()) {
+          allow_wrap_or_preserved_newline();
+        }
+      }
+      if (current_token.type === 'TK_RESERVED' && in_array(current_token.text, ['function', 'get', 'set'])) {
+        print_token();
+        flags.last_word = current_token.text;
+        return;
+      }
+      prefix = 'NONE';
+      if (last_type === 'TK_END_BLOCK') {
+        if (!(current_token.type === 'TK_RESERVED' && in_array(current_token.text, ['else', 'catch', 'finally']))) {
+          prefix = 'NEWLINE';
+        } else {
+          if (opt.brace_style === "expand" || opt.brace_style === "end-expand" || (opt.brace_style === "none" && current_token.wanted_newline)) {
+            prefix = 'NEWLINE';
+          } else {
+            prefix = 'SPACE';
+            output.space_before_token = true;
+          }
+        }
+      } else if (last_type === 'TK_SEMICOLON' && flags.mode === MODE.BlockStatement) {
+        prefix = 'NEWLINE';
+      } else if (last_type === 'TK_SEMICOLON' && is_expression(flags.mode)) {
+        prefix = 'SPACE';
+      } else if (last_type === 'TK_STRING') {
+        prefix = 'NEWLINE';
+      } else if (last_type === 'TK_RESERVED' || last_type === 'TK_WORD' || (flags.last_text === '*' && last_last_text === 'function')) {
+        prefix = 'SPACE';
+      } else if (last_type === 'TK_START_BLOCK') {
+        prefix = 'NEWLINE';
+      } else if (last_type === 'TK_END_EXPR') {
+        output.space_before_token = true;
+        prefix = 'NEWLINE';
+      }
+      if (current_token.type === 'TK_RESERVED' && in_array(current_token.text, Tokenizer.line_starters) && flags.last_text !== ')') {
+        if (flags.last_text === 'else' || flags.last_text === 'export') {
+          prefix = 'SPACE';
+        } else {
+          prefix = 'NEWLINE';
+        }
+      }
+      if (current_token.type === 'TK_RESERVED' && in_array(current_token.text, ['else', 'catch', 'finally'])) {
+        if (last_type !== 'TK_END_BLOCK' || opt.brace_style === "expand" || opt.brace_style === "end-expand" || (opt.brace_style === "none" && current_token.wanted_newline)) {
+          print_newline();
+        } else {
+          output.trim(true);
+          var line = output.current_line;
+          if (line.last() !== '}') {
+            print_newline();
+          }
+          output.space_before_token = true;
+        }
+      } else if (prefix === 'NEWLINE') {
+        if (last_type === 'TK_RESERVED' && is_special_word(flags.last_text)) {
+          output.space_before_token = true;
+        } else if (last_type !== 'TK_END_EXPR') {
+          if ((last_type !== 'TK_START_EXPR' || !(current_token.type === 'TK_RESERVED' && in_array(current_token.text, ['var', 'let', 'const']))) && flags.last_text !== ':') {
+            if (current_token.type === 'TK_RESERVED' && current_token.text === 'if' && flags.last_text === 'else') {
+              output.space_before_token = true;
+            } else {
+              print_newline();
+            }
+          }
+        } else if (current_token.type === 'TK_RESERVED' && in_array(current_token.text, Tokenizer.line_starters) && flags.last_text !== ')') {
+          print_newline();
+        }
+      } else if (flags.multiline_frame && is_array(flags.mode) && flags.last_text === ',' && last_last_text === '}') {
+        print_newline();
+      } else if (prefix === 'SPACE') {
+        output.space_before_token = true;
+      }
+      print_token();
+      flags.last_word = current_token.text;
+      if (current_token.type === 'TK_RESERVED' && current_token.text === 'do') {
+        flags.do_block = true;
+      }
+      if (current_token.type === 'TK_RESERVED' && current_token.text === 'if') {
+        flags.if_block = true;
+      }
+    }
+    function handle_semicolon() {
+      if (start_of_statement()) {
+        output.space_before_token = false;
+      }
+      while (flags.mode === MODE.Statement && !flags.if_block && !flags.do_block) {
+        restore_mode();
+      }
+      print_token();
+    }
+    function handle_string() {
+      if (start_of_statement()) {
+        output.space_before_token = true;
+      } else if (last_type === 'TK_RESERVED' || last_type === 'TK_WORD') {
+        output.space_before_token = true;
+      } else if (last_type === 'TK_COMMA' || last_type === 'TK_START_EXPR' || last_type === 'TK_EQUALS' || last_type === 'TK_OPERATOR') {
+        if (!start_of_object_property()) {
+          allow_wrap_or_preserved_newline();
+        }
+      } else {
+        print_newline();
+      }
+      print_token();
+    }
+    function handle_equals() {
+      if (start_of_statement()) {}
+      if (flags.declaration_statement) {
+        flags.declaration_assignment = true;
+      }
+      output.space_before_token = true;
+      print_token();
+      output.space_before_token = true;
+    }
+    function handle_comma() {
+      if (flags.declaration_statement) {
+        if (is_expression(flags.parent.mode)) {
+          flags.declaration_assignment = false;
+        }
+        print_token();
+        if (flags.declaration_assignment) {
+          flags.declaration_assignment = false;
+          print_newline(false, true);
+        } else {
+          output.space_before_token = true;
+          if (opt.comma_first) {
+            allow_wrap_or_preserved_newline();
+          }
+        }
+        return;
+      }
+      print_token();
+      if (flags.mode === MODE.ObjectLiteral || (flags.mode === MODE.Statement && flags.parent.mode === MODE.ObjectLiteral)) {
+        if (flags.mode === MODE.Statement) {
+          restore_mode();
+        }
+        print_newline();
+      } else {
+        output.space_before_token = true;
+        if (opt.comma_first) {
+          allow_wrap_or_preserved_newline();
+        }
+      }
+    }
+    function handle_operator() {
+      if (start_of_statement()) {}
+      if (last_type === 'TK_RESERVED' && is_special_word(flags.last_text)) {
+        output.space_before_token = true;
+        print_token();
+        return;
+      }
+      if (current_token.text === '*' && last_type === 'TK_DOT') {
+        print_token();
+        return;
+      }
+      if (current_token.text === ':' && flags.in_case) {
+        flags.case_body = true;
+        indent();
+        print_token();
+        print_newline();
+        flags.in_case = false;
+        return;
+      }
+      if (current_token.text === '::') {
+        print_token();
+        return;
+      }
+      if (last_type === 'TK_OPERATOR') {
+        allow_wrap_or_preserved_newline();
+      }
+      var space_before = true;
+      var space_after = true;
+      if (in_array(current_token.text, ['--', '++', '!', '~']) || (in_array(current_token.text, ['-', '+']) && (in_array(last_type, ['TK_START_BLOCK', 'TK_START_EXPR', 'TK_EQUALS', 'TK_OPERATOR']) || in_array(flags.last_text, Tokenizer.line_starters) || flags.last_text === ','))) {
+        space_before = false;
+        space_after = false;
+        if (current_token.wanted_newline && (current_token.text === '--' || current_token.text === '++')) {
+          print_newline(false, true);
+        }
+        if (flags.last_text === ';' && is_expression(flags.mode)) {
+          space_before = true;
+        }
+        if (last_type === 'TK_RESERVED') {
+          space_before = true;
+        } else if (last_type === 'TK_END_EXPR') {
+          space_before = !(flags.last_text === ']' && (current_token.text === '--' || current_token.text === '++'));
+        } else if (last_type === 'TK_OPERATOR') {
+          space_before = in_array(current_token.text, ['--', '-', '++', '+']) && in_array(flags.last_text, ['--', '-', '++', '+']);
+          if (in_array(current_token.text, ['+', '-']) && in_array(flags.last_text, ['--', '++'])) {
+            space_after = true;
+          }
+        }
+        if ((flags.mode === MODE.BlockStatement || flags.mode === MODE.Statement) && (flags.last_text === '{' || flags.last_text === ';')) {
+          print_newline();
+        }
+      } else if (current_token.text === ':') {
+        if (flags.ternary_depth === 0) {
+          space_before = false;
+        } else {
+          flags.ternary_depth -= 1;
+        }
+      } else if (current_token.text === '?') {
+        flags.ternary_depth += 1;
+      } else if (current_token.text === '*' && last_type === 'TK_RESERVED' && flags.last_text === 'function') {
+        space_before = false;
+        space_after = false;
+      }
+      output.space_before_token = output.space_before_token || space_before;
+      print_token();
+      output.space_before_token = space_after;
+    }
+    function handle_block_comment() {
+      if (output.raw) {
+        output.add_raw_token(current_token);
+        if (current_token.directives && current_token.directives['preserve'] === 'end') {
+          if (!opt.test_output_raw) {
+            output.raw = false;
+          }
+        }
+        return;
+      }
+      if (current_token.directives) {
+        print_newline(false, true);
+        print_token();
+        if (current_token.directives['preserve'] === 'start') {
+          output.raw = true;
+        }
+        print_newline(false, true);
+        return;
+      }
+      if (!acorn.newline.test(current_token.text) && !current_token.wanted_newline) {
+        output.space_before_token = true;
+        print_token();
+        output.space_before_token = true;
+        return;
+      }
+      var lines = split_newlines(current_token.text);
+      var j;
+      var javadoc = false;
+      var starless = false;
+      var lastIndent = current_token.whitespace_before;
+      var lastIndentLength = lastIndent.length;
+      print_newline(false, true);
+      if (lines.length > 1) {
+        if (all_lines_start_with(lines.slice(1), '*')) {
+          javadoc = true;
+        } else if (each_line_matches_indent(lines.slice(1), lastIndent)) {
+          starless = true;
+        }
+      }
+      print_token(lines[0]);
+      for (j = 1; j < lines.length; j++) {
+        print_newline(false, true);
+        if (javadoc) {
+          print_token(' ' + ltrim(lines[j]));
+        } else if (starless && lines[j].length > lastIndentLength) {
+          print_token(lines[j].substring(lastIndentLength));
+        } else {
+          output.add_token(lines[j]);
+        }
+      }
+      print_newline(false, true);
+    }
+    function handle_comment() {
+      if (current_token.wanted_newline) {
+        print_newline(false, true);
+      } else {
+        output.trim(true);
+      }
+      output.space_before_token = true;
+      print_token();
+      print_newline(false, true);
+    }
+    function handle_dot() {
+      if (start_of_statement()) {}
+      if (last_type === 'TK_RESERVED' && is_special_word(flags.last_text)) {
+        output.space_before_token = true;
+      } else {
+        allow_wrap_or_preserved_newline(flags.last_text === ')' && opt.break_chained_methods);
+      }
+      print_token();
+    }
+    function handle_unknown() {
+      print_token();
+      if (current_token.text[current_token.text.length - 1] === '\n') {
+        print_newline();
+      }
+    }
+    function handle_eof() {
+      while (flags.mode === MODE.Statement) {
+        restore_mode();
+      }
+    }
+  }
+  function OutputLine(parent) {
+    var _character_count = 0;
+    var _indent_count = -1;
+    var _items = [];
+    var _empty = true;
+    this.set_indent = function(level) {
+      _character_count = parent.baseIndentLength + level * parent.indent_length;
+      _indent_count = level;
+    };
+    this.get_character_count = function() {
+      return _character_count;
+    };
+    this.is_empty = function() {
+      return _empty;
+    };
+    this.last = function() {
+      if (!this._empty) {
+        return _items[_items.length - 1];
+      } else {
+        return null;
+      }
+    };
+    this.push = function(input) {
+      _items.push(input);
+      _character_count += input.length;
+      _empty = false;
+    };
+    this.pop = function() {
+      var item = null;
+      if (!_empty) {
+        item = _items.pop();
+        _character_count -= item.length;
+        _empty = _items.length === 0;
+      }
+      return item;
+    };
+    this.remove_indent = function() {
+      if (_indent_count > 0) {
+        _indent_count -= 1;
+        _character_count -= parent.indent_length;
+      }
+    };
+    this.trim = function() {
+      while (this.last() === ' ') {
+        var item = _items.pop();
+        _character_count -= 1;
+      }
+      _empty = _items.length === 0;
+    };
+    this.toString = function() {
+      var result = '';
+      if (!this._empty) {
+        if (_indent_count >= 0) {
+          result = parent.indent_cache[_indent_count];
+        }
+        result += _items.join('');
+      }
+      return result;
+    };
+  }
+  function Output(indent_string, baseIndentString) {
+    baseIndentString = baseIndentString || '';
+    this.indent_cache = [baseIndentString];
+    this.baseIndentLength = baseIndentString.length;
+    this.indent_length = indent_string.length;
+    this.raw = false;
+    var lines = [];
+    this.baseIndentString = baseIndentString;
+    this.indent_string = indent_string;
+    this.previous_line = null;
+    this.current_line = null;
+    this.space_before_token = false;
+    this.add_outputline = function() {
+      this.previous_line = this.current_line;
+      this.current_line = new OutputLine(this);
+      lines.push(this.current_line);
+    };
+    this.add_outputline();
+    this.get_line_number = function() {
+      return lines.length;
+    };
+    this.add_new_line = function(force_newline) {
+      if (this.get_line_number() === 1 && this.just_added_newline()) {
+        return false;
+      }
+      if (force_newline || !this.just_added_newline()) {
+        if (!this.raw) {
+          this.add_outputline();
+        }
+        return true;
+      }
+      return false;
+    };
+    this.get_code = function() {
+      var sweet_code = lines.join('\n').replace(/[\r\n\t ]+$/, '');
+      return sweet_code;
+    };
+    this.set_indent = function(level) {
+      if (lines.length > 1) {
+        while (level >= this.indent_cache.length) {
+          this.indent_cache.push(this.indent_cache[this.indent_cache.length - 1] + this.indent_string);
+        }
+        this.current_line.set_indent(level);
+        return true;
+      }
+      this.current_line.set_indent(0);
+      return false;
+    };
+    this.add_raw_token = function(token) {
+      for (var x = 0; x < token.newlines; x++) {
+        this.add_outputline();
+      }
+      this.current_line.push(token.whitespace_before);
+      this.current_line.push(token.text);
+      this.space_before_token = false;
+    };
+    this.add_token = function(printable_token) {
+      this.add_space_before_token();
+      this.current_line.push(printable_token);
+    };
+    this.add_space_before_token = function() {
+      if (this.space_before_token && !this.just_added_newline()) {
+        this.current_line.push(' ');
+      }
+      this.space_before_token = false;
+    };
+    this.remove_redundant_indentation = function(frame) {
+      if (frame.multiline_frame || frame.mode === MODE.ForInitializer || frame.mode === MODE.Conditional) {
+        return;
+      }
+      var index = frame.start_line_index;
+      var line;
+      var output_length = lines.length;
+      while (index < output_length) {
+        lines[index].remove_indent();
+        index++;
+      }
+    };
+    this.trim = function(eat_newlines) {
+      eat_newlines = (eat_newlines === undefined) ? false : eat_newlines;
+      this.current_line.trim(indent_string, baseIndentString);
+      while (eat_newlines && lines.length > 1 && this.current_line.is_empty()) {
+        lines.pop();
+        this.current_line = lines[lines.length - 1];
+        this.current_line.trim();
+      }
+      this.previous_line = lines.length > 1 ? lines[lines.length - 2] : null;
+    };
+    this.just_added_newline = function() {
+      return this.current_line.is_empty();
+    };
+    this.just_added_blankline = function() {
+      if (this.just_added_newline()) {
+        if (lines.length === 1) {
+          return true;
+        }
+        var line = lines[lines.length - 2];
+        return line.is_empty();
+      }
+      return false;
+    };
+  }
+  var Token = function(type, text, newlines, whitespace_before, mode, parent) {
+    this.type = type;
+    this.text = text;
+    this.comments_before = [];
+    this.newlines = newlines || 0;
+    this.wanted_newline = newlines > 0;
+    this.whitespace_before = whitespace_before || '';
+    this.parent = null;
+    this.directives = null;
+  };
+  function tokenizer(input, opts, indent_string) {
+    var whitespace = "\n\r\t ".split('');
+    var digit = /[0-9]/;
+    var digit_hex = /[0123456789abcdefABCDEF]/;
+    var punct = ('+ - * / % & ++ -- = += -= *= /= %= == === != !== > < >= <= >> << >>> >>>= >>= <<= && &= | || ! ~ , : ? ^ ^= |= :: =>' + ' <%= <% %> <?= <? ?>').split(' ');
+    this.line_starters = 'continue,try,throw,return,var,let,const,if,switch,case,default,for,while,break,function,import,export'.split(',');
+    var reserved_words = this.line_starters.concat(['do', 'in', 'else', 'get', 'set', 'new', 'catch', 'finally', 'typeof', 'yield', 'async', 'await']);
+    var block_comment_pattern = /([\s\S]*?)((?:\*\/)|$)/g;
+    var comment_pattern = /([^\n\r\u2028\u2029]*)/g;
+    var directives_block_pattern = /\/\* beautify( \w+[:]\w+)+ \*\//g;
+    var directive_pattern = / (\w+)[:](\w+)/g;
+    var directives_end_ignore_pattern = /([\s\S]*?)((?:\/\*\sbeautify\signore:end\s\*\/)|$)/g;
+    var template_pattern = /((<\?php|<\?=)[\s\S]*?\?>)|(<%[\s\S]*?%>)/g;
+    var n_newlines,
+        whitespace_before_token,
+        in_html_comment,
+        tokens,
+        parser_pos;
+    var input_length;
+    this.tokenize = function() {
+      input_length = input.length;
+      parser_pos = 0;
+      in_html_comment = false;
+      tokens = [];
+      var next,
+          last;
+      var token_values;
+      var open = null;
+      var open_stack = [];
+      var comments = [];
+      while (!(last && last.type === 'TK_EOF')) {
+        token_values = tokenize_next();
+        next = new Token(token_values[1], token_values[0], n_newlines, whitespace_before_token);
+        while (next.type === 'TK_COMMENT' || next.type === 'TK_BLOCK_COMMENT' || next.type === 'TK_UNKNOWN') {
+          if (next.type === 'TK_BLOCK_COMMENT') {
+            next.directives = token_values[2];
+          }
+          comments.push(next);
+          token_values = tokenize_next();
+          next = new Token(token_values[1], token_values[0], n_newlines, whitespace_before_token);
+        }
+        if (comments.length) {
+          next.comments_before = comments;
+          comments = [];
+        }
+        if (next.type === 'TK_START_BLOCK' || next.type === 'TK_START_EXPR') {
+          next.parent = last;
+          open_stack.push(open);
+          open = next;
+        } else if ((next.type === 'TK_END_BLOCK' || next.type === 'TK_END_EXPR') && (open && ((next.text === ']' && open.text === '[') || (next.text === ')' && open.text === '(') || (next.text === '}' && open.text === '{')))) {
+          next.parent = open.parent;
+          open = open_stack.pop();
+        }
+        tokens.push(next);
+        last = next;
+      }
+      return tokens;
+    };
+    function get_directives(text) {
+      if (!text.match(directives_block_pattern)) {
+        return null;
+      }
+      var directives = {};
+      directive_pattern.lastIndex = 0;
+      var directive_match = directive_pattern.exec(text);
+      while (directive_match) {
+        directives[directive_match[1]] = directive_match[2];
+        directive_match = directive_pattern.exec(text);
+      }
+      return directives;
+    }
+    function tokenize_next() {
+      var i,
+          resulting_string;
+      var whitespace_on_this_line = [];
+      n_newlines = 0;
+      whitespace_before_token = '';
+      if (parser_pos >= input_length) {
+        return ['', 'TK_EOF'];
+      }
+      var last_token;
+      if (tokens.length) {
+        last_token = tokens[tokens.length - 1];
+      } else {
+        last_token = new Token('TK_START_BLOCK', '{');
+      }
+      var c = input.charAt(parser_pos);
+      parser_pos += 1;
+      while (in_array(c, whitespace)) {
+        if (acorn.newline.test(c)) {
+          if (!(c === '\n' && input.charAt(parser_pos - 2) === '\r')) {
+            n_newlines += 1;
+            whitespace_on_this_line = [];
+          }
+        } else {
+          whitespace_on_this_line.push(c);
+        }
+        if (parser_pos >= input_length) {
+          return ['', 'TK_EOF'];
+        }
+        c = input.charAt(parser_pos);
+        parser_pos += 1;
+      }
+      if (whitespace_on_this_line.length) {
+        whitespace_before_token = whitespace_on_this_line.join('');
+      }
+      if (digit.test(c)) {
+        var allow_decimal = true;
+        var allow_e = true;
+        var local_digit = digit;
+        if (c === '0' && parser_pos < input_length && /[Xx]/.test(input.charAt(parser_pos))) {
+          allow_decimal = false;
+          allow_e = false;
+          c += input.charAt(parser_pos);
+          parser_pos += 1;
+          local_digit = digit_hex;
+        } else {
+          c = '';
+          parser_pos -= 1;
+        }
+        while (parser_pos < input_length && local_digit.test(input.charAt(parser_pos))) {
+          c += input.charAt(parser_pos);
+          parser_pos += 1;
+          if (allow_decimal && parser_pos < input_length && input.charAt(parser_pos) === '.') {
+            c += input.charAt(parser_pos);
+            parser_pos += 1;
+            allow_decimal = false;
+          }
+          if (allow_e && parser_pos < input_length && /[Ee]/.test(input.charAt(parser_pos))) {
+            c += input.charAt(parser_pos);
+            parser_pos += 1;
+            if (parser_pos < input_length && /[+-]/.test(input.charAt(parser_pos))) {
+              c += input.charAt(parser_pos);
+              parser_pos += 1;
+            }
+            allow_e = false;
+            allow_decimal = false;
+          }
+        }
+        return [c, 'TK_WORD'];
+      }
+      if (acorn.isIdentifierStart(input.charCodeAt(parser_pos - 1))) {
+        if (parser_pos < input_length) {
+          while (acorn.isIdentifierChar(input.charCodeAt(parser_pos))) {
+            c += input.charAt(parser_pos);
+            parser_pos += 1;
+            if (parser_pos === input_length) {
+              break;
+            }
+          }
+        }
+        if (!(last_token.type === 'TK_DOT' || (last_token.type === 'TK_RESERVED' && in_array(last_token.text, ['set', 'get']))) && in_array(c, reserved_words)) {
+          if (c === 'in') {
+            return [c, 'TK_OPERATOR'];
+          }
+          return [c, 'TK_RESERVED'];
+        }
+        return [c, 'TK_WORD'];
+      }
+      if (c === '(' || c === '[') {
+        return [c, 'TK_START_EXPR'];
+      }
+      if (c === ')' || c === ']') {
+        return [c, 'TK_END_EXPR'];
+      }
+      if (c === '{') {
+        return [c, 'TK_START_BLOCK'];
+      }
+      if (c === '}') {
+        return [c, 'TK_END_BLOCK'];
+      }
+      if (c === ';') {
+        return [c, 'TK_SEMICOLON'];
+      }
+      if (c === '/') {
+        var comment = '';
+        if (input.charAt(parser_pos) === '*') {
+          parser_pos += 1;
+          block_comment_pattern.lastIndex = parser_pos;
+          var comment_match = block_comment_pattern.exec(input);
+          comment = '/*' + comment_match[0];
+          parser_pos += comment_match[0].length;
+          var directives = get_directives(comment);
+          if (directives && directives['ignore'] === 'start') {
+            directives_end_ignore_pattern.lastIndex = parser_pos;
+            comment_match = directives_end_ignore_pattern.exec(input);
+            comment += comment_match[0];
+            parser_pos += comment_match[0].length;
+          }
+          comment = comment.replace(acorn.lineBreak, '\n');
+          return [comment, 'TK_BLOCK_COMMENT', directives];
+        }
+        if (input.charAt(parser_pos) === '/') {
+          parser_pos += 1;
+          comment_pattern.lastIndex = parser_pos;
+          var comment_match = comment_pattern.exec(input);
+          comment = '//' + comment_match[0];
+          parser_pos += comment_match[0].length;
+          return [comment, 'TK_COMMENT'];
+        }
+      }
+      if (c === '`' || c === "'" || c === '"' || ((c === '/') || (opts.e4x && c === "<" && input.slice(parser_pos - 1).match(/^<([-a-zA-Z:0-9_.]+|{[^{}]*}|!\[CDATA\[[\s\S]*?\]\])(\s+[-a-zA-Z:0-9_.]+\s*=\s*('[^']*'|"[^"]*"|{.*?}))*\s*(\/?)\s*>/))) && ((last_token.type === 'TK_RESERVED' && in_array(last_token.text, ['return', 'case', 'throw', 'else', 'do', 'typeof', 'yield'])) || (last_token.type === 'TK_END_EXPR' && last_token.text === ')' && last_token.parent && last_token.parent.type === 'TK_RESERVED' && in_array(last_token.parent.text, ['if', 'while', 'for'])) || (in_array(last_token.type, ['TK_COMMENT', 'TK_START_EXPR', 'TK_START_BLOCK', 'TK_END_BLOCK', 'TK_OPERATOR', 'TK_EQUALS', 'TK_EOF', 'TK_SEMICOLON', 'TK_COMMA'])))) {
+        var sep = c,
+            esc = false,
+            has_char_escapes = false;
+        resulting_string = c;
+        if (sep === '/') {
+          var in_char_class = false;
+          while (parser_pos < input_length && ((esc || in_char_class || input.charAt(parser_pos) !== sep) && !acorn.newline.test(input.charAt(parser_pos)))) {
+            resulting_string += input.charAt(parser_pos);
+            if (!esc) {
+              esc = input.charAt(parser_pos) === '\\';
+              if (input.charAt(parser_pos) === '[') {
+                in_char_class = true;
+              } else if (input.charAt(parser_pos) === ']') {
+                in_char_class = false;
+              }
+            } else {
+              esc = false;
+            }
+            parser_pos += 1;
+          }
+        } else if (opts.e4x && sep === '<') {
+          var xmlRegExp = /<(\/?)([-a-zA-Z:0-9_.]+|{[^{}]*}|!\[CDATA\[[\s\S]*?\]\])(\s+[-a-zA-Z:0-9_.]+\s*=\s*('[^']*'|"[^"]*"|{.*?}))*\s*(\/?)\s*>/g;
+          var xmlStr = input.slice(parser_pos - 1);
+          var match = xmlRegExp.exec(xmlStr);
+          if (match && match.index === 0) {
+            var rootTag = match[2];
+            var depth = 0;
+            while (match) {
+              var isEndTag = !!match[1];
+              var tagName = match[2];
+              var isSingletonTag = (!!match[match.length - 1]) || (tagName.slice(0, 8) === "![CDATA[");
+              if (tagName === rootTag && !isSingletonTag) {
+                if (isEndTag) {
+                  --depth;
+                } else {
+                  ++depth;
+                }
+              }
+              if (depth <= 0) {
+                break;
+              }
+              match = xmlRegExp.exec(xmlStr);
+            }
+            var xmlLength = match ? match.index + match[0].length : xmlStr.length;
+            xmlStr = xmlStr.slice(0, xmlLength);
+            parser_pos += xmlLength - 1;
+            xmlStr = xmlStr.replace(acorn.lineBreak, '\n');
+            return [xmlStr, "TK_STRING"];
+          }
+        } else {
+          while (parser_pos < input_length && (esc || (input.charAt(parser_pos) !== sep && (sep === '`' || !acorn.newline.test(input.charAt(parser_pos)))))) {
+            if ((esc || sep === '`') && acorn.newline.test(input.charAt(parser_pos))) {
+              if (input.charAt(parser_pos) === '\r' && input.charAt(parser_pos + 1) === '\n') {
+                parser_pos += 1;
+              }
+              resulting_string += '\n';
+            } else {
+              resulting_string += input.charAt(parser_pos);
+            }
+            if (esc) {
+              if (input.charAt(parser_pos) === 'x' || input.charAt(parser_pos) === 'u') {
+                has_char_escapes = true;
+              }
+              esc = false;
+            } else {
+              esc = input.charAt(parser_pos) === '\\';
+            }
+            parser_pos += 1;
+          }
+        }
+        if (has_char_escapes && opts.unescape_strings) {
+          resulting_string = unescape_string(resulting_string);
+        }
+        if (parser_pos < input_length && input.charAt(parser_pos) === sep) {
+          resulting_string += sep;
+          parser_pos += 1;
+          if (sep === '/') {
+            while (parser_pos < input_length && acorn.isIdentifierStart(input.charCodeAt(parser_pos))) {
+              resulting_string += input.charAt(parser_pos);
+              parser_pos += 1;
+            }
+          }
+        }
+        return [resulting_string, 'TK_STRING'];
+      }
+      if (c === '#') {
+        if (tokens.length === 0 && input.charAt(parser_pos) === '!') {
+          resulting_string = c;
+          while (parser_pos < input_length && c !== '\n') {
+            c = input.charAt(parser_pos);
+            resulting_string += c;
+            parser_pos += 1;
+          }
+          return [trim(resulting_string) + '\n', 'TK_UNKNOWN'];
+        }
+        var sharp = '#';
+        if (parser_pos < input_length && digit.test(input.charAt(parser_pos))) {
+          do {
+            c = input.charAt(parser_pos);
+            sharp += c;
+            parser_pos += 1;
+          } while (parser_pos < input_length && c !== '#' && c !== '=');
+          if (c === '#') {} else if (input.charAt(parser_pos) === '[' && input.charAt(parser_pos + 1) === ']') {
+            sharp += '[]';
+            parser_pos += 2;
+          } else if (input.charAt(parser_pos) === '{' && input.charAt(parser_pos + 1) === '}') {
+            sharp += '{}';
+            parser_pos += 2;
+          }
+          return [sharp, 'TK_WORD'];
+        }
+      }
+      if (c === '<' && (input.charAt(parser_pos) === '?' || input.charAt(parser_pos) === '%')) {
+        template_pattern.lastIndex = parser_pos - 1;
+        var template_match = template_pattern.exec(input);
+        if (template_match) {
+          c = template_match[0];
+          parser_pos += c.length - 1;
+          c = c.replace(acorn.lineBreak, '\n');
+          return [c, 'TK_STRING'];
+        }
+      }
+      if (c === '<' && input.substring(parser_pos - 1, parser_pos + 3) === '<!--') {
+        parser_pos += 3;
+        c = '<!--';
+        while (!acorn.newline.test(input.charAt(parser_pos)) && parser_pos < input_length) {
+          c += input.charAt(parser_pos);
+          parser_pos++;
+        }
+        in_html_comment = true;
+        return [c, 'TK_COMMENT'];
+      }
+      if (c === '-' && in_html_comment && input.substring(parser_pos - 1, parser_pos + 2) === '-->') {
+        in_html_comment = false;
+        parser_pos += 2;
+        return ['-->', 'TK_COMMENT'];
+      }
+      if (c === '.') {
+        return [c, 'TK_DOT'];
+      }
+      if (in_array(c, punct)) {
+        while (parser_pos < input_length && in_array(c + input.charAt(parser_pos), punct)) {
+          c += input.charAt(parser_pos);
+          parser_pos += 1;
+          if (parser_pos >= input_length) {
+            break;
+          }
+        }
+        if (c === ',') {
+          return [c, 'TK_COMMA'];
+        } else if (c === '=') {
+          return [c, 'TK_EQUALS'];
+        } else {
+          return [c, 'TK_OPERATOR'];
+        }
+      }
+      return [c, 'TK_UNKNOWN'];
+    }
+    function unescape_string(s) {
+      var esc = false,
+          out = '',
+          pos = 0,
+          s_hex = '',
+          escaped = 0,
+          c;
+      while (esc || pos < s.length) {
+        c = s.charAt(pos);
+        pos++;
+        if (esc) {
+          esc = false;
+          if (c === 'x') {
+            s_hex = s.substr(pos, 2);
+            pos += 2;
+          } else if (c === 'u') {
+            s_hex = s.substr(pos, 4);
+            pos += 4;
+          } else {
+            out += '\\' + c;
+            continue;
+          }
+          if (!s_hex.match(/^[0123456789abcdefABCDEF]+$/)) {
+            return s;
+          }
+          escaped = parseInt(s_hex, 16);
+          if (escaped >= 0x00 && escaped < 0x20) {
+            if (c === 'x') {
+              out += '\\x' + s_hex;
+            } else {
+              out += '\\u' + s_hex;
+            }
+            continue;
+          } else if (escaped === 0x22 || escaped === 0x27 || escaped === 0x5c) {
+            out += '\\' + String.fromCharCode(escaped);
+          } else if (c === 'x' && escaped > 0x7e && escaped <= 0xff) {
+            return s;
+          } else {
+            out += String.fromCharCode(escaped);
+          }
+        } else if (c === '\\') {
+          esc = true;
+        } else {
+          out += c;
+        }
+      }
+      return out;
+    }
+  }
+  if (typeof define === "function" && define.amd) {
+    define("2", [], function() {
+      return {js_beautify: js_beautify};
+    });
+  } else if (typeof exports !== "undefined") {
+    exports.js_beautify = js_beautify;
+  } else if (typeof window !== "undefined") {
+    window.js_beautify = js_beautify;
+  } else if (typeof global !== "undefined") {
+    global.js_beautify = js_beautify;
+  }
+}());
+
+_removeDefine();
+})();
+$__System.registerDynamic("3", [], false, function(__require, __exports, __module) {
+  var _retrieveGlobal = $__System.get("@@global-helpers").prepareGlobal(__module.id, null, null);
+  (function() {
+    var jsonlint = this["jsonlint"];
+    var jsonlint = function() {
+      var a = !0,
+          b = !1,
+          c = {},
+          d = function() {
+            var a = {
+              trace: function() {},
+              yy: {},
+              symbols_: {
+                error: 2,
+                JSONString: 3,
+                STRING: 4,
+                JSONNumber: 5,
+                NUMBER: 6,
+                JSONNullLiteral: 7,
+                NULL: 8,
+                JSONBooleanLiteral: 9,
+                TRUE: 10,
+                FALSE: 11,
+                JSONText: 12,
+                JSONValue: 13,
+                EOF: 14,
+                JSONObject: 15,
+                JSONArray: 16,
+                "{": 17,
+                "}": 18,
+                JSONMemberList: 19,
+                JSONMember: 20,
+                ":": 21,
+                ",": 22,
+                "[": 23,
+                "]": 24,
+                JSONElementList: 25,
+                $accept: 0,
+                $end: 1
+              },
+              terminals_: {
+                2: "error",
+                4: "STRING",
+                6: "NUMBER",
+                8: "NULL",
+                10: "TRUE",
+                11: "FALSE",
+                14: "EOF",
+                17: "{",
+                18: "}",
+                21: ":",
+                22: ",",
+                23: "[",
+                24: "]"
+              },
+              productions_: [0, [3, 1], [5, 1], [7, 1], [9, 1], [9, 1], [12, 2], [13, 1], [13, 1], [13, 1], [13, 1], [13, 1], [13, 1], [15, 2], [15, 3], [20, 3], [19, 1], [19, 3], [16, 2], [16, 3], [25, 1], [25, 3]],
+              performAction: function(b, c, d, e, f, g, h) {
+                var i = g.length - 1;
+                switch (f) {
+                  case 1:
+                    this.$ = b.replace(/\\(\\|")/g, "$1").replace(/\\n/g, "\n").replace(/\\r/g, "\r").replace(/\\t/g, "	").replace(/\\v/g, "").replace(/\\f/g, "\f").replace(/\\b/g, "\b");
+                    break;
+                  case 2:
+                    this.$ = Number(b);
+                    break;
+                  case 3:
+                    this.$ = null;
+                    break;
+                  case 4:
+                    this.$ = !0;
+                    break;
+                  case 5:
+                    this.$ = !1;
+                    break;
+                  case 6:
+                    return this.$ = g[i - 1];
+                  case 13:
+                    this.$ = {};
+                    break;
+                  case 14:
+                    this.$ = g[i - 1];
+                    break;
+                  case 15:
+                    this.$ = [g[i - 2], g[i]];
+                    break;
+                  case 16:
+                    this.$ = {}, this.$[g[i][0]] = g[i][1];
+                    break;
+                  case 17:
+                    this.$ = g[i - 2], g[i - 2][g[i][0]] = g[i][1];
+                    break;
+                  case 18:
+                    this.$ = [];
+                    break;
+                  case 19:
+                    this.$ = g[i - 1];
+                    break;
+                  case 20:
+                    this.$ = [g[i]];
+                    break;
+                  case 21:
+                    this.$ = g[i - 2], g[i - 2].push(g[i]);
+                }
+              },
+              table: [{
+                3: 5,
+                4: [1, 12],
+                5: 6,
+                6: [1, 13],
+                7: 3,
+                8: [1, 9],
+                9: 4,
+                10: [1, 10],
+                11: [1, 11],
+                12: 1,
+                13: 2,
+                15: 7,
+                16: 8,
+                17: [1, 14],
+                23: [1, 15]
+              }, {1: [3]}, {14: [1, 16]}, {
+                14: [2, 7],
+                18: [2, 7],
+                22: [2, 7],
+                24: [2, 7]
+              }, {
+                14: [2, 8],
+                18: [2, 8],
+                22: [2, 8],
+                24: [2, 8]
+              }, {
+                14: [2, 9],
+                18: [2, 9],
+                22: [2, 9],
+                24: [2, 9]
+              }, {
+                14: [2, 10],
+                18: [2, 10],
+                22: [2, 10],
+                24: [2, 10]
+              }, {
+                14: [2, 11],
+                18: [2, 11],
+                22: [2, 11],
+                24: [2, 11]
+              }, {
+                14: [2, 12],
+                18: [2, 12],
+                22: [2, 12],
+                24: [2, 12]
+              }, {
+                14: [2, 3],
+                18: [2, 3],
+                22: [2, 3],
+                24: [2, 3]
+              }, {
+                14: [2, 4],
+                18: [2, 4],
+                22: [2, 4],
+                24: [2, 4]
+              }, {
+                14: [2, 5],
+                18: [2, 5],
+                22: [2, 5],
+                24: [2, 5]
+              }, {
+                14: [2, 1],
+                18: [2, 1],
+                21: [2, 1],
+                22: [2, 1],
+                24: [2, 1]
+              }, {
+                14: [2, 2],
+                18: [2, 2],
+                22: [2, 2],
+                24: [2, 2]
+              }, {
+                3: 20,
+                4: [1, 12],
+                18: [1, 17],
+                19: 18,
+                20: 19
+              }, {
+                3: 5,
+                4: [1, 12],
+                5: 6,
+                6: [1, 13],
+                7: 3,
+                8: [1, 9],
+                9: 4,
+                10: [1, 10],
+                11: [1, 11],
+                13: 23,
+                15: 7,
+                16: 8,
+                17: [1, 14],
+                23: [1, 15],
+                24: [1, 21],
+                25: 22
+              }, {1: [2, 6]}, {
+                14: [2, 13],
+                18: [2, 13],
+                22: [2, 13],
+                24: [2, 13]
+              }, {
+                18: [1, 24],
+                22: [1, 25]
+              }, {
+                18: [2, 16],
+                22: [2, 16]
+              }, {21: [1, 26]}, {
+                14: [2, 18],
+                18: [2, 18],
+                22: [2, 18],
+                24: [2, 18]
+              }, {
+                22: [1, 28],
+                24: [1, 27]
+              }, {
+                22: [2, 20],
+                24: [2, 20]
+              }, {
+                14: [2, 14],
+                18: [2, 14],
+                22: [2, 14],
+                24: [2, 14]
+              }, {
+                3: 20,
+                4: [1, 12],
+                20: 29
+              }, {
+                3: 5,
+                4: [1, 12],
+                5: 6,
+                6: [1, 13],
+                7: 3,
+                8: [1, 9],
+                9: 4,
+                10: [1, 10],
+                11: [1, 11],
+                13: 30,
+                15: 7,
+                16: 8,
+                17: [1, 14],
+                23: [1, 15]
+              }, {
+                14: [2, 19],
+                18: [2, 19],
+                22: [2, 19],
+                24: [2, 19]
+              }, {
+                3: 5,
+                4: [1, 12],
+                5: 6,
+                6: [1, 13],
+                7: 3,
+                8: [1, 9],
+                9: 4,
+                10: [1, 10],
+                11: [1, 11],
+                13: 31,
+                15: 7,
+                16: 8,
+                17: [1, 14],
+                23: [1, 15]
+              }, {
+                18: [2, 17],
+                22: [2, 17]
+              }, {
+                18: [2, 15],
+                22: [2, 15]
+              }, {
+                22: [2, 21],
+                24: [2, 21]
+              }],
+              defaultActions: {16: [2, 6]},
+              parseError: function(b, c) {
+                throw new Error(b);
+              },
+              parse: function(b) {
+                function o(a) {
+                  d.length = d.length - 2 * a, e.length = e.length - a, f.length = f.length - a;
+                }
+                function p() {
+                  var a;
+                  return a = c.lexer.lex() || 1, typeof a != "number" && (a = c.symbols_[a] || a), a;
+                }
+                var c = this,
+                    d = [0],
+                    e = [null],
+                    f = [],
+                    g = this.table,
+                    h = "",
+                    i = 0,
+                    j = 0,
+                    k = 0,
+                    l = 2,
+                    m = 1;
+                this.lexer.setInput(b), this.lexer.yy = this.yy, this.yy.lexer = this.lexer, typeof this.lexer.yylloc == "undefined" && (this.lexer.yylloc = {});
+                var n = this.lexer.yylloc;
+                f.push(n), typeof this.yy.parseError == "function" && (this.parseError = this.yy.parseError);
+                var q,
+                    r,
+                    s,
+                    t,
+                    u,
+                    v,
+                    w = {},
+                    x,
+                    y,
+                    z,
+                    A;
+                for (; ; ) {
+                  s = d[d.length - 1], this.defaultActions[s] ? t = this.defaultActions[s] : (q == null && (q = p()), t = g[s] && g[s][q]);
+                  if (typeof t == "undefined" || !t.length || !t[0]) {
+                    if (!k) {
+                      A = [];
+                      for (x in g[s])
+                        this.terminals_[x] && x > 2 && A.push("'" + this.terminals_[x] + "'");
+                      var B = "";
+                      this.lexer.showPosition ? B = "Parse error on line " + (i + 1) + ":\n" + this.lexer.showPosition() + "\nExpecting " + A.join(", ") + ", got '" + this.terminals_[q] + "'" : B = "Parse error on line " + (i + 1) + ": Unexpected " + (q == 1 ? "end of input" : "'" + (this.terminals_[q] || q) + "'"), this.parseError(B, {
+                        text: this.lexer.match,
+                        token: this.terminals_[q] || q,
+                        line: this.lexer.yylineno,
+                        loc: n,
+                        expected: A
+                      });
+                    }
+                    if (k == 3) {
+                      if (q == m)
+                        throw new Error(B || "Parsing halted.");
+                      j = this.lexer.yyleng, h = this.lexer.yytext, i = this.lexer.yylineno, n = this.lexer.yylloc, q = p();
+                    }
+                    for (; ; ) {
+                      if (l.toString() in g[s])
+                        break;
+                      if (s == 0)
+                        throw new Error(B || "Parsing halted.");
+                      o(1), s = d[d.length - 1];
+                    }
+                    r = q, q = l, s = d[d.length - 1], t = g[s] && g[s][l], k = 3;
+                  }
+                  if (t[0] instanceof Array && t.length > 1)
+                    throw new Error("Parse Error: multiple actions possible at state: " + s + ", token: " + q);
+                  switch (t[0]) {
+                    case 1:
+                      d.push(q), e.push(this.lexer.yytext), f.push(this.lexer.yylloc), d.push(t[1]), q = null, r ? (q = r, r = null) : (j = this.lexer.yyleng, h = this.lexer.yytext, i = this.lexer.yylineno, n = this.lexer.yylloc, k > 0 && k--);
+                      break;
+                    case 2:
+                      y = this.productions_[t[1]][1], w.$ = e[e.length - y], w._$ = {
+                        first_line: f[f.length - (y || 1)].first_line,
+                        last_line: f[f.length - 1].last_line,
+                        first_column: f[f.length - (y || 1)].first_column,
+                        last_column: f[f.length - 1].last_column
+                      }, v = this.performAction.call(w, h, j, i, this.yy, t[1], e, f);
+                      if (typeof v != "undefined")
+                        return v;
+                      y && (d = d.slice(0, -1 * y * 2), e = e.slice(0, -1 * y), f = f.slice(0, -1 * y)), d.push(this.productions_[t[1]][0]), e.push(w.$), f.push(w._$), z = g[d[d.length - 2]][d[d.length - 1]], d.push(z);
+                      break;
+                    case 3:
+                      return !0;
+                  }
+                }
+                return !0;
+              }
+            },
+                b = function() {
+                  var a = {
+                    EOF: 1,
+                    parseError: function(b, c) {
+                      if (!this.yy.parseError)
+                        throw new Error(b);
+                      this.yy.parseError(b, c);
+                    },
+                    setInput: function(a) {
+                      return this._input = a, this._more = this._less = this.done = !1, this.yylineno = this.yyleng = 0, this.yytext = this.matched = this.match = "", this.conditionStack = ["INITIAL"], this.yylloc = {
+                        first_line: 1,
+                        first_column: 0,
+                        last_line: 1,
+                        last_column: 0
+                      }, this;
+                    },
+                    input: function() {
+                      var a = this._input[0];
+                      this.yytext += a, this.yyleng++, this.match += a, this.matched += a;
+                      var b = a.match(/\n/);
+                      return b && this.yylineno++, this._input = this._input.slice(1), a;
+                    },
+                    unput: function(a) {
+                      return this._input = a + this._input, this;
+                    },
+                    more: function() {
+                      return this._more = !0, this;
+                    },
+                    less: function(a) {
+                      this._input = this.match.slice(a) + this._input;
+                    },
+                    pastInput: function() {
+                      var a = this.matched.substr(0, this.matched.length - this.match.length);
+                      return (a.length > 20 ? "..." : "") + a.substr(-20).replace(/\n/g, "");
+                    },
+                    upcomingInput: function() {
+                      var a = this.match;
+                      return a.length < 20 && (a += this._input.substr(0, 20 - a.length)), (a.substr(0, 20) + (a.length > 20 ? "..." : "")).replace(/\n/g, "");
+                    },
+                    showPosition: function() {
+                      var a = this.pastInput(),
+                          b = (new Array(a.length + 1)).join("-");
+                      return a + this.upcomingInput() + "\n" + b + "^";
+                    },
+                    next: function() {
+                      if (this.done)
+                        return this.EOF;
+                      this._input || (this.done = !0);
+                      var a,
+                          b,
+                          c,
+                          d,
+                          e,
+                          f;
+                      this._more || (this.yytext = "", this.match = "");
+                      var g = this._currentRules();
+                      for (var h = 0; h < g.length; h++) {
+                        c = this._input.match(this.rules[g[h]]);
+                        if (c && (!b || c[0].length > b[0].length)) {
+                          b = c, d = h;
+                          if (!this.options.flex)
+                            break;
+                        }
+                      }
+                      if (b) {
+                        f = b[0].match(/\n.*/g), f && (this.yylineno += f.length), this.yylloc = {
+                          first_line: this.yylloc.last_line,
+                          last_line: this.yylineno + 1,
+                          first_column: this.yylloc.last_column,
+                          last_column: f ? f[f.length - 1].length - 1 : this.yylloc.last_column + b[0].length
+                        }, this.yytext += b[0], this.match += b[0], this.yyleng = this.yytext.length, this._more = !1, this._input = this._input.slice(b[0].length), this.matched += b[0], a = this.performAction.call(this, this.yy, this, g[d], this.conditionStack[this.conditionStack.length - 1]), this.done && this._input && (this.done = !1);
+                        if (a)
+                          return a;
+                        return;
+                      }
+                      if (this._input === "")
+                        return this.EOF;
+                      this.parseError("Lexical error on line " + (this.yylineno + 1) + ". Unrecognized text.\n" + this.showPosition(), {
+                        text: "",
+                        token: null,
+                        line: this.yylineno
+                      });
+                    },
+                    lex: function() {
+                      var b = this.next();
+                      return typeof b != "undefined" ? b : this.lex();
+                    },
+                    begin: function(b) {
+                      this.conditionStack.push(b);
+                    },
+                    popState: function() {
+                      return this.conditionStack.pop();
+                    },
+                    _currentRules: function() {
+                      return this.conditions[this.conditionStack[this.conditionStack.length - 1]].rules;
+                    },
+                    topState: function() {
+                      return this.conditionStack[this.conditionStack.length - 2];
+                    },
+                    pushState: function(b) {
+                      this.begin(b);
+                    }
+                  };
+                  return a.options = {}, a.performAction = function(b, c, d, e) {
+                    var f = e;
+                    switch (d) {
+                      case 0:
+                        break;
+                      case 1:
+                        return 6;
+                      case 2:
+                        return c.yytext = c.yytext.substr(1, c.yyleng - 2), 4;
+                      case 3:
+                        return 17;
+                      case 4:
+                        return 18;
+                      case 5:
+                        return 23;
+                      case 6:
+                        return 24;
+                      case 7:
+                        return 22;
+                      case 8:
+                        return 21;
+                      case 9:
+                        return 10;
+                      case 10:
+                        return 11;
+                      case 11:
+                        return 8;
+                      case 12:
+                        return 14;
+                      case 13:
+                        return "INVALID";
+                    }
+                  }, a.rules = [/^(?:\s+)/, /^(?:(-?([0-9]|[1-9][0-9]+))(\.[0-9]+)?([eE][-+]?[0-9]+)?\b)/, /^(?:"(?:\\[\\"bfnrt/]|\\u[a-fA-F0-9]{4}|[^\\\0-\x09\x0a-\x1f"])*")/, /^(?:\{)/, /^(?:\})/, /^(?:\[)/, /^(?:\])/, /^(?:,)/, /^(?::)/, /^(?:true\b)/, /^(?:false\b)/, /^(?:null\b)/, /^(?:$)/, /^(?:.)/], a.conditions = {INITIAL: {
+                      rules: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13],
+                      inclusive: !0
+                    }}, a;
+                }();
+            return a.lexer = b, a;
+          }();
+      return typeof a != "undefined" && typeof c != "undefined" && (c.parser = d, c.parse = function() {
+        return d.parse.apply(d, arguments);
+      }, c.main = function(d) {
+        if (!d[1])
+          throw new Error("Usage: " + d[0] + " FILE");
+        if (typeof process != "undefined")
+          var e = a("fs").readFileSync(a("path").join(process.cwd(), d[1]), "utf8");
+        else
+          var f = a("file").path(a("file").cwd()),
+              e = f.join(d[1]).read({charset: "utf-8"});
+        return c.parser.parse(e);
+      }, typeof b != "undefined" && a.main === b && c.main(typeof process != "undefined" ? process.argv.slice(1) : a("system").args)), c;
+    }();
+    this["jsonlint"] = jsonlint;
+  })();
+  return _retrieveGlobal();
+});
+
+(function() {
+var _removeDefine = $__System.get("@@amd-helpers").createDefine();
+(function(mod) {
+  if (typeof exports == "object" && typeof module == "object")
+    mod(require("../../lib/codemirror"));
+  else if (typeof define == "function" && define.amd)
+    define("4", ["5"], mod);
+  else
+    mod(CodeMirror);
+})(function(CodeMirror) {
+  "use strict";
+  CodeMirror.defineMode("javascript", function(config, parserConfig) {
+    var indentUnit = config.indentUnit;
+    var statementIndent = parserConfig.statementIndent;
+    var jsonldMode = parserConfig.jsonld;
+    var jsonMode = parserConfig.json || jsonldMode;
+    var isTS = parserConfig.typescript;
+    var wordRE = parserConfig.wordCharacters || /[\w$\xa1-\uffff]/;
+    var keywords = function() {
+      function kw(type) {
+        return {
+          type: type,
+          style: "keyword"
+        };
+      }
+      var A = kw("keyword a"),
+          B = kw("keyword b"),
+          C = kw("keyword c");
+      var operator = kw("operator"),
+          atom = {
+            type: "atom",
+            style: "atom"
+          };
+      var jsKeywords = {
+        "if": kw("if"),
+        "while": A,
+        "with": A,
+        "else": B,
+        "do": B,
+        "try": B,
+        "finally": B,
+        "return": C,
+        "break": C,
+        "continue": C,
+        "new": kw("new"),
+        "delete": C,
+        "throw": C,
+        "debugger": C,
+        "var": kw("var"),
+        "const": kw("var"),
+        "let": kw("var"),
+        "async": kw("async"),
+        "function": kw("function"),
+        "catch": kw("catch"),
+        "for": kw("for"),
+        "switch": kw("switch"),
+        "case": kw("case"),
+        "default": kw("default"),
+        "in": operator,
+        "typeof": operator,
+        "instanceof": operator,
+        "true": atom,
+        "false": atom,
+        "null": atom,
+        "undefined": atom,
+        "NaN": atom,
+        "Infinity": atom,
+        "this": kw("this"),
+        "class": kw("class"),
+        "super": kw("atom"),
+        "await": C,
+        "yield": C,
+        "export": kw("export"),
+        "import": kw("import"),
+        "extends": C
+      };
+      if (isTS) {
+        var type = {
+          type: "variable",
+          style: "variable-3"
+        };
+        var tsKeywords = {
+          "interface": kw("interface"),
+          "extends": kw("extends"),
+          "constructor": kw("constructor"),
+          "public": kw("public"),
+          "private": kw("private"),
+          "protected": kw("protected"),
+          "static": kw("static"),
+          "string": type,
+          "number": type,
+          "boolean": type,
+          "any": type
+        };
+        for (var attr in tsKeywords) {
+          jsKeywords[attr] = tsKeywords[attr];
+        }
+      }
+      return jsKeywords;
+    }();
+    var isOperatorChar = /[+\-*&%=<>!?|~^]/;
+    var isJsonldKeyword = /^@(context|id|value|language|type|container|list|set|reverse|index|base|vocab|graph)"/;
+    function readRegexp(stream) {
+      var escaped = false,
+          next,
+          inSet = false;
+      while ((next = stream.next()) != null) {
+        if (!escaped) {
+          if (next == "/" && !inSet)
+            return;
+          if (next == "[")
+            inSet = true;
+          else if (inSet && next == "]")
+            inSet = false;
+        }
+        escaped = !escaped && next == "\\";
+      }
+    }
+    var type,
+        content;
+    function ret(tp, style, cont) {
+      type = tp;
+      content = cont;
+      return style;
+    }
+    function tokenBase(stream, state) {
+      var ch = stream.next();
+      if (ch == '"' || ch == "'") {
+        state.tokenize = tokenString(ch);
+        return state.tokenize(stream, state);
+      } else if (ch == "." && stream.match(/^\d+(?:[eE][+\-]?\d+)?/)) {
+        return ret("number", "number");
+      } else if (ch == "." && stream.match("..")) {
+        return ret("spread", "meta");
+      } else if (/[\[\]{}\(\),;\:\.]/.test(ch)) {
+        return ret(ch);
+      } else if (ch == "=" && stream.eat(">")) {
+        return ret("=>", "operator");
+      } else if (ch == "0" && stream.eat(/x/i)) {
+        stream.eatWhile(/[\da-f]/i);
+        return ret("number", "number");
+      } else if (ch == "0" && stream.eat(/o/i)) {
+        stream.eatWhile(/[0-7]/i);
+        return ret("number", "number");
+      } else if (ch == "0" && stream.eat(/b/i)) {
+        stream.eatWhile(/[01]/i);
+        return ret("number", "number");
+      } else if (/\d/.test(ch)) {
+        stream.match(/^\d*(?:\.\d*)?(?:[eE][+\-]?\d+)?/);
+        return ret("number", "number");
+      } else if (ch == "/") {
+        if (stream.eat("*")) {
+          state.tokenize = tokenComment;
+          return tokenComment(stream, state);
+        } else if (stream.eat("/")) {
+          stream.skipToEnd();
+          return ret("comment", "comment");
+        } else if (state.lastType == "operator" || state.lastType == "keyword c" || state.lastType == "sof" || /^[\[{}\(,;:]$/.test(state.lastType)) {
+          readRegexp(stream);
+          stream.match(/^\b(([gimyu])(?![gimyu]*\2))+\b/);
+          return ret("regexp", "string-2");
+        } else {
+          stream.eatWhile(isOperatorChar);
+          return ret("operator", "operator", stream.current());
+        }
+      } else if (ch == "`") {
+        state.tokenize = tokenQuasi;
+        return tokenQuasi(stream, state);
+      } else if (ch == "#") {
+        stream.skipToEnd();
+        return ret("error", "error");
+      } else if (isOperatorChar.test(ch)) {
+        stream.eatWhile(isOperatorChar);
+        return ret("operator", "operator", stream.current());
+      } else if (wordRE.test(ch)) {
+        stream.eatWhile(wordRE);
+        var word = stream.current(),
+            known = keywords.propertyIsEnumerable(word) && keywords[word];
+        return (known && state.lastType != ".") ? ret(known.type, known.style, word) : ret("variable", "variable", word);
+      }
+    }
+    function tokenString(quote) {
+      return function(stream, state) {
+        var escaped = false,
+            next;
+        if (jsonldMode && stream.peek() == "@" && stream.match(isJsonldKeyword)) {
+          state.tokenize = tokenBase;
+          return ret("jsonld-keyword", "meta");
+        }
+        while ((next = stream.next()) != null) {
+          if (next == quote && !escaped)
+            break;
+          escaped = !escaped && next == "\\";
+        }
+        if (!escaped)
+          state.tokenize = tokenBase;
+        return ret("string", "string");
+      };
+    }
+    function tokenComment(stream, state) {
+      var maybeEnd = false,
+          ch;
+      while (ch = stream.next()) {
+        if (ch == "/" && maybeEnd) {
+          state.tokenize = tokenBase;
+          break;
+        }
+        maybeEnd = (ch == "*");
+      }
+      return ret("comment", "comment");
+    }
+    function tokenQuasi(stream, state) {
+      var escaped = false,
+          next;
+      while ((next = stream.next()) != null) {
+        if (!escaped && (next == "`" || next == "$" && stream.eat("{"))) {
+          state.tokenize = tokenBase;
+          break;
+        }
+        escaped = !escaped && next == "\\";
+      }
+      return ret("quasi", "string-2", stream.current());
+    }
+    var brackets = "([{}])";
+    function findFatArrow(stream, state) {
+      if (state.fatArrowAt)
+        state.fatArrowAt = null;
+      var arrow = stream.string.indexOf("=>", stream.start);
+      if (arrow < 0)
+        return;
+      var depth = 0,
+          sawSomething = false;
+      for (var pos = arrow - 1; pos >= 0; --pos) {
+        var ch = stream.string.charAt(pos);
+        var bracket = brackets.indexOf(ch);
+        if (bracket >= 0 && bracket < 3) {
+          if (!depth) {
+            ++pos;
+            break;
+          }
+          if (--depth == 0)
+            break;
+        } else if (bracket >= 3 && bracket < 6) {
+          ++depth;
+        } else if (wordRE.test(ch)) {
+          sawSomething = true;
+        } else if (/["'\/]/.test(ch)) {
+          return;
+        } else if (sawSomething && !depth) {
+          ++pos;
+          break;
+        }
+      }
+      if (sawSomething && !depth)
+        state.fatArrowAt = pos;
+    }
+    var atomicTypes = {
+      "atom": true,
+      "number": true,
+      "variable": true,
+      "string": true,
+      "regexp": true,
+      "this": true,
+      "jsonld-keyword": true
+    };
+    function JSLexical(indented, column, type, align, prev, info) {
+      this.indented = indented;
+      this.column = column;
+      this.type = type;
+      this.prev = prev;
+      this.info = info;
+      if (align != null)
+        this.align = align;
+    }
+    function inScope(state, varname) {
+      for (var v = state.localVars; v; v = v.next)
+        if (v.name == varname)
+          return true;
+      for (var cx = state.context; cx; cx = cx.prev) {
+        for (var v = cx.vars; v; v = v.next)
+          if (v.name == varname)
+            return true;
+      }
+    }
+    function parseJS(state, style, type, content, stream) {
+      var cc = state.cc;
+      cx.state = state;
+      cx.stream = stream;
+      cx.marked = null, cx.cc = cc;
+      cx.style = style;
+      if (!state.lexical.hasOwnProperty("align"))
+        state.lexical.align = true;
+      while (true) {
+        var combinator = cc.length ? cc.pop() : jsonMode ? expression : statement;
+        if (combinator(type, content)) {
+          while (cc.length && cc[cc.length - 1].lex)
+            cc.pop()();
+          if (cx.marked)
+            return cx.marked;
+          if (type == "variable" && inScope(state, content))
+            return "variable-2";
+          return style;
+        }
+      }
+    }
+    var cx = {
+      state: null,
+      column: null,
+      marked: null,
+      cc: null
+    };
+    function pass() {
+      for (var i = arguments.length - 1; i >= 0; i--)
+        cx.cc.push(arguments[i]);
+    }
+    function cont() {
+      pass.apply(null, arguments);
+      return true;
+    }
+    function register(varname) {
+      function inList(list) {
+        for (var v = list; v; v = v.next)
+          if (v.name == varname)
+            return true;
+        return false;
+      }
+      var state = cx.state;
+      cx.marked = "def";
+      if (state.context) {
+        if (inList(state.localVars))
+          return;
+        state.localVars = {
+          name: varname,
+          next: state.localVars
+        };
+      } else {
+        if (inList(state.globalVars))
+          return;
+        if (parserConfig.globalVars)
+          state.globalVars = {
+            name: varname,
+            next: state.globalVars
+          };
+      }
+    }
+    var defaultVars = {
+      name: "this",
+      next: {name: "arguments"}
+    };
+    function pushcontext() {
+      cx.state.context = {
+        prev: cx.state.context,
+        vars: cx.state.localVars
+      };
+      cx.state.localVars = defaultVars;
+    }
+    function popcontext() {
+      cx.state.localVars = cx.state.context.vars;
+      cx.state.context = cx.state.context.prev;
+    }
+    function pushlex(type, info) {
+      var result = function() {
+        var state = cx.state,
+            indent = state.indented;
+        if (state.lexical.type == "stat")
+          indent = state.lexical.indented;
+        else
+          for (var outer = state.lexical; outer && outer.type == ")" && outer.align; outer = outer.prev)
+            indent = outer.indented;
+        state.lexical = new JSLexical(indent, cx.stream.column(), type, null, state.lexical, info);
+      };
+      result.lex = true;
+      return result;
+    }
+    function poplex() {
+      var state = cx.state;
+      if (state.lexical.prev) {
+        if (state.lexical.type == ")")
+          state.indented = state.lexical.indented;
+        state.lexical = state.lexical.prev;
+      }
+    }
+    poplex.lex = true;
+    function expect(wanted) {
+      function exp(type) {
+        if (type == wanted)
+          return cont();
+        else if (wanted == ";")
+          return pass();
+        else
+          return cont(exp);
+      }
+      ;
+      return exp;
+    }
+    function statement(type, value) {
+      if (type == "var")
+        return cont(pushlex("vardef", value.length), vardef, expect(";"), poplex);
+      if (type == "keyword a")
+        return cont(pushlex("form"), expression, statement, poplex);
+      if (type == "keyword b")
+        return cont(pushlex("form"), statement, poplex);
+      if (type == "{")
+        return cont(pushlex("}"), block, poplex);
+      if (type == ";")
+        return cont();
+      if (type == "if") {
+        if (cx.state.lexical.info == "else" && cx.state.cc[cx.state.cc.length - 1] == poplex)
+          cx.state.cc.pop()();
+        return cont(pushlex("form"), expression, statement, poplex, maybeelse);
+      }
+      if (type == "function")
+        return cont(functiondef);
+      if (type == "for")
+        return cont(pushlex("form"), forspec, statement, poplex);
+      if (type == "variable")
+        return cont(pushlex("stat"), maybelabel);
+      if (type == "switch")
+        return cont(pushlex("form"), expression, pushlex("}", "switch"), expect("{"), block, poplex, poplex);
+      if (type == "case")
+        return cont(expression, expect(":"));
+      if (type == "default")
+        return cont(expect(":"));
+      if (type == "catch")
+        return cont(pushlex("form"), pushcontext, expect("("), funarg, expect(")"), statement, poplex, popcontext);
+      if (type == "class")
+        return cont(pushlex("form"), className, poplex);
+      if (type == "export")
+        return cont(pushlex("stat"), afterExport, poplex);
+      if (type == "import")
+        return cont(pushlex("stat"), afterImport, poplex);
+      return pass(pushlex("stat"), expression, expect(";"), poplex);
+    }
+    function expression(type) {
+      return expressionInner(type, false);
+    }
+    function expressionNoComma(type) {
+      return expressionInner(type, true);
+    }
+    function expressionInner(type, noComma) {
+      if (cx.state.fatArrowAt == cx.stream.start) {
+        var body = noComma ? arrowBodyNoComma : arrowBody;
+        if (type == "(")
+          return cont(pushcontext, pushlex(")"), commasep(pattern, ")"), poplex, expect("=>"), body, popcontext);
+        else if (type == "variable")
+          return pass(pushcontext, pattern, expect("=>"), body, popcontext);
+      }
+      var maybeop = noComma ? maybeoperatorNoComma : maybeoperatorComma;
+      if (atomicTypes.hasOwnProperty(type))
+        return cont(maybeop);
+      if (type == "async")
+        return cont(expression);
+      if (type == "function")
+        return cont(functiondef, maybeop);
+      if (type == "keyword c")
+        return cont(noComma ? maybeexpressionNoComma : maybeexpression);
+      if (type == "(")
+        return cont(pushlex(")"), maybeexpression, comprehension, expect(")"), poplex, maybeop);
+      if (type == "operator" || type == "spread")
+        return cont(noComma ? expressionNoComma : expression);
+      if (type == "[")
+        return cont(pushlex("]"), arrayLiteral, poplex, maybeop);
+      if (type == "{")
+        return contCommasep(objprop, "}", null, maybeop);
+      if (type == "quasi")
+        return pass(quasi, maybeop);
+      if (type == "new")
+        return cont(maybeTarget(noComma));
+      return cont();
+    }
+    function maybeexpression(type) {
+      if (type.match(/[;\}\)\],]/))
+        return pass();
+      return pass(expression);
+    }
+    function maybeexpressionNoComma(type) {
+      if (type.match(/[;\}\)\],]/))
+        return pass();
+      return pass(expressionNoComma);
+    }
+    function maybeoperatorComma(type, value) {
+      if (type == ",")
+        return cont(expression);
+      return maybeoperatorNoComma(type, value, false);
+    }
+    function maybeoperatorNoComma(type, value, noComma) {
+      var me = noComma == false ? maybeoperatorComma : maybeoperatorNoComma;
+      var expr = noComma == false ? expression : expressionNoComma;
+      if (type == "=>")
+        return cont(pushcontext, noComma ? arrowBodyNoComma : arrowBody, popcontext);
+      if (type == "operator") {
+        if (/\+\+|--/.test(value))
+          return cont(me);
+        if (value == "?")
+          return cont(expression, expect(":"), expr);
+        return cont(expr);
+      }
+      if (type == "quasi") {
+        return pass(quasi, me);
+      }
+      if (type == ";")
+        return;
+      if (type == "(")
+        return contCommasep(expressionNoComma, ")", "call", me);
+      if (type == ".")
+        return cont(property, me);
+      if (type == "[")
+        return cont(pushlex("]"), maybeexpression, expect("]"), poplex, me);
+    }
+    function quasi(type, value) {
+      if (type != "quasi")
+        return pass();
+      if (value.slice(value.length - 2) != "${")
+        return cont(quasi);
+      return cont(expression, continueQuasi);
+    }
+    function continueQuasi(type) {
+      if (type == "}") {
+        cx.marked = "string-2";
+        cx.state.tokenize = tokenQuasi;
+        return cont(quasi);
+      }
+    }
+    function arrowBody(type) {
+      findFatArrow(cx.stream, cx.state);
+      return pass(type == "{" ? statement : expression);
+    }
+    function arrowBodyNoComma(type) {
+      findFatArrow(cx.stream, cx.state);
+      return pass(type == "{" ? statement : expressionNoComma);
+    }
+    function maybeTarget(noComma) {
+      return function(type) {
+        if (type == ".")
+          return cont(noComma ? targetNoComma : target);
+        else
+          return pass(noComma ? expressionNoComma : expression);
+      };
+    }
+    function target(_, value) {
+      if (value == "target") {
+        cx.marked = "keyword";
+        return cont(maybeoperatorComma);
+      }
+    }
+    function targetNoComma(_, value) {
+      if (value == "target") {
+        cx.marked = "keyword";
+        return cont(maybeoperatorNoComma);
+      }
+    }
+    function maybelabel(type) {
+      if (type == ":")
+        return cont(poplex, statement);
+      return pass(maybeoperatorComma, expect(";"), poplex);
+    }
+    function property(type) {
+      if (type == "variable") {
+        cx.marked = "property";
+        return cont();
+      }
+    }
+    function objprop(type, value) {
+      if (type == "async") {
+        return cont(objprop);
+      } else if (type == "variable" || cx.style == "keyword") {
+        cx.marked = "property";
+        if (value == "get" || value == "set")
+          return cont(getterSetter);
+        return cont(afterprop);
+      } else if (type == "number" || type == "string") {
+        cx.marked = jsonldMode ? "property" : (cx.style + " property");
+        return cont(afterprop);
+      } else if (type == "jsonld-keyword") {
+        return cont(afterprop);
+      } else if (type == "[") {
+        return cont(expression, expect("]"), afterprop);
+      }
+    }
+    function getterSetter(type) {
+      if (type != "variable")
+        return pass(afterprop);
+      cx.marked = "property";
+      return cont(functiondef);
+    }
+    function afterprop(type) {
+      if (type == ":")
+        return cont(expressionNoComma);
+      if (type == "(")
+        return pass(functiondef);
+    }
+    function commasep(what, end) {
+      function proceed(type) {
+        if (type == ",") {
+          var lex = cx.state.lexical;
+          if (lex.info == "call")
+            lex.pos = (lex.pos || 0) + 1;
+          return cont(what, proceed);
+        }
+        if (type == end)
+          return cont();
+        return cont(expect(end));
+      }
+      return function(type) {
+        if (type == end)
+          return cont();
+        return pass(what, proceed);
+      };
+    }
+    function contCommasep(what, end, info) {
+      for (var i = 3; i < arguments.length; i++)
+        cx.cc.push(arguments[i]);
+      return cont(pushlex(end, info), commasep(what, end), poplex);
+    }
+    function block(type) {
+      if (type == "}")
+        return cont();
+      return pass(statement, block);
+    }
+    function maybetype(type) {
+      if (isTS && type == ":")
+        return cont(typedef);
+    }
+    function maybedefault(_, value) {
+      if (value == "=")
+        return cont(expressionNoComma);
+    }
+    function typedef(type) {
+      if (type == "variable") {
+        cx.marked = "variable-3";
+        return cont();
+      }
+    }
+    function vardef() {
+      return pass(pattern, maybetype, maybeAssign, vardefCont);
+    }
+    function pattern(type, value) {
+      if (type == "variable") {
+        register(value);
+        return cont();
+      }
+      if (type == "spread")
+        return cont(pattern);
+      if (type == "[")
+        return contCommasep(pattern, "]");
+      if (type == "{")
+        return contCommasep(proppattern, "}");
+    }
+    function proppattern(type, value) {
+      if (type == "variable" && !cx.stream.match(/^\s*:/, false)) {
+        register(value);
+        return cont(maybeAssign);
+      }
+      if (type == "variable")
+        cx.marked = "property";
+      if (type == "spread")
+        return cont(pattern);
+      return cont(expect(":"), pattern, maybeAssign);
+    }
+    function maybeAssign(_type, value) {
+      if (value == "=")
+        return cont(expressionNoComma);
+    }
+    function vardefCont(type) {
+      if (type == ",")
+        return cont(vardef);
+    }
+    function maybeelse(type, value) {
+      if (type == "keyword b" && value == "else")
+        return cont(pushlex("form", "else"), statement, poplex);
+    }
+    function forspec(type) {
+      if (type == "(")
+        return cont(pushlex(")"), forspec1, expect(")"), poplex);
+    }
+    function forspec1(type) {
+      if (type == "var")
+        return cont(vardef, expect(";"), forspec2);
+      if (type == ";")
+        return cont(forspec2);
+      if (type == "variable")
+        return cont(formaybeinof);
+      return pass(expression, expect(";"), forspec2);
+    }
+    function formaybeinof(_type, value) {
+      if (value == "in" || value == "of") {
+        cx.marked = "keyword";
+        return cont(expression);
+      }
+      return cont(maybeoperatorComma, forspec2);
+    }
+    function forspec2(type, value) {
+      if (type == ";")
+        return cont(forspec3);
+      if (value == "in" || value == "of") {
+        cx.marked = "keyword";
+        return cont(expression);
+      }
+      return pass(expression, expect(";"), forspec3);
+    }
+    function forspec3(type) {
+      if (type != ")")
+        cont(expression);
+    }
+    function functiondef(type, value) {
+      if (value == "*") {
+        cx.marked = "keyword";
+        return cont(functiondef);
+      }
+      if (type == "variable") {
+        register(value);
+        return cont(functiondef);
+      }
+      if (type == "(")
+        return cont(pushcontext, pushlex(")"), commasep(funarg, ")"), poplex, statement, popcontext);
+    }
+    function funarg(type) {
+      if (type == "spread")
+        return cont(funarg);
+      return pass(pattern, maybetype, maybedefault);
+    }
+    function className(type, value) {
+      if (type == "variable") {
+        register(value);
+        return cont(classNameAfter);
+      }
+    }
+    function classNameAfter(type, value) {
+      if (value == "extends")
+        return cont(expression, classNameAfter);
+      if (type == "{")
+        return cont(pushlex("}"), classBody, poplex);
+    }
+    function classBody(type, value) {
+      if (type == "variable" || cx.style == "keyword") {
+        if (value == "static") {
+          cx.marked = "keyword";
+          return cont(classBody);
+        }
+        cx.marked = "property";
+        if (value == "get" || value == "set")
+          return cont(classGetterSetter, functiondef, classBody);
+        return cont(functiondef, classBody);
+      }
+      if (value == "*") {
+        cx.marked = "keyword";
+        return cont(classBody);
+      }
+      if (type == ";")
+        return cont(classBody);
+      if (type == "}")
+        return cont();
+    }
+    function classGetterSetter(type) {
+      if (type != "variable")
+        return pass();
+      cx.marked = "property";
+      return cont();
+    }
+    function afterExport(_type, value) {
+      if (value == "*") {
+        cx.marked = "keyword";
+        return cont(maybeFrom, expect(";"));
+      }
+      if (value == "default") {
+        cx.marked = "keyword";
+        return cont(expression, expect(";"));
+      }
+      return pass(statement);
+    }
+    function afterImport(type) {
+      if (type == "string")
+        return cont();
+      return pass(importSpec, maybeFrom);
+    }
+    function importSpec(type, value) {
+      if (type == "{")
+        return contCommasep(importSpec, "}");
+      if (type == "variable")
+        register(value);
+      if (value == "*")
+        cx.marked = "keyword";
+      return cont(maybeAs);
+    }
+    function maybeAs(_type, value) {
+      if (value == "as") {
+        cx.marked = "keyword";
+        return cont(importSpec);
+      }
+    }
+    function maybeFrom(_type, value) {
+      if (value == "from") {
+        cx.marked = "keyword";
+        return cont(expression);
+      }
+    }
+    function arrayLiteral(type) {
+      if (type == "]")
+        return cont();
+      return pass(expressionNoComma, maybeArrayComprehension);
+    }
+    function maybeArrayComprehension(type) {
+      if (type == "for")
+        return pass(comprehension, expect("]"));
+      if (type == ",")
+        return cont(commasep(maybeexpressionNoComma, "]"));
+      return pass(commasep(expressionNoComma, "]"));
+    }
+    function comprehension(type) {
+      if (type == "for")
+        return cont(forspec, comprehension);
+      if (type == "if")
+        return cont(expression, comprehension);
+    }
+    function isContinuedStatement(state, textAfter) {
+      return state.lastType == "operator" || state.lastType == "," || isOperatorChar.test(textAfter.charAt(0)) || /[,.]/.test(textAfter.charAt(0));
+    }
+    return {
+      startState: function(basecolumn) {
+        var state = {
+          tokenize: tokenBase,
+          lastType: "sof",
+          cc: [],
+          lexical: new JSLexical((basecolumn || 0) - indentUnit, 0, "block", false),
+          localVars: parserConfig.localVars,
+          context: parserConfig.localVars && {vars: parserConfig.localVars},
+          indented: 0
+        };
+        if (parserConfig.globalVars && typeof parserConfig.globalVars == "object")
+          state.globalVars = parserConfig.globalVars;
+        return state;
+      },
+      token: function(stream, state) {
+        if (stream.sol()) {
+          if (!state.lexical.hasOwnProperty("align"))
+            state.lexical.align = false;
+          state.indented = stream.indentation();
+          findFatArrow(stream, state);
+        }
+        if (state.tokenize != tokenComment && stream.eatSpace())
+          return null;
+        var style = state.tokenize(stream, state);
+        if (type == "comment")
+          return style;
+        state.lastType = type == "operator" && (content == "++" || content == "--") ? "incdec" : type;
+        return parseJS(state, style, type, content, stream);
+      },
+      indent: function(state, textAfter) {
+        if (state.tokenize == tokenComment)
+          return CodeMirror.Pass;
+        if (state.tokenize != tokenBase)
+          return 0;
+        var firstChar = textAfter && textAfter.charAt(0),
+            lexical = state.lexical;
+        if (!/^\s*else\b/.test(textAfter))
+          for (var i = state.cc.length - 1; i >= 0; --i) {
+            var c = state.cc[i];
+            if (c == poplex)
+              lexical = lexical.prev;
+            else if (c != maybeelse)
+              break;
+          }
+        if (lexical.type == "stat" && firstChar == "}")
+          lexical = lexical.prev;
+        if (statementIndent && lexical.type == ")" && lexical.prev.type == "stat")
+          lexical = lexical.prev;
+        var type = lexical.type,
+            closing = firstChar == type;
+        if (type == "vardef")
+          return lexical.indented + (state.lastType == "operator" || state.lastType == "," ? lexical.info + 1 : 0);
+        else if (type == "form" && firstChar == "{")
+          return lexical.indented;
+        else if (type == "form")
+          return lexical.indented + indentUnit;
+        else if (type == "stat")
+          return lexical.indented + (isContinuedStatement(state, textAfter) ? statementIndent || indentUnit : 0);
+        else if (lexical.info == "switch" && !closing && parserConfig.doubleIndentSwitch != false)
+          return lexical.indented + (/^(?:case|default)\b/.test(textAfter) ? indentUnit : 2 * indentUnit);
+        else if (lexical.align)
+          return lexical.column + (closing ? 0 : 1);
+        else
+          return lexical.indented + (closing ? 0 : indentUnit);
+      },
+      electricInput: /^\s*(?:case .*?:|default:|\{|\})$/,
+      blockCommentStart: jsonMode ? null : "/*",
+      blockCommentEnd: jsonMode ? null : "*/",
+      lineComment: jsonMode ? null : "//",
+      fold: "brace",
+      closeBrackets: "()[]{}''\"\"``",
+      helperType: jsonMode ? "json" : "javascript",
+      jsonldMode: jsonldMode,
+      jsonMode: jsonMode
+    };
+  });
+  CodeMirror.registerHelper("wordChars", "javascript", /[\w$]/);
+  CodeMirror.defineMIME("text/javascript", "javascript");
+  CodeMirror.defineMIME("text/ecmascript", "javascript");
+  CodeMirror.defineMIME("application/javascript", "javascript");
+  CodeMirror.defineMIME("application/x-javascript", "javascript");
+  CodeMirror.defineMIME("application/ecmascript", "javascript");
+  CodeMirror.defineMIME("application/json", {
+    name: "javascript",
+    json: true
+  });
+  CodeMirror.defineMIME("application/x-json", {
+    name: "javascript",
+    json: true
+  });
+  CodeMirror.defineMIME("application/ld+json", {
+    name: "javascript",
+    jsonld: true
+  });
+  CodeMirror.defineMIME("text/typescript", {
+    name: "javascript",
+    typescript: true
+  });
+  CodeMirror.defineMIME("application/typescript", {
+    name: "javascript",
+    typescript: true
+  });
+});
+
+_removeDefine();
+})();
+(function() {
+var _removeDefine = $__System.get("@@amd-helpers").createDefine();
 (function(mod) {
   if (typeof exports == "object" && typeof module == "object")
     module.exports = mod();
   else if (typeof define == "function" && define.amd)
-    return define("2", [], mod);
+    return define("5", [], mod);
   else
     this.CodeMirror = mod();
 })(function() {
@@ -1420,7 +4482,7 @@ var _removeDefine = $__System.get("@@amd-helpers").createDefine();
       if (horiz.clientWidth)
         scroll(horiz.scrollLeft, "horizontal");
     });
-    this.checkedZeroWidth = false;
+    this.checkedOverlay = false;
     if (ie && ie_version < 8)
       this.horiz.style.minHeight = this.vert.style.minWidth = "18px";
   }
@@ -1448,10 +4510,10 @@ var _removeDefine = $__System.get("@@amd-helpers").createDefine();
         this.horiz.style.display = "";
         this.horiz.firstChild.style.width = "0";
       }
-      if (!this.checkedZeroWidth && measure.clientHeight > 0) {
+      if (!this.checkedOverlay && measure.clientHeight > 0) {
         if (sWidth == 0)
-          this.zeroWidthHack();
-        this.checkedZeroWidth = true;
+          this.overlayHack();
+        this.checkedOverlay = true;
       }
       return {
         right: needsV ? sWidth : 0,
@@ -1461,33 +4523,21 @@ var _removeDefine = $__System.get("@@amd-helpers").createDefine();
     setScrollLeft: function(pos) {
       if (this.horiz.scrollLeft != pos)
         this.horiz.scrollLeft = pos;
-      if (this.disableHoriz)
-        this.enableZeroWidthBar(this.horiz, this.disableHoriz);
     },
     setScrollTop: function(pos) {
       if (this.vert.scrollTop != pos)
         this.vert.scrollTop = pos;
-      if (this.disableVert)
-        this.enableZeroWidthBar(this.vert, this.disableVert);
     },
-    zeroWidthHack: function() {
+    overlayHack: function() {
       var w = mac && !mac_geMountainLion ? "12px" : "18px";
-      this.horiz.style.height = this.vert.style.width = w;
-      this.horiz.style.pointerEvents = this.vert.style.pointerEvents = "none";
-      this.disableHoriz = new Delayed;
-      this.disableVert = new Delayed;
-    },
-    enableZeroWidthBar: function(bar, delay) {
-      bar.style.pointerEvents = "auto";
-      function maybeDisable() {
-        var box = bar.getBoundingClientRect();
-        var elt = document.elementFromPoint(box.left + 1, box.bottom - 1);
-        if (elt != bar)
-          bar.style.pointerEvents = "none";
-        else
-          delay.set(1000, maybeDisable);
-      }
-      delay.set(1000, maybeDisable);
+      this.horiz.style.minHeight = this.vert.style.minWidth = w;
+      var self = this;
+      var barMouseDown = function(e) {
+        if (e_target(e) != self.vert && e_target(e) != self.horiz)
+          operation(self.cm, onMouseDown)(e);
+      };
+      on(this.vert, "mousedown", barMouseDown);
+      on(this.horiz, "mousedown", barMouseDown);
     },
     clear: function() {
       var parent = this.horiz.parentNode;
@@ -4085,7 +7135,7 @@ var _removeDefine = $__System.get("@@amd-helpers").createDefine();
       restartBlink(cm);
     if (cm.state.focused && op.updateInput)
       cm.display.input.reset(op.typing);
-    if (op.focus && op.focus == activeElt() && (!document.hasFocus || document.hasFocus()))
+    if (op.focus && op.focus == activeElt())
       ensureFocus(op.cm);
   }
   function endOperation_finish(op) {
@@ -4786,7 +7836,7 @@ var _removeDefine = $__System.get("@@amd-helpers").createDefine();
     on(document, "mousemove", move);
     on(document, "mouseup", up);
   }
-  function gutterEvent(cm, e, type, prevent) {
+  function gutterEvent(cm, e, type, prevent, signalfn) {
     try {
       var mX = e.clientX,
           mY = e.clientY;
@@ -4807,13 +7857,13 @@ var _removeDefine = $__System.get("@@amd-helpers").createDefine();
       if (g && g.getBoundingClientRect().right >= mX) {
         var line = lineAtHeight(cm.doc, mY);
         var gutter = cm.options.gutters[i];
-        signal(cm, type, cm, line, gutter, e);
+        signalfn(cm, type, cm, line, gutter, e);
         return e_defaultPrevented(e);
       }
     }
   }
   function clickInGutter(cm, e) {
-    return gutterEvent(cm, e, "gutterClick", true);
+    return gutterEvent(cm, e, "gutterClick", true, signalLater);
   }
   var lastDrop = 0;
   function onDrop(e) {
@@ -5227,7 +8277,7 @@ var _removeDefine = $__System.get("@@amd-helpers").createDefine();
   function contextMenuInGutter(cm, e) {
     if (!hasHandler(cm, "gutterContextMenu"))
       return false;
-    return gutterEvent(cm, e, "gutterContextMenu", false);
+    return gutterEvent(cm, e, "gutterContextMenu", false, signal);
   }
   var changeEnd = CodeMirror.changeEnd = function(change) {
     if (!change.text)
@@ -10207,36 +13257,69 @@ var _removeDefine = $__System.get("@@amd-helpers").createDefine();
       return order;
     };
   })();
-  CodeMirror.version = "5.8.1";
+  CodeMirror.version = "5.8.0";
   return CodeMirror;
 });
 
 _removeDefine();
 })();
-$__System.register("1", ["2"], function (_export) {
-	"use strict";
+$__System.register('1', ['2', '3', '4', '5'], function (_export) {
+	//
+	'use strict';
 
-	var CodeMirror;
+	var beautify, jsonlint, _js, CodeMirror, doc;
+
 	return {
-		setters: [function (_) {
-			CodeMirror = _["default"];
+		setters: [function (_4) {
+			beautify = _4.js_beautify;
+		}, function (_3) {
+			jsonlint = _3['default'];
+		}, function (_2) {
+			_js = _2['default'];
+		}, function (_) {
+			CodeMirror = _['default'];
 		}],
 		execute: function () {
+			doc = document;
 
-			window.app = new function Main() {
-				babelHelpers.classCallCheck(this, Main);
+			window.app = new ((function () {
+				function Main() {
+					var _this = this;
 
-				var myCodeMirror = CodeMirror(document.body, {
-					value: "function myScript(){return 100;}\n",
-					mode: "javascript"
-				});
-				/*super()
-    	.bindNode('sandbox', '#app')
-    	.setClassFor({
-    		todos: Todos,
-    		randomCat: RandomCat
-    	});*/
-			}();
+					babelHelpers.classCallCheck(this, Main);
+
+					var form = doc.forms.main,
+					    code = form.code;
+
+					var editor = CodeMirror.fromTextArea(document.getElementById("code"), {
+						lineNumbers: true,
+						styleActiveLine: true,
+						matchBrackets: true
+					});
+
+					form.addEventListener('submit', function (evt) {
+						evt.preventDefault();
+						editor.setValue(beautify(code.value));
+						try {
+							jsonlint.parse(code.value);
+							_this.notify(true, 'Valid JSON');
+						} catch (e) {
+							_this.notify(false, e);
+						}
+					});
+				}
+
+				babelHelpers.createClass(Main, [{
+					key: 'notify',
+					value: function notify(success, text) {
+						var result = doc.querySelector('#result');
+						result.classList.toggle('success', success);
+						result.classList.toggle('error', !success);
+						result.innerHTML = text;
+					}
+				}]);
+				return Main;
+			})())();
 		}
 	};
 });
