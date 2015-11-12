@@ -2,10 +2,10 @@
 let gulp = require('gulp');
 let paths = {
 	styles: './sass/**/*.scss',
-	scripts: './src/**/*.js'
+	scripts: './js/**/*.js'
 }
 
-gulp.task('scripts', () => {
+/*gulp.task('scripts', () => {
 	let changed = require('gulp-changed'),
 		babel = require('gulp-babel');
 
@@ -21,14 +21,14 @@ gulp.task('scripts', () => {
 gulp.task('scripts:watch', () => {
 	gulp.start('scripts');
 	gulp.watch(paths.scripts, ['scripts']);
-});
+});*/
 
-gulp.task('scripts:bundle', ['scripts'], cb => {
+gulp.task('scripts:bundle'/*, ['scripts']*/, cb => {
 	let path = require("path");
 	let Builder = require('systemjs-builder');
 	let builder = new Builder();
 
-	builder.loadConfig('src/config.js').then(() => {
+	builder.loadConfig('js/config.js').then(() => {
 		builder.config({
 			transpiler: 'babel',
 		    babelOptions: {

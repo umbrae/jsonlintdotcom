@@ -1,17 +1,10 @@
-'use strict';
-
 System.config({
-    transpiler: 'babel',
     baseURL: '.',
     defaultJSExtensions: true,
-    babelOptions: {
-        stage: 0
-    },
     map: {
-        matreshka: 'src/lib/matreshka',
-        text: 'src/lib/text',
-        lib: 'src/lib',
-        app: 'src/app',
+        text: 'js/lib/text',
+        lib: 'js/lib',
+        app: 'js/app',
         codemirror: 'node_modules/codemirror/lib/codemirror',
         'javascript-syntax': 'node_modules/codemirror/mode/javascript/javascript',
         jsonlint: 'node_modules/jsonlint/web/jsonlint',

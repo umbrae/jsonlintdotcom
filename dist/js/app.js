@@ -1,432 +1,4 @@
 "format global";
-(function (global) {
-  var babelHelpers = global.babelHelpers = {};
-
-  babelHelpers.inherits = function (subClass, superClass) {
-    if (typeof superClass !== "function" && superClass !== null) {
-      throw new TypeError("Super expression must either be null or a function, not " + typeof superClass);
-    }
-
-    subClass.prototype = Object.create(superClass && superClass.prototype, {
-      constructor: {
-        value: subClass,
-        enumerable: false,
-        writable: true,
-        configurable: true
-      }
-    });
-    if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass;
-  };
-
-  babelHelpers.defaults = function (obj, defaults) {
-    var keys = Object.getOwnPropertyNames(defaults);
-
-    for (var i = 0; i < keys.length; i++) {
-      var key = keys[i];
-      var value = Object.getOwnPropertyDescriptor(defaults, key);
-
-      if (value && value.configurable && obj[key] === undefined) {
-        Object.defineProperty(obj, key, value);
-      }
-    }
-
-    return obj;
-  };
-
-  babelHelpers.createClass = (function () {
-    function defineProperties(target, props) {
-      for (var i = 0; i < props.length; i++) {
-        var descriptor = props[i];
-        descriptor.enumerable = descriptor.enumerable || false;
-        descriptor.configurable = true;
-        if ("value" in descriptor) descriptor.writable = true;
-        Object.defineProperty(target, descriptor.key, descriptor);
-      }
-    }
-
-    return function (Constructor, protoProps, staticProps) {
-      if (protoProps) defineProperties(Constructor.prototype, protoProps);
-      if (staticProps) defineProperties(Constructor, staticProps);
-      return Constructor;
-    };
-  })();
-
-  babelHelpers.createDecoratedClass = (function () {
-    function defineProperties(target, descriptors, initializers) {
-      for (var i = 0; i < descriptors.length; i++) {
-        var descriptor = descriptors[i];
-        var decorators = descriptor.decorators;
-        var key = descriptor.key;
-        delete descriptor.key;
-        delete descriptor.decorators;
-        descriptor.enumerable = descriptor.enumerable || false;
-        descriptor.configurable = true;
-        if ("value" in descriptor || descriptor.initializer) descriptor.writable = true;
-
-        if (decorators) {
-          for (var f = 0; f < decorators.length; f++) {
-            var decorator = decorators[f];
-
-            if (typeof decorator === "function") {
-              descriptor = decorator(target, key, descriptor) || descriptor;
-            } else {
-              throw new TypeError("The decorator for method " + descriptor.key + " is of the invalid type " + typeof decorator);
-            }
-          }
-
-          if (descriptor.initializer !== undefined) {
-            initializers[key] = descriptor;
-            continue;
-          }
-        }
-
-        Object.defineProperty(target, key, descriptor);
-      }
-    }
-
-    return function (Constructor, protoProps, staticProps, protoInitializers, staticInitializers) {
-      if (protoProps) defineProperties(Constructor.prototype, protoProps, protoInitializers);
-      if (staticProps) defineProperties(Constructor, staticProps, staticInitializers);
-      return Constructor;
-    };
-  })();
-
-  babelHelpers.createDecoratedObject = function (descriptors) {
-    var target = {};
-
-    for (var i = 0; i < descriptors.length; i++) {
-      var descriptor = descriptors[i];
-      var decorators = descriptor.decorators;
-      var key = descriptor.key;
-      delete descriptor.key;
-      delete descriptor.decorators;
-      descriptor.enumerable = true;
-      descriptor.configurable = true;
-      if ("value" in descriptor || descriptor.initializer) descriptor.writable = true;
-
-      if (decorators) {
-        for (var f = 0; f < decorators.length; f++) {
-          var decorator = decorators[f];
-
-          if (typeof decorator === "function") {
-            descriptor = decorator(target, key, descriptor) || descriptor;
-          } else {
-            throw new TypeError("The decorator for method " + descriptor.key + " is of the invalid type " + typeof decorator);
-          }
-        }
-      }
-
-      if (descriptor.initializer) {
-        descriptor.value = descriptor.initializer.call(target);
-      }
-
-      Object.defineProperty(target, key, descriptor);
-    }
-
-    return target;
-  };
-
-  babelHelpers.defineDecoratedPropertyDescriptor = function (target, key, descriptors) {
-    var _descriptor = descriptors[key];
-    if (!_descriptor) return;
-    var descriptor = {};
-
-    for (var _key in _descriptor) descriptor[_key] = _descriptor[_key];
-
-    descriptor.value = descriptor.initializer ? descriptor.initializer.call(target) : undefined;
-    Object.defineProperty(target, key, descriptor);
-  };
-
-  babelHelpers.taggedTemplateLiteral = function (strings, raw) {
-    return Object.freeze(Object.defineProperties(strings, {
-      raw: {
-        value: Object.freeze(raw)
-      }
-    }));
-  };
-
-  babelHelpers.taggedTemplateLiteralLoose = function (strings, raw) {
-    strings.raw = raw;
-    return strings;
-  };
-
-  babelHelpers.toArray = function (arr) {
-    return Array.isArray(arr) ? arr : Array.from(arr);
-  };
-
-  babelHelpers.toConsumableArray = function (arr) {
-    if (Array.isArray(arr)) {
-      for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) arr2[i] = arr[i];
-
-      return arr2;
-    } else {
-      return Array.from(arr);
-    }
-  };
-
-  babelHelpers.slicedToArray = (function () {
-    function sliceIterator(arr, i) {
-      var _arr = [];
-      var _n = true;
-      var _d = false;
-      var _e = undefined;
-
-      try {
-        for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) {
-          _arr.push(_s.value);
-
-          if (i && _arr.length === i) break;
-        }
-      } catch (err) {
-        _d = true;
-        _e = err;
-      } finally {
-        try {
-          if (!_n && _i["return"]) _i["return"]();
-        } finally {
-          if (_d) throw _e;
-        }
-      }
-
-      return _arr;
-    }
-
-    return function (arr, i) {
-      if (Array.isArray(arr)) {
-        return arr;
-      } else if (Symbol.iterator in Object(arr)) {
-        return sliceIterator(arr, i);
-      } else {
-        throw new TypeError("Invalid attempt to destructure non-iterable instance");
-      }
-    };
-  })();
-
-  babelHelpers.slicedToArrayLoose = function (arr, i) {
-    if (Array.isArray(arr)) {
-      return arr;
-    } else if (Symbol.iterator in Object(arr)) {
-      var _arr = [];
-
-      for (var _iterator = arr[Symbol.iterator](), _step; !(_step = _iterator.next()).done;) {
-        _arr.push(_step.value);
-
-        if (i && _arr.length === i) break;
-      }
-
-      return _arr;
-    } else {
-      throw new TypeError("Invalid attempt to destructure non-iterable instance");
-    }
-  };
-
-  babelHelpers.objectWithoutProperties = function (obj, keys) {
-    var target = {};
-
-    for (var i in obj) {
-      if (keys.indexOf(i) >= 0) continue;
-      if (!Object.prototype.hasOwnProperty.call(obj, i)) continue;
-      target[i] = obj[i];
-    }
-
-    return target;
-  };
-
-  babelHelpers.hasOwn = Object.prototype.hasOwnProperty;
-  babelHelpers.slice = Array.prototype.slice;
-  babelHelpers.bind = Function.prototype.bind;
-
-  babelHelpers.defineProperty = function (obj, key, value) {
-    if (key in obj) {
-      Object.defineProperty(obj, key, {
-        value: value,
-        enumerable: true,
-        configurable: true,
-        writable: true
-      });
-    } else {
-      obj[key] = value;
-    }
-
-    return obj;
-  };
-
-  babelHelpers.asyncToGenerator = function (fn) {
-    return function () {
-      var gen = fn.apply(this, arguments);
-      return new Promise(function (resolve, reject) {
-        var callNext = step.bind(null, "next");
-        var callThrow = step.bind(null, "throw");
-
-        function step(key, arg) {
-          try {
-            var info = gen[key](arg);
-            var value = info.value;
-          } catch (error) {
-            reject(error);
-            return;
-          }
-
-          if (info.done) {
-            resolve(value);
-          } else {
-            Promise.resolve(value).then(callNext, callThrow);
-          }
-        }
-
-        callNext();
-      });
-    };
-  };
-
-  babelHelpers.interopExportWildcard = function (obj, defaults) {
-    var newObj = defaults({}, obj);
-    delete newObj["default"];
-    return newObj;
-  };
-
-  babelHelpers.interopRequireWildcard = function (obj) {
-    if (obj && obj.__esModule) {
-      return obj;
-    } else {
-      var newObj = {};
-
-      if (obj != null) {
-        for (var key in obj) {
-          if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key];
-        }
-      }
-
-      newObj["default"] = obj;
-      return newObj;
-    }
-  };
-
-  babelHelpers.interopRequireDefault = function (obj) {
-    return obj && obj.__esModule ? obj : {
-      "default": obj
-    };
-  };
-
-  babelHelpers._typeof = function (obj) {
-    return obj && obj.constructor === Symbol ? "symbol" : typeof obj;
-  };
-
-  babelHelpers._extends = Object.assign || function (target) {
-    for (var i = 1; i < arguments.length; i++) {
-      var source = arguments[i];
-
-      for (var key in source) {
-        if (Object.prototype.hasOwnProperty.call(source, key)) {
-          target[key] = source[key];
-        }
-      }
-    }
-
-    return target;
-  };
-
-  babelHelpers.get = function get(object, property, receiver) {
-    if (object === null) object = Function.prototype;
-    var desc = Object.getOwnPropertyDescriptor(object, property);
-
-    if (desc === undefined) {
-      var parent = Object.getPrototypeOf(object);
-
-      if (parent === null) {
-        return undefined;
-      } else {
-        return get(parent, property, receiver);
-      }
-    } else if ("value" in desc) {
-      return desc.value;
-    } else {
-      var getter = desc.get;
-
-      if (getter === undefined) {
-        return undefined;
-      }
-
-      return getter.call(receiver);
-    }
-  };
-
-  babelHelpers.set = function set(object, property, value, receiver) {
-    var desc = Object.getOwnPropertyDescriptor(object, property);
-
-    if (desc === undefined) {
-      var parent = Object.getPrototypeOf(object);
-
-      if (parent !== null) {
-        set(parent, property, value, receiver);
-      }
-    } else if ("value" in desc && desc.writable) {
-      desc.value = value;
-    } else {
-      var setter = desc.set;
-
-      if (setter !== undefined) {
-        setter.call(receiver, value);
-      }
-    }
-
-    return value;
-  };
-
-  babelHelpers.newArrowCheck = function (innerThis, boundThis) {
-    if (innerThis !== boundThis) {
-      throw new TypeError("Cannot instantiate an arrow function");
-    }
-  };
-
-  babelHelpers.classCallCheck = function (instance, Constructor) {
-    if (!(instance instanceof Constructor)) {
-      throw new TypeError("Cannot call a class as a function");
-    }
-  };
-
-  babelHelpers.objectDestructuringEmpty = function (obj) {
-    if (obj == null) throw new TypeError("Cannot destructure undefined");
-  };
-
-  babelHelpers.temporalUndefined = {};
-
-  babelHelpers.temporalAssertDefined = function (val, name, undef) {
-    if (val === undef) {
-      throw new ReferenceError(name + " is not defined - temporal dead zone");
-    }
-
-    return true;
-  };
-
-  babelHelpers.selfGlobal = typeof global === "undefined" ? self : global;
-  babelHelpers.typeofReactElement = typeof Symbol === "function" && Symbol["for"] && Symbol["for"]("react.element") || 60103;
-
-  babelHelpers.defaultProps = function (defaultProps, props) {
-    if (defaultProps) {
-      for (var propName in defaultProps) {
-        if (typeof props[propName] === "undefined") {
-          props[propName] = defaultProps[propName];
-        }
-      }
-    }
-
-    return props;
-  };
-
-  babelHelpers._instanceof = function (left, right) {
-    if (right != null && right[Symbol.hasInstance]) {
-      return right[Symbol.hasInstance](left);
-    } else {
-      return left instanceof right;
-    }
-  };
-
-  babelHelpers.interopRequire = function (obj) {
-    return obj && obj.__esModule ? obj["default"] : obj;
-  };
-})(typeof global === "undefined" ? self : global);
-
 (function(global) {
 
   var defined = {};
@@ -1217,6 +789,930 @@
 })(typeof self != 'undefined' ? self : global);
 
 "bundle";
+(function() {
+var _removeDefine = $__System.get("@@amd-helpers").createDefine();
+(function(mod) {
+  if (typeof exports == "object" && typeof module == "object")
+    mod(require("../../lib/codemirror"));
+  else if (typeof define == "function" && define.amd)
+    define("2", ["3"], mod);
+  else
+    mod(CodeMirror);
+})(function(CodeMirror) {
+  "use strict";
+  CodeMirror.defineMode("javascript", function(config, parserConfig) {
+    var indentUnit = config.indentUnit;
+    var statementIndent = parserConfig.statementIndent;
+    var jsonldMode = parserConfig.jsonld;
+    var jsonMode = parserConfig.json || jsonldMode;
+    var isTS = parserConfig.typescript;
+    var wordRE = parserConfig.wordCharacters || /[\w$\xa1-\uffff]/;
+    var keywords = function() {
+      function kw(type) {
+        return {
+          type: type,
+          style: "keyword"
+        };
+      }
+      var A = kw("keyword a"),
+          B = kw("keyword b"),
+          C = kw("keyword c");
+      var operator = kw("operator"),
+          atom = {
+            type: "atom",
+            style: "atom"
+          };
+      var jsKeywords = {
+        "if": kw("if"),
+        "while": A,
+        "with": A,
+        "else": B,
+        "do": B,
+        "try": B,
+        "finally": B,
+        "return": C,
+        "break": C,
+        "continue": C,
+        "new": kw("new"),
+        "delete": C,
+        "throw": C,
+        "debugger": C,
+        "var": kw("var"),
+        "const": kw("var"),
+        "let": kw("var"),
+        "async": kw("async"),
+        "function": kw("function"),
+        "catch": kw("catch"),
+        "for": kw("for"),
+        "switch": kw("switch"),
+        "case": kw("case"),
+        "default": kw("default"),
+        "in": operator,
+        "typeof": operator,
+        "instanceof": operator,
+        "true": atom,
+        "false": atom,
+        "null": atom,
+        "undefined": atom,
+        "NaN": atom,
+        "Infinity": atom,
+        "this": kw("this"),
+        "class": kw("class"),
+        "super": kw("atom"),
+        "await": C,
+        "yield": C,
+        "export": kw("export"),
+        "import": kw("import"),
+        "extends": C
+      };
+      if (isTS) {
+        var type = {
+          type: "variable",
+          style: "variable-3"
+        };
+        var tsKeywords = {
+          "interface": kw("interface"),
+          "extends": kw("extends"),
+          "constructor": kw("constructor"),
+          "public": kw("public"),
+          "private": kw("private"),
+          "protected": kw("protected"),
+          "static": kw("static"),
+          "string": type,
+          "number": type,
+          "boolean": type,
+          "any": type
+        };
+        for (var attr in tsKeywords) {
+          jsKeywords[attr] = tsKeywords[attr];
+        }
+      }
+      return jsKeywords;
+    }();
+    var isOperatorChar = /[+\-*&%=<>!?|~^]/;
+    var isJsonldKeyword = /^@(context|id|value|language|type|container|list|set|reverse|index|base|vocab|graph)"/;
+    function readRegexp(stream) {
+      var escaped = false,
+          next,
+          inSet = false;
+      while ((next = stream.next()) != null) {
+        if (!escaped) {
+          if (next == "/" && !inSet)
+            return;
+          if (next == "[")
+            inSet = true;
+          else if (inSet && next == "]")
+            inSet = false;
+        }
+        escaped = !escaped && next == "\\";
+      }
+    }
+    var type,
+        content;
+    function ret(tp, style, cont) {
+      type = tp;
+      content = cont;
+      return style;
+    }
+    function tokenBase(stream, state) {
+      var ch = stream.next();
+      if (ch == '"' || ch == "'") {
+        state.tokenize = tokenString(ch);
+        return state.tokenize(stream, state);
+      } else if (ch == "." && stream.match(/^\d+(?:[eE][+\-]?\d+)?/)) {
+        return ret("number", "number");
+      } else if (ch == "." && stream.match("..")) {
+        return ret("spread", "meta");
+      } else if (/[\[\]{}\(\),;\:\.]/.test(ch)) {
+        return ret(ch);
+      } else if (ch == "=" && stream.eat(">")) {
+        return ret("=>", "operator");
+      } else if (ch == "0" && stream.eat(/x/i)) {
+        stream.eatWhile(/[\da-f]/i);
+        return ret("number", "number");
+      } else if (ch == "0" && stream.eat(/o/i)) {
+        stream.eatWhile(/[0-7]/i);
+        return ret("number", "number");
+      } else if (ch == "0" && stream.eat(/b/i)) {
+        stream.eatWhile(/[01]/i);
+        return ret("number", "number");
+      } else if (/\d/.test(ch)) {
+        stream.match(/^\d*(?:\.\d*)?(?:[eE][+\-]?\d+)?/);
+        return ret("number", "number");
+      } else if (ch == "/") {
+        if (stream.eat("*")) {
+          state.tokenize = tokenComment;
+          return tokenComment(stream, state);
+        } else if (stream.eat("/")) {
+          stream.skipToEnd();
+          return ret("comment", "comment");
+        } else if (state.lastType == "operator" || state.lastType == "keyword c" || state.lastType == "sof" || /^[\[{}\(,;:]$/.test(state.lastType)) {
+          readRegexp(stream);
+          stream.match(/^\b(([gimyu])(?![gimyu]*\2))+\b/);
+          return ret("regexp", "string-2");
+        } else {
+          stream.eatWhile(isOperatorChar);
+          return ret("operator", "operator", stream.current());
+        }
+      } else if (ch == "`") {
+        state.tokenize = tokenQuasi;
+        return tokenQuasi(stream, state);
+      } else if (ch == "#") {
+        stream.skipToEnd();
+        return ret("error", "error");
+      } else if (isOperatorChar.test(ch)) {
+        stream.eatWhile(isOperatorChar);
+        return ret("operator", "operator", stream.current());
+      } else if (wordRE.test(ch)) {
+        stream.eatWhile(wordRE);
+        var word = stream.current(),
+            known = keywords.propertyIsEnumerable(word) && keywords[word];
+        return (known && state.lastType != ".") ? ret(known.type, known.style, word) : ret("variable", "variable", word);
+      }
+    }
+    function tokenString(quote) {
+      return function(stream, state) {
+        var escaped = false,
+            next;
+        if (jsonldMode && stream.peek() == "@" && stream.match(isJsonldKeyword)) {
+          state.tokenize = tokenBase;
+          return ret("jsonld-keyword", "meta");
+        }
+        while ((next = stream.next()) != null) {
+          if (next == quote && !escaped)
+            break;
+          escaped = !escaped && next == "\\";
+        }
+        if (!escaped)
+          state.tokenize = tokenBase;
+        return ret("string", "string");
+      };
+    }
+    function tokenComment(stream, state) {
+      var maybeEnd = false,
+          ch;
+      while (ch = stream.next()) {
+        if (ch == "/" && maybeEnd) {
+          state.tokenize = tokenBase;
+          break;
+        }
+        maybeEnd = (ch == "*");
+      }
+      return ret("comment", "comment");
+    }
+    function tokenQuasi(stream, state) {
+      var escaped = false,
+          next;
+      while ((next = stream.next()) != null) {
+        if (!escaped && (next == "`" || next == "$" && stream.eat("{"))) {
+          state.tokenize = tokenBase;
+          break;
+        }
+        escaped = !escaped && next == "\\";
+      }
+      return ret("quasi", "string-2", stream.current());
+    }
+    var brackets = "([{}])";
+    function findFatArrow(stream, state) {
+      if (state.fatArrowAt)
+        state.fatArrowAt = null;
+      var arrow = stream.string.indexOf("=>", stream.start);
+      if (arrow < 0)
+        return;
+      var depth = 0,
+          sawSomething = false;
+      for (var pos = arrow - 1; pos >= 0; --pos) {
+        var ch = stream.string.charAt(pos);
+        var bracket = brackets.indexOf(ch);
+        if (bracket >= 0 && bracket < 3) {
+          if (!depth) {
+            ++pos;
+            break;
+          }
+          if (--depth == 0)
+            break;
+        } else if (bracket >= 3 && bracket < 6) {
+          ++depth;
+        } else if (wordRE.test(ch)) {
+          sawSomething = true;
+        } else if (/["'\/]/.test(ch)) {
+          return;
+        } else if (sawSomething && !depth) {
+          ++pos;
+          break;
+        }
+      }
+      if (sawSomething && !depth)
+        state.fatArrowAt = pos;
+    }
+    var atomicTypes = {
+      "atom": true,
+      "number": true,
+      "variable": true,
+      "string": true,
+      "regexp": true,
+      "this": true,
+      "jsonld-keyword": true
+    };
+    function JSLexical(indented, column, type, align, prev, info) {
+      this.indented = indented;
+      this.column = column;
+      this.type = type;
+      this.prev = prev;
+      this.info = info;
+      if (align != null)
+        this.align = align;
+    }
+    function inScope(state, varname) {
+      for (var v = state.localVars; v; v = v.next)
+        if (v.name == varname)
+          return true;
+      for (var cx = state.context; cx; cx = cx.prev) {
+        for (var v = cx.vars; v; v = v.next)
+          if (v.name == varname)
+            return true;
+      }
+    }
+    function parseJS(state, style, type, content, stream) {
+      var cc = state.cc;
+      cx.state = state;
+      cx.stream = stream;
+      cx.marked = null, cx.cc = cc;
+      cx.style = style;
+      if (!state.lexical.hasOwnProperty("align"))
+        state.lexical.align = true;
+      while (true) {
+        var combinator = cc.length ? cc.pop() : jsonMode ? expression : statement;
+        if (combinator(type, content)) {
+          while (cc.length && cc[cc.length - 1].lex)
+            cc.pop()();
+          if (cx.marked)
+            return cx.marked;
+          if (type == "variable" && inScope(state, content))
+            return "variable-2";
+          return style;
+        }
+      }
+    }
+    var cx = {
+      state: null,
+      column: null,
+      marked: null,
+      cc: null
+    };
+    function pass() {
+      for (var i = arguments.length - 1; i >= 0; i--)
+        cx.cc.push(arguments[i]);
+    }
+    function cont() {
+      pass.apply(null, arguments);
+      return true;
+    }
+    function register(varname) {
+      function inList(list) {
+        for (var v = list; v; v = v.next)
+          if (v.name == varname)
+            return true;
+        return false;
+      }
+      var state = cx.state;
+      cx.marked = "def";
+      if (state.context) {
+        if (inList(state.localVars))
+          return;
+        state.localVars = {
+          name: varname,
+          next: state.localVars
+        };
+      } else {
+        if (inList(state.globalVars))
+          return;
+        if (parserConfig.globalVars)
+          state.globalVars = {
+            name: varname,
+            next: state.globalVars
+          };
+      }
+    }
+    var defaultVars = {
+      name: "this",
+      next: {name: "arguments"}
+    };
+    function pushcontext() {
+      cx.state.context = {
+        prev: cx.state.context,
+        vars: cx.state.localVars
+      };
+      cx.state.localVars = defaultVars;
+    }
+    function popcontext() {
+      cx.state.localVars = cx.state.context.vars;
+      cx.state.context = cx.state.context.prev;
+    }
+    function pushlex(type, info) {
+      var result = function() {
+        var state = cx.state,
+            indent = state.indented;
+        if (state.lexical.type == "stat")
+          indent = state.lexical.indented;
+        else
+          for (var outer = state.lexical; outer && outer.type == ")" && outer.align; outer = outer.prev)
+            indent = outer.indented;
+        state.lexical = new JSLexical(indent, cx.stream.column(), type, null, state.lexical, info);
+      };
+      result.lex = true;
+      return result;
+    }
+    function poplex() {
+      var state = cx.state;
+      if (state.lexical.prev) {
+        if (state.lexical.type == ")")
+          state.indented = state.lexical.indented;
+        state.lexical = state.lexical.prev;
+      }
+    }
+    poplex.lex = true;
+    function expect(wanted) {
+      function exp(type) {
+        if (type == wanted)
+          return cont();
+        else if (wanted == ";")
+          return pass();
+        else
+          return cont(exp);
+      }
+      ;
+      return exp;
+    }
+    function statement(type, value) {
+      if (type == "var")
+        return cont(pushlex("vardef", value.length), vardef, expect(";"), poplex);
+      if (type == "keyword a")
+        return cont(pushlex("form"), expression, statement, poplex);
+      if (type == "keyword b")
+        return cont(pushlex("form"), statement, poplex);
+      if (type == "{")
+        return cont(pushlex("}"), block, poplex);
+      if (type == ";")
+        return cont();
+      if (type == "if") {
+        if (cx.state.lexical.info == "else" && cx.state.cc[cx.state.cc.length - 1] == poplex)
+          cx.state.cc.pop()();
+        return cont(pushlex("form"), expression, statement, poplex, maybeelse);
+      }
+      if (type == "function")
+        return cont(functiondef);
+      if (type == "for")
+        return cont(pushlex("form"), forspec, statement, poplex);
+      if (type == "variable")
+        return cont(pushlex("stat"), maybelabel);
+      if (type == "switch")
+        return cont(pushlex("form"), expression, pushlex("}", "switch"), expect("{"), block, poplex, poplex);
+      if (type == "case")
+        return cont(expression, expect(":"));
+      if (type == "default")
+        return cont(expect(":"));
+      if (type == "catch")
+        return cont(pushlex("form"), pushcontext, expect("("), funarg, expect(")"), statement, poplex, popcontext);
+      if (type == "class")
+        return cont(pushlex("form"), className, poplex);
+      if (type == "export")
+        return cont(pushlex("stat"), afterExport, poplex);
+      if (type == "import")
+        return cont(pushlex("stat"), afterImport, poplex);
+      return pass(pushlex("stat"), expression, expect(";"), poplex);
+    }
+    function expression(type) {
+      return expressionInner(type, false);
+    }
+    function expressionNoComma(type) {
+      return expressionInner(type, true);
+    }
+    function expressionInner(type, noComma) {
+      if (cx.state.fatArrowAt == cx.stream.start) {
+        var body = noComma ? arrowBodyNoComma : arrowBody;
+        if (type == "(")
+          return cont(pushcontext, pushlex(")"), commasep(pattern, ")"), poplex, expect("=>"), body, popcontext);
+        else if (type == "variable")
+          return pass(pushcontext, pattern, expect("=>"), body, popcontext);
+      }
+      var maybeop = noComma ? maybeoperatorNoComma : maybeoperatorComma;
+      if (atomicTypes.hasOwnProperty(type))
+        return cont(maybeop);
+      if (type == "async")
+        return cont(expression);
+      if (type == "function")
+        return cont(functiondef, maybeop);
+      if (type == "keyword c")
+        return cont(noComma ? maybeexpressionNoComma : maybeexpression);
+      if (type == "(")
+        return cont(pushlex(")"), maybeexpression, comprehension, expect(")"), poplex, maybeop);
+      if (type == "operator" || type == "spread")
+        return cont(noComma ? expressionNoComma : expression);
+      if (type == "[")
+        return cont(pushlex("]"), arrayLiteral, poplex, maybeop);
+      if (type == "{")
+        return contCommasep(objprop, "}", null, maybeop);
+      if (type == "quasi")
+        return pass(quasi, maybeop);
+      if (type == "new")
+        return cont(maybeTarget(noComma));
+      return cont();
+    }
+    function maybeexpression(type) {
+      if (type.match(/[;\}\)\],]/))
+        return pass();
+      return pass(expression);
+    }
+    function maybeexpressionNoComma(type) {
+      if (type.match(/[;\}\)\],]/))
+        return pass();
+      return pass(expressionNoComma);
+    }
+    function maybeoperatorComma(type, value) {
+      if (type == ",")
+        return cont(expression);
+      return maybeoperatorNoComma(type, value, false);
+    }
+    function maybeoperatorNoComma(type, value, noComma) {
+      var me = noComma == false ? maybeoperatorComma : maybeoperatorNoComma;
+      var expr = noComma == false ? expression : expressionNoComma;
+      if (type == "=>")
+        return cont(pushcontext, noComma ? arrowBodyNoComma : arrowBody, popcontext);
+      if (type == "operator") {
+        if (/\+\+|--/.test(value))
+          return cont(me);
+        if (value == "?")
+          return cont(expression, expect(":"), expr);
+        return cont(expr);
+      }
+      if (type == "quasi") {
+        return pass(quasi, me);
+      }
+      if (type == ";")
+        return;
+      if (type == "(")
+        return contCommasep(expressionNoComma, ")", "call", me);
+      if (type == ".")
+        return cont(property, me);
+      if (type == "[")
+        return cont(pushlex("]"), maybeexpression, expect("]"), poplex, me);
+    }
+    function quasi(type, value) {
+      if (type != "quasi")
+        return pass();
+      if (value.slice(value.length - 2) != "${")
+        return cont(quasi);
+      return cont(expression, continueQuasi);
+    }
+    function continueQuasi(type) {
+      if (type == "}") {
+        cx.marked = "string-2";
+        cx.state.tokenize = tokenQuasi;
+        return cont(quasi);
+      }
+    }
+    function arrowBody(type) {
+      findFatArrow(cx.stream, cx.state);
+      return pass(type == "{" ? statement : expression);
+    }
+    function arrowBodyNoComma(type) {
+      findFatArrow(cx.stream, cx.state);
+      return pass(type == "{" ? statement : expressionNoComma);
+    }
+    function maybeTarget(noComma) {
+      return function(type) {
+        if (type == ".")
+          return cont(noComma ? targetNoComma : target);
+        else
+          return pass(noComma ? expressionNoComma : expression);
+      };
+    }
+    function target(_, value) {
+      if (value == "target") {
+        cx.marked = "keyword";
+        return cont(maybeoperatorComma);
+      }
+    }
+    function targetNoComma(_, value) {
+      if (value == "target") {
+        cx.marked = "keyword";
+        return cont(maybeoperatorNoComma);
+      }
+    }
+    function maybelabel(type) {
+      if (type == ":")
+        return cont(poplex, statement);
+      return pass(maybeoperatorComma, expect(";"), poplex);
+    }
+    function property(type) {
+      if (type == "variable") {
+        cx.marked = "property";
+        return cont();
+      }
+    }
+    function objprop(type, value) {
+      if (type == "async") {
+        return cont(objprop);
+      } else if (type == "variable" || cx.style == "keyword") {
+        cx.marked = "property";
+        if (value == "get" || value == "set")
+          return cont(getterSetter);
+        return cont(afterprop);
+      } else if (type == "number" || type == "string") {
+        cx.marked = jsonldMode ? "property" : (cx.style + " property");
+        return cont(afterprop);
+      } else if (type == "jsonld-keyword") {
+        return cont(afterprop);
+      } else if (type == "[") {
+        return cont(expression, expect("]"), afterprop);
+      }
+    }
+    function getterSetter(type) {
+      if (type != "variable")
+        return pass(afterprop);
+      cx.marked = "property";
+      return cont(functiondef);
+    }
+    function afterprop(type) {
+      if (type == ":")
+        return cont(expressionNoComma);
+      if (type == "(")
+        return pass(functiondef);
+    }
+    function commasep(what, end) {
+      function proceed(type) {
+        if (type == ",") {
+          var lex = cx.state.lexical;
+          if (lex.info == "call")
+            lex.pos = (lex.pos || 0) + 1;
+          return cont(what, proceed);
+        }
+        if (type == end)
+          return cont();
+        return cont(expect(end));
+      }
+      return function(type) {
+        if (type == end)
+          return cont();
+        return pass(what, proceed);
+      };
+    }
+    function contCommasep(what, end, info) {
+      for (var i = 3; i < arguments.length; i++)
+        cx.cc.push(arguments[i]);
+      return cont(pushlex(end, info), commasep(what, end), poplex);
+    }
+    function block(type) {
+      if (type == "}")
+        return cont();
+      return pass(statement, block);
+    }
+    function maybetype(type) {
+      if (isTS && type == ":")
+        return cont(typedef);
+    }
+    function maybedefault(_, value) {
+      if (value == "=")
+        return cont(expressionNoComma);
+    }
+    function typedef(type) {
+      if (type == "variable") {
+        cx.marked = "variable-3";
+        return cont();
+      }
+    }
+    function vardef() {
+      return pass(pattern, maybetype, maybeAssign, vardefCont);
+    }
+    function pattern(type, value) {
+      if (type == "variable") {
+        register(value);
+        return cont();
+      }
+      if (type == "spread")
+        return cont(pattern);
+      if (type == "[")
+        return contCommasep(pattern, "]");
+      if (type == "{")
+        return contCommasep(proppattern, "}");
+    }
+    function proppattern(type, value) {
+      if (type == "variable" && !cx.stream.match(/^\s*:/, false)) {
+        register(value);
+        return cont(maybeAssign);
+      }
+      if (type == "variable")
+        cx.marked = "property";
+      if (type == "spread")
+        return cont(pattern);
+      return cont(expect(":"), pattern, maybeAssign);
+    }
+    function maybeAssign(_type, value) {
+      if (value == "=")
+        return cont(expressionNoComma);
+    }
+    function vardefCont(type) {
+      if (type == ",")
+        return cont(vardef);
+    }
+    function maybeelse(type, value) {
+      if (type == "keyword b" && value == "else")
+        return cont(pushlex("form", "else"), statement, poplex);
+    }
+    function forspec(type) {
+      if (type == "(")
+        return cont(pushlex(")"), forspec1, expect(")"), poplex);
+    }
+    function forspec1(type) {
+      if (type == "var")
+        return cont(vardef, expect(";"), forspec2);
+      if (type == ";")
+        return cont(forspec2);
+      if (type == "variable")
+        return cont(formaybeinof);
+      return pass(expression, expect(";"), forspec2);
+    }
+    function formaybeinof(_type, value) {
+      if (value == "in" || value == "of") {
+        cx.marked = "keyword";
+        return cont(expression);
+      }
+      return cont(maybeoperatorComma, forspec2);
+    }
+    function forspec2(type, value) {
+      if (type == ";")
+        return cont(forspec3);
+      if (value == "in" || value == "of") {
+        cx.marked = "keyword";
+        return cont(expression);
+      }
+      return pass(expression, expect(";"), forspec3);
+    }
+    function forspec3(type) {
+      if (type != ")")
+        cont(expression);
+    }
+    function functiondef(type, value) {
+      if (value == "*") {
+        cx.marked = "keyword";
+        return cont(functiondef);
+      }
+      if (type == "variable") {
+        register(value);
+        return cont(functiondef);
+      }
+      if (type == "(")
+        return cont(pushcontext, pushlex(")"), commasep(funarg, ")"), poplex, statement, popcontext);
+    }
+    function funarg(type) {
+      if (type == "spread")
+        return cont(funarg);
+      return pass(pattern, maybetype, maybedefault);
+    }
+    function className(type, value) {
+      if (type == "variable") {
+        register(value);
+        return cont(classNameAfter);
+      }
+    }
+    function classNameAfter(type, value) {
+      if (value == "extends")
+        return cont(expression, classNameAfter);
+      if (type == "{")
+        return cont(pushlex("}"), classBody, poplex);
+    }
+    function classBody(type, value) {
+      if (type == "variable" || cx.style == "keyword") {
+        if (value == "static") {
+          cx.marked = "keyword";
+          return cont(classBody);
+        }
+        cx.marked = "property";
+        if (value == "get" || value == "set")
+          return cont(classGetterSetter, functiondef, classBody);
+        return cont(functiondef, classBody);
+      }
+      if (value == "*") {
+        cx.marked = "keyword";
+        return cont(classBody);
+      }
+      if (type == ";")
+        return cont(classBody);
+      if (type == "}")
+        return cont();
+    }
+    function classGetterSetter(type) {
+      if (type != "variable")
+        return pass();
+      cx.marked = "property";
+      return cont();
+    }
+    function afterExport(_type, value) {
+      if (value == "*") {
+        cx.marked = "keyword";
+        return cont(maybeFrom, expect(";"));
+      }
+      if (value == "default") {
+        cx.marked = "keyword";
+        return cont(expression, expect(";"));
+      }
+      return pass(statement);
+    }
+    function afterImport(type) {
+      if (type == "string")
+        return cont();
+      return pass(importSpec, maybeFrom);
+    }
+    function importSpec(type, value) {
+      if (type == "{")
+        return contCommasep(importSpec, "}");
+      if (type == "variable")
+        register(value);
+      if (value == "*")
+        cx.marked = "keyword";
+      return cont(maybeAs);
+    }
+    function maybeAs(_type, value) {
+      if (value == "as") {
+        cx.marked = "keyword";
+        return cont(importSpec);
+      }
+    }
+    function maybeFrom(_type, value) {
+      if (value == "from") {
+        cx.marked = "keyword";
+        return cont(expression);
+      }
+    }
+    function arrayLiteral(type) {
+      if (type == "]")
+        return cont();
+      return pass(expressionNoComma, maybeArrayComprehension);
+    }
+    function maybeArrayComprehension(type) {
+      if (type == "for")
+        return pass(comprehension, expect("]"));
+      if (type == ",")
+        return cont(commasep(maybeexpressionNoComma, "]"));
+      return pass(commasep(expressionNoComma, "]"));
+    }
+    function comprehension(type) {
+      if (type == "for")
+        return cont(forspec, comprehension);
+      if (type == "if")
+        return cont(expression, comprehension);
+    }
+    function isContinuedStatement(state, textAfter) {
+      return state.lastType == "operator" || state.lastType == "," || isOperatorChar.test(textAfter.charAt(0)) || /[,.]/.test(textAfter.charAt(0));
+    }
+    return {
+      startState: function(basecolumn) {
+        var state = {
+          tokenize: tokenBase,
+          lastType: "sof",
+          cc: [],
+          lexical: new JSLexical((basecolumn || 0) - indentUnit, 0, "block", false),
+          localVars: parserConfig.localVars,
+          context: parserConfig.localVars && {vars: parserConfig.localVars},
+          indented: 0
+        };
+        if (parserConfig.globalVars && typeof parserConfig.globalVars == "object")
+          state.globalVars = parserConfig.globalVars;
+        return state;
+      },
+      token: function(stream, state) {
+        if (stream.sol()) {
+          if (!state.lexical.hasOwnProperty("align"))
+            state.lexical.align = false;
+          state.indented = stream.indentation();
+          findFatArrow(stream, state);
+        }
+        if (state.tokenize != tokenComment && stream.eatSpace())
+          return null;
+        var style = state.tokenize(stream, state);
+        if (type == "comment")
+          return style;
+        state.lastType = type == "operator" && (content == "++" || content == "--") ? "incdec" : type;
+        return parseJS(state, style, type, content, stream);
+      },
+      indent: function(state, textAfter) {
+        if (state.tokenize == tokenComment)
+          return CodeMirror.Pass;
+        if (state.tokenize != tokenBase)
+          return 0;
+        var firstChar = textAfter && textAfter.charAt(0),
+            lexical = state.lexical;
+        if (!/^\s*else\b/.test(textAfter))
+          for (var i = state.cc.length - 1; i >= 0; --i) {
+            var c = state.cc[i];
+            if (c == poplex)
+              lexical = lexical.prev;
+            else if (c != maybeelse)
+              break;
+          }
+        if (lexical.type == "stat" && firstChar == "}")
+          lexical = lexical.prev;
+        if (statementIndent && lexical.type == ")" && lexical.prev.type == "stat")
+          lexical = lexical.prev;
+        var type = lexical.type,
+            closing = firstChar == type;
+        if (type == "vardef")
+          return lexical.indented + (state.lastType == "operator" || state.lastType == "," ? lexical.info + 1 : 0);
+        else if (type == "form" && firstChar == "{")
+          return lexical.indented;
+        else if (type == "form")
+          return lexical.indented + indentUnit;
+        else if (type == "stat")
+          return lexical.indented + (isContinuedStatement(state, textAfter) ? statementIndent || indentUnit : 0);
+        else if (lexical.info == "switch" && !closing && parserConfig.doubleIndentSwitch != false)
+          return lexical.indented + (/^(?:case|default)\b/.test(textAfter) ? indentUnit : 2 * indentUnit);
+        else if (lexical.align)
+          return lexical.column + (closing ? 0 : 1);
+        else
+          return lexical.indented + (closing ? 0 : indentUnit);
+      },
+      electricInput: /^\s*(?:case .*?:|default:|\{|\})$/,
+      blockCommentStart: jsonMode ? null : "/*",
+      blockCommentEnd: jsonMode ? null : "*/",
+      lineComment: jsonMode ? null : "//",
+      fold: "brace",
+      closeBrackets: "()[]{}''\"\"``",
+      helperType: jsonMode ? "json" : "javascript",
+      jsonldMode: jsonldMode,
+      jsonMode: jsonMode
+    };
+  });
+  CodeMirror.registerHelper("wordChars", "javascript", /[\w$]/);
+  CodeMirror.defineMIME("text/javascript", "javascript");
+  CodeMirror.defineMIME("text/ecmascript", "javascript");
+  CodeMirror.defineMIME("application/javascript", "javascript");
+  CodeMirror.defineMIME("application/x-javascript", "javascript");
+  CodeMirror.defineMIME("application/ecmascript", "javascript");
+  CodeMirror.defineMIME("application/json", {
+    name: "javascript",
+    json: true
+  });
+  CodeMirror.defineMIME("application/x-json", {
+    name: "javascript",
+    json: true
+  });
+  CodeMirror.defineMIME("application/ld+json", {
+    name: "javascript",
+    jsonld: true
+  });
+  CodeMirror.defineMIME("text/typescript", {
+    name: "javascript",
+    typescript: true
+  });
+  CodeMirror.defineMIME("application/typescript", {
+    name: "javascript",
+    typescript: true
+  });
+});
+
+_removeDefine();
+})();
 (function() {
 var _removeDefine = $__System.get("@@amd-helpers").createDefine();
 (function() {
@@ -2695,7 +3191,7 @@ var _removeDefine = $__System.get("@@amd-helpers").createDefine();
     }
   }
   if (typeof define === "function" && define.amd) {
-    define("2", [], function() {
+    define("4", [], function() {
       return {js_beautify: js_beautify};
     });
   } else if (typeof exports !== "undefined") {
@@ -2709,7 +3205,7 @@ var _removeDefine = $__System.get("@@amd-helpers").createDefine();
 
 _removeDefine();
 })();
-$__System.registerDynamic("3", [], false, function(__require, __exports, __module) {
+$__System.registerDynamic("5", [], false, function(__require, __exports, __module) {
   var _retrieveGlobal = $__System.get("@@global-helpers").prepareGlobal(__module.id, null, null);
   (function() {
     var jsonlint = this["jsonlint"];
@@ -3239,933 +3735,9 @@ $__System.registerDynamic("3", [], false, function(__require, __exports, __modul
 var _removeDefine = $__System.get("@@amd-helpers").createDefine();
 (function(mod) {
   if (typeof exports == "object" && typeof module == "object")
-    mod(require("../../lib/codemirror"));
-  else if (typeof define == "function" && define.amd)
-    define("4", ["5"], mod);
-  else
-    mod(CodeMirror);
-})(function(CodeMirror) {
-  "use strict";
-  CodeMirror.defineMode("javascript", function(config, parserConfig) {
-    var indentUnit = config.indentUnit;
-    var statementIndent = parserConfig.statementIndent;
-    var jsonldMode = parserConfig.jsonld;
-    var jsonMode = parserConfig.json || jsonldMode;
-    var isTS = parserConfig.typescript;
-    var wordRE = parserConfig.wordCharacters || /[\w$\xa1-\uffff]/;
-    var keywords = function() {
-      function kw(type) {
-        return {
-          type: type,
-          style: "keyword"
-        };
-      }
-      var A = kw("keyword a"),
-          B = kw("keyword b"),
-          C = kw("keyword c");
-      var operator = kw("operator"),
-          atom = {
-            type: "atom",
-            style: "atom"
-          };
-      var jsKeywords = {
-        "if": kw("if"),
-        "while": A,
-        "with": A,
-        "else": B,
-        "do": B,
-        "try": B,
-        "finally": B,
-        "return": C,
-        "break": C,
-        "continue": C,
-        "new": kw("new"),
-        "delete": C,
-        "throw": C,
-        "debugger": C,
-        "var": kw("var"),
-        "const": kw("var"),
-        "let": kw("var"),
-        "async": kw("async"),
-        "function": kw("function"),
-        "catch": kw("catch"),
-        "for": kw("for"),
-        "switch": kw("switch"),
-        "case": kw("case"),
-        "default": kw("default"),
-        "in": operator,
-        "typeof": operator,
-        "instanceof": operator,
-        "true": atom,
-        "false": atom,
-        "null": atom,
-        "undefined": atom,
-        "NaN": atom,
-        "Infinity": atom,
-        "this": kw("this"),
-        "class": kw("class"),
-        "super": kw("atom"),
-        "await": C,
-        "yield": C,
-        "export": kw("export"),
-        "import": kw("import"),
-        "extends": C
-      };
-      if (isTS) {
-        var type = {
-          type: "variable",
-          style: "variable-3"
-        };
-        var tsKeywords = {
-          "interface": kw("interface"),
-          "extends": kw("extends"),
-          "constructor": kw("constructor"),
-          "public": kw("public"),
-          "private": kw("private"),
-          "protected": kw("protected"),
-          "static": kw("static"),
-          "string": type,
-          "number": type,
-          "boolean": type,
-          "any": type
-        };
-        for (var attr in tsKeywords) {
-          jsKeywords[attr] = tsKeywords[attr];
-        }
-      }
-      return jsKeywords;
-    }();
-    var isOperatorChar = /[+\-*&%=<>!?|~^]/;
-    var isJsonldKeyword = /^@(context|id|value|language|type|container|list|set|reverse|index|base|vocab|graph)"/;
-    function readRegexp(stream) {
-      var escaped = false,
-          next,
-          inSet = false;
-      while ((next = stream.next()) != null) {
-        if (!escaped) {
-          if (next == "/" && !inSet)
-            return;
-          if (next == "[")
-            inSet = true;
-          else if (inSet && next == "]")
-            inSet = false;
-        }
-        escaped = !escaped && next == "\\";
-      }
-    }
-    var type,
-        content;
-    function ret(tp, style, cont) {
-      type = tp;
-      content = cont;
-      return style;
-    }
-    function tokenBase(stream, state) {
-      var ch = stream.next();
-      if (ch == '"' || ch == "'") {
-        state.tokenize = tokenString(ch);
-        return state.tokenize(stream, state);
-      } else if (ch == "." && stream.match(/^\d+(?:[eE][+\-]?\d+)?/)) {
-        return ret("number", "number");
-      } else if (ch == "." && stream.match("..")) {
-        return ret("spread", "meta");
-      } else if (/[\[\]{}\(\),;\:\.]/.test(ch)) {
-        return ret(ch);
-      } else if (ch == "=" && stream.eat(">")) {
-        return ret("=>", "operator");
-      } else if (ch == "0" && stream.eat(/x/i)) {
-        stream.eatWhile(/[\da-f]/i);
-        return ret("number", "number");
-      } else if (ch == "0" && stream.eat(/o/i)) {
-        stream.eatWhile(/[0-7]/i);
-        return ret("number", "number");
-      } else if (ch == "0" && stream.eat(/b/i)) {
-        stream.eatWhile(/[01]/i);
-        return ret("number", "number");
-      } else if (/\d/.test(ch)) {
-        stream.match(/^\d*(?:\.\d*)?(?:[eE][+\-]?\d+)?/);
-        return ret("number", "number");
-      } else if (ch == "/") {
-        if (stream.eat("*")) {
-          state.tokenize = tokenComment;
-          return tokenComment(stream, state);
-        } else if (stream.eat("/")) {
-          stream.skipToEnd();
-          return ret("comment", "comment");
-        } else if (state.lastType == "operator" || state.lastType == "keyword c" || state.lastType == "sof" || /^[\[{}\(,;:]$/.test(state.lastType)) {
-          readRegexp(stream);
-          stream.match(/^\b(([gimyu])(?![gimyu]*\2))+\b/);
-          return ret("regexp", "string-2");
-        } else {
-          stream.eatWhile(isOperatorChar);
-          return ret("operator", "operator", stream.current());
-        }
-      } else if (ch == "`") {
-        state.tokenize = tokenQuasi;
-        return tokenQuasi(stream, state);
-      } else if (ch == "#") {
-        stream.skipToEnd();
-        return ret("error", "error");
-      } else if (isOperatorChar.test(ch)) {
-        stream.eatWhile(isOperatorChar);
-        return ret("operator", "operator", stream.current());
-      } else if (wordRE.test(ch)) {
-        stream.eatWhile(wordRE);
-        var word = stream.current(),
-            known = keywords.propertyIsEnumerable(word) && keywords[word];
-        return (known && state.lastType != ".") ? ret(known.type, known.style, word) : ret("variable", "variable", word);
-      }
-    }
-    function tokenString(quote) {
-      return function(stream, state) {
-        var escaped = false,
-            next;
-        if (jsonldMode && stream.peek() == "@" && stream.match(isJsonldKeyword)) {
-          state.tokenize = tokenBase;
-          return ret("jsonld-keyword", "meta");
-        }
-        while ((next = stream.next()) != null) {
-          if (next == quote && !escaped)
-            break;
-          escaped = !escaped && next == "\\";
-        }
-        if (!escaped)
-          state.tokenize = tokenBase;
-        return ret("string", "string");
-      };
-    }
-    function tokenComment(stream, state) {
-      var maybeEnd = false,
-          ch;
-      while (ch = stream.next()) {
-        if (ch == "/" && maybeEnd) {
-          state.tokenize = tokenBase;
-          break;
-        }
-        maybeEnd = (ch == "*");
-      }
-      return ret("comment", "comment");
-    }
-    function tokenQuasi(stream, state) {
-      var escaped = false,
-          next;
-      while ((next = stream.next()) != null) {
-        if (!escaped && (next == "`" || next == "$" && stream.eat("{"))) {
-          state.tokenize = tokenBase;
-          break;
-        }
-        escaped = !escaped && next == "\\";
-      }
-      return ret("quasi", "string-2", stream.current());
-    }
-    var brackets = "([{}])";
-    function findFatArrow(stream, state) {
-      if (state.fatArrowAt)
-        state.fatArrowAt = null;
-      var arrow = stream.string.indexOf("=>", stream.start);
-      if (arrow < 0)
-        return;
-      var depth = 0,
-          sawSomething = false;
-      for (var pos = arrow - 1; pos >= 0; --pos) {
-        var ch = stream.string.charAt(pos);
-        var bracket = brackets.indexOf(ch);
-        if (bracket >= 0 && bracket < 3) {
-          if (!depth) {
-            ++pos;
-            break;
-          }
-          if (--depth == 0)
-            break;
-        } else if (bracket >= 3 && bracket < 6) {
-          ++depth;
-        } else if (wordRE.test(ch)) {
-          sawSomething = true;
-        } else if (/["'\/]/.test(ch)) {
-          return;
-        } else if (sawSomething && !depth) {
-          ++pos;
-          break;
-        }
-      }
-      if (sawSomething && !depth)
-        state.fatArrowAt = pos;
-    }
-    var atomicTypes = {
-      "atom": true,
-      "number": true,
-      "variable": true,
-      "string": true,
-      "regexp": true,
-      "this": true,
-      "jsonld-keyword": true
-    };
-    function JSLexical(indented, column, type, align, prev, info) {
-      this.indented = indented;
-      this.column = column;
-      this.type = type;
-      this.prev = prev;
-      this.info = info;
-      if (align != null)
-        this.align = align;
-    }
-    function inScope(state, varname) {
-      for (var v = state.localVars; v; v = v.next)
-        if (v.name == varname)
-          return true;
-      for (var cx = state.context; cx; cx = cx.prev) {
-        for (var v = cx.vars; v; v = v.next)
-          if (v.name == varname)
-            return true;
-      }
-    }
-    function parseJS(state, style, type, content, stream) {
-      var cc = state.cc;
-      cx.state = state;
-      cx.stream = stream;
-      cx.marked = null, cx.cc = cc;
-      cx.style = style;
-      if (!state.lexical.hasOwnProperty("align"))
-        state.lexical.align = true;
-      while (true) {
-        var combinator = cc.length ? cc.pop() : jsonMode ? expression : statement;
-        if (combinator(type, content)) {
-          while (cc.length && cc[cc.length - 1].lex)
-            cc.pop()();
-          if (cx.marked)
-            return cx.marked;
-          if (type == "variable" && inScope(state, content))
-            return "variable-2";
-          return style;
-        }
-      }
-    }
-    var cx = {
-      state: null,
-      column: null,
-      marked: null,
-      cc: null
-    };
-    function pass() {
-      for (var i = arguments.length - 1; i >= 0; i--)
-        cx.cc.push(arguments[i]);
-    }
-    function cont() {
-      pass.apply(null, arguments);
-      return true;
-    }
-    function register(varname) {
-      function inList(list) {
-        for (var v = list; v; v = v.next)
-          if (v.name == varname)
-            return true;
-        return false;
-      }
-      var state = cx.state;
-      cx.marked = "def";
-      if (state.context) {
-        if (inList(state.localVars))
-          return;
-        state.localVars = {
-          name: varname,
-          next: state.localVars
-        };
-      } else {
-        if (inList(state.globalVars))
-          return;
-        if (parserConfig.globalVars)
-          state.globalVars = {
-            name: varname,
-            next: state.globalVars
-          };
-      }
-    }
-    var defaultVars = {
-      name: "this",
-      next: {name: "arguments"}
-    };
-    function pushcontext() {
-      cx.state.context = {
-        prev: cx.state.context,
-        vars: cx.state.localVars
-      };
-      cx.state.localVars = defaultVars;
-    }
-    function popcontext() {
-      cx.state.localVars = cx.state.context.vars;
-      cx.state.context = cx.state.context.prev;
-    }
-    function pushlex(type, info) {
-      var result = function() {
-        var state = cx.state,
-            indent = state.indented;
-        if (state.lexical.type == "stat")
-          indent = state.lexical.indented;
-        else
-          for (var outer = state.lexical; outer && outer.type == ")" && outer.align; outer = outer.prev)
-            indent = outer.indented;
-        state.lexical = new JSLexical(indent, cx.stream.column(), type, null, state.lexical, info);
-      };
-      result.lex = true;
-      return result;
-    }
-    function poplex() {
-      var state = cx.state;
-      if (state.lexical.prev) {
-        if (state.lexical.type == ")")
-          state.indented = state.lexical.indented;
-        state.lexical = state.lexical.prev;
-      }
-    }
-    poplex.lex = true;
-    function expect(wanted) {
-      function exp(type) {
-        if (type == wanted)
-          return cont();
-        else if (wanted == ";")
-          return pass();
-        else
-          return cont(exp);
-      }
-      ;
-      return exp;
-    }
-    function statement(type, value) {
-      if (type == "var")
-        return cont(pushlex("vardef", value.length), vardef, expect(";"), poplex);
-      if (type == "keyword a")
-        return cont(pushlex("form"), expression, statement, poplex);
-      if (type == "keyword b")
-        return cont(pushlex("form"), statement, poplex);
-      if (type == "{")
-        return cont(pushlex("}"), block, poplex);
-      if (type == ";")
-        return cont();
-      if (type == "if") {
-        if (cx.state.lexical.info == "else" && cx.state.cc[cx.state.cc.length - 1] == poplex)
-          cx.state.cc.pop()();
-        return cont(pushlex("form"), expression, statement, poplex, maybeelse);
-      }
-      if (type == "function")
-        return cont(functiondef);
-      if (type == "for")
-        return cont(pushlex("form"), forspec, statement, poplex);
-      if (type == "variable")
-        return cont(pushlex("stat"), maybelabel);
-      if (type == "switch")
-        return cont(pushlex("form"), expression, pushlex("}", "switch"), expect("{"), block, poplex, poplex);
-      if (type == "case")
-        return cont(expression, expect(":"));
-      if (type == "default")
-        return cont(expect(":"));
-      if (type == "catch")
-        return cont(pushlex("form"), pushcontext, expect("("), funarg, expect(")"), statement, poplex, popcontext);
-      if (type == "class")
-        return cont(pushlex("form"), className, poplex);
-      if (type == "export")
-        return cont(pushlex("stat"), afterExport, poplex);
-      if (type == "import")
-        return cont(pushlex("stat"), afterImport, poplex);
-      return pass(pushlex("stat"), expression, expect(";"), poplex);
-    }
-    function expression(type) {
-      return expressionInner(type, false);
-    }
-    function expressionNoComma(type) {
-      return expressionInner(type, true);
-    }
-    function expressionInner(type, noComma) {
-      if (cx.state.fatArrowAt == cx.stream.start) {
-        var body = noComma ? arrowBodyNoComma : arrowBody;
-        if (type == "(")
-          return cont(pushcontext, pushlex(")"), commasep(pattern, ")"), poplex, expect("=>"), body, popcontext);
-        else if (type == "variable")
-          return pass(pushcontext, pattern, expect("=>"), body, popcontext);
-      }
-      var maybeop = noComma ? maybeoperatorNoComma : maybeoperatorComma;
-      if (atomicTypes.hasOwnProperty(type))
-        return cont(maybeop);
-      if (type == "async")
-        return cont(expression);
-      if (type == "function")
-        return cont(functiondef, maybeop);
-      if (type == "keyword c")
-        return cont(noComma ? maybeexpressionNoComma : maybeexpression);
-      if (type == "(")
-        return cont(pushlex(")"), maybeexpression, comprehension, expect(")"), poplex, maybeop);
-      if (type == "operator" || type == "spread")
-        return cont(noComma ? expressionNoComma : expression);
-      if (type == "[")
-        return cont(pushlex("]"), arrayLiteral, poplex, maybeop);
-      if (type == "{")
-        return contCommasep(objprop, "}", null, maybeop);
-      if (type == "quasi")
-        return pass(quasi, maybeop);
-      if (type == "new")
-        return cont(maybeTarget(noComma));
-      return cont();
-    }
-    function maybeexpression(type) {
-      if (type.match(/[;\}\)\],]/))
-        return pass();
-      return pass(expression);
-    }
-    function maybeexpressionNoComma(type) {
-      if (type.match(/[;\}\)\],]/))
-        return pass();
-      return pass(expressionNoComma);
-    }
-    function maybeoperatorComma(type, value) {
-      if (type == ",")
-        return cont(expression);
-      return maybeoperatorNoComma(type, value, false);
-    }
-    function maybeoperatorNoComma(type, value, noComma) {
-      var me = noComma == false ? maybeoperatorComma : maybeoperatorNoComma;
-      var expr = noComma == false ? expression : expressionNoComma;
-      if (type == "=>")
-        return cont(pushcontext, noComma ? arrowBodyNoComma : arrowBody, popcontext);
-      if (type == "operator") {
-        if (/\+\+|--/.test(value))
-          return cont(me);
-        if (value == "?")
-          return cont(expression, expect(":"), expr);
-        return cont(expr);
-      }
-      if (type == "quasi") {
-        return pass(quasi, me);
-      }
-      if (type == ";")
-        return;
-      if (type == "(")
-        return contCommasep(expressionNoComma, ")", "call", me);
-      if (type == ".")
-        return cont(property, me);
-      if (type == "[")
-        return cont(pushlex("]"), maybeexpression, expect("]"), poplex, me);
-    }
-    function quasi(type, value) {
-      if (type != "quasi")
-        return pass();
-      if (value.slice(value.length - 2) != "${")
-        return cont(quasi);
-      return cont(expression, continueQuasi);
-    }
-    function continueQuasi(type) {
-      if (type == "}") {
-        cx.marked = "string-2";
-        cx.state.tokenize = tokenQuasi;
-        return cont(quasi);
-      }
-    }
-    function arrowBody(type) {
-      findFatArrow(cx.stream, cx.state);
-      return pass(type == "{" ? statement : expression);
-    }
-    function arrowBodyNoComma(type) {
-      findFatArrow(cx.stream, cx.state);
-      return pass(type == "{" ? statement : expressionNoComma);
-    }
-    function maybeTarget(noComma) {
-      return function(type) {
-        if (type == ".")
-          return cont(noComma ? targetNoComma : target);
-        else
-          return pass(noComma ? expressionNoComma : expression);
-      };
-    }
-    function target(_, value) {
-      if (value == "target") {
-        cx.marked = "keyword";
-        return cont(maybeoperatorComma);
-      }
-    }
-    function targetNoComma(_, value) {
-      if (value == "target") {
-        cx.marked = "keyword";
-        return cont(maybeoperatorNoComma);
-      }
-    }
-    function maybelabel(type) {
-      if (type == ":")
-        return cont(poplex, statement);
-      return pass(maybeoperatorComma, expect(";"), poplex);
-    }
-    function property(type) {
-      if (type == "variable") {
-        cx.marked = "property";
-        return cont();
-      }
-    }
-    function objprop(type, value) {
-      if (type == "async") {
-        return cont(objprop);
-      } else if (type == "variable" || cx.style == "keyword") {
-        cx.marked = "property";
-        if (value == "get" || value == "set")
-          return cont(getterSetter);
-        return cont(afterprop);
-      } else if (type == "number" || type == "string") {
-        cx.marked = jsonldMode ? "property" : (cx.style + " property");
-        return cont(afterprop);
-      } else if (type == "jsonld-keyword") {
-        return cont(afterprop);
-      } else if (type == "[") {
-        return cont(expression, expect("]"), afterprop);
-      }
-    }
-    function getterSetter(type) {
-      if (type != "variable")
-        return pass(afterprop);
-      cx.marked = "property";
-      return cont(functiondef);
-    }
-    function afterprop(type) {
-      if (type == ":")
-        return cont(expressionNoComma);
-      if (type == "(")
-        return pass(functiondef);
-    }
-    function commasep(what, end) {
-      function proceed(type) {
-        if (type == ",") {
-          var lex = cx.state.lexical;
-          if (lex.info == "call")
-            lex.pos = (lex.pos || 0) + 1;
-          return cont(what, proceed);
-        }
-        if (type == end)
-          return cont();
-        return cont(expect(end));
-      }
-      return function(type) {
-        if (type == end)
-          return cont();
-        return pass(what, proceed);
-      };
-    }
-    function contCommasep(what, end, info) {
-      for (var i = 3; i < arguments.length; i++)
-        cx.cc.push(arguments[i]);
-      return cont(pushlex(end, info), commasep(what, end), poplex);
-    }
-    function block(type) {
-      if (type == "}")
-        return cont();
-      return pass(statement, block);
-    }
-    function maybetype(type) {
-      if (isTS && type == ":")
-        return cont(typedef);
-    }
-    function maybedefault(_, value) {
-      if (value == "=")
-        return cont(expressionNoComma);
-    }
-    function typedef(type) {
-      if (type == "variable") {
-        cx.marked = "variable-3";
-        return cont();
-      }
-    }
-    function vardef() {
-      return pass(pattern, maybetype, maybeAssign, vardefCont);
-    }
-    function pattern(type, value) {
-      if (type == "variable") {
-        register(value);
-        return cont();
-      }
-      if (type == "spread")
-        return cont(pattern);
-      if (type == "[")
-        return contCommasep(pattern, "]");
-      if (type == "{")
-        return contCommasep(proppattern, "}");
-    }
-    function proppattern(type, value) {
-      if (type == "variable" && !cx.stream.match(/^\s*:/, false)) {
-        register(value);
-        return cont(maybeAssign);
-      }
-      if (type == "variable")
-        cx.marked = "property";
-      if (type == "spread")
-        return cont(pattern);
-      return cont(expect(":"), pattern, maybeAssign);
-    }
-    function maybeAssign(_type, value) {
-      if (value == "=")
-        return cont(expressionNoComma);
-    }
-    function vardefCont(type) {
-      if (type == ",")
-        return cont(vardef);
-    }
-    function maybeelse(type, value) {
-      if (type == "keyword b" && value == "else")
-        return cont(pushlex("form", "else"), statement, poplex);
-    }
-    function forspec(type) {
-      if (type == "(")
-        return cont(pushlex(")"), forspec1, expect(")"), poplex);
-    }
-    function forspec1(type) {
-      if (type == "var")
-        return cont(vardef, expect(";"), forspec2);
-      if (type == ";")
-        return cont(forspec2);
-      if (type == "variable")
-        return cont(formaybeinof);
-      return pass(expression, expect(";"), forspec2);
-    }
-    function formaybeinof(_type, value) {
-      if (value == "in" || value == "of") {
-        cx.marked = "keyword";
-        return cont(expression);
-      }
-      return cont(maybeoperatorComma, forspec2);
-    }
-    function forspec2(type, value) {
-      if (type == ";")
-        return cont(forspec3);
-      if (value == "in" || value == "of") {
-        cx.marked = "keyword";
-        return cont(expression);
-      }
-      return pass(expression, expect(";"), forspec3);
-    }
-    function forspec3(type) {
-      if (type != ")")
-        cont(expression);
-    }
-    function functiondef(type, value) {
-      if (value == "*") {
-        cx.marked = "keyword";
-        return cont(functiondef);
-      }
-      if (type == "variable") {
-        register(value);
-        return cont(functiondef);
-      }
-      if (type == "(")
-        return cont(pushcontext, pushlex(")"), commasep(funarg, ")"), poplex, statement, popcontext);
-    }
-    function funarg(type) {
-      if (type == "spread")
-        return cont(funarg);
-      return pass(pattern, maybetype, maybedefault);
-    }
-    function className(type, value) {
-      if (type == "variable") {
-        register(value);
-        return cont(classNameAfter);
-      }
-    }
-    function classNameAfter(type, value) {
-      if (value == "extends")
-        return cont(expression, classNameAfter);
-      if (type == "{")
-        return cont(pushlex("}"), classBody, poplex);
-    }
-    function classBody(type, value) {
-      if (type == "variable" || cx.style == "keyword") {
-        if (value == "static") {
-          cx.marked = "keyword";
-          return cont(classBody);
-        }
-        cx.marked = "property";
-        if (value == "get" || value == "set")
-          return cont(classGetterSetter, functiondef, classBody);
-        return cont(functiondef, classBody);
-      }
-      if (value == "*") {
-        cx.marked = "keyword";
-        return cont(classBody);
-      }
-      if (type == ";")
-        return cont(classBody);
-      if (type == "}")
-        return cont();
-    }
-    function classGetterSetter(type) {
-      if (type != "variable")
-        return pass();
-      cx.marked = "property";
-      return cont();
-    }
-    function afterExport(_type, value) {
-      if (value == "*") {
-        cx.marked = "keyword";
-        return cont(maybeFrom, expect(";"));
-      }
-      if (value == "default") {
-        cx.marked = "keyword";
-        return cont(expression, expect(";"));
-      }
-      return pass(statement);
-    }
-    function afterImport(type) {
-      if (type == "string")
-        return cont();
-      return pass(importSpec, maybeFrom);
-    }
-    function importSpec(type, value) {
-      if (type == "{")
-        return contCommasep(importSpec, "}");
-      if (type == "variable")
-        register(value);
-      if (value == "*")
-        cx.marked = "keyword";
-      return cont(maybeAs);
-    }
-    function maybeAs(_type, value) {
-      if (value == "as") {
-        cx.marked = "keyword";
-        return cont(importSpec);
-      }
-    }
-    function maybeFrom(_type, value) {
-      if (value == "from") {
-        cx.marked = "keyword";
-        return cont(expression);
-      }
-    }
-    function arrayLiteral(type) {
-      if (type == "]")
-        return cont();
-      return pass(expressionNoComma, maybeArrayComprehension);
-    }
-    function maybeArrayComprehension(type) {
-      if (type == "for")
-        return pass(comprehension, expect("]"));
-      if (type == ",")
-        return cont(commasep(maybeexpressionNoComma, "]"));
-      return pass(commasep(expressionNoComma, "]"));
-    }
-    function comprehension(type) {
-      if (type == "for")
-        return cont(forspec, comprehension);
-      if (type == "if")
-        return cont(expression, comprehension);
-    }
-    function isContinuedStatement(state, textAfter) {
-      return state.lastType == "operator" || state.lastType == "," || isOperatorChar.test(textAfter.charAt(0)) || /[,.]/.test(textAfter.charAt(0));
-    }
-    return {
-      startState: function(basecolumn) {
-        var state = {
-          tokenize: tokenBase,
-          lastType: "sof",
-          cc: [],
-          lexical: new JSLexical((basecolumn || 0) - indentUnit, 0, "block", false),
-          localVars: parserConfig.localVars,
-          context: parserConfig.localVars && {vars: parserConfig.localVars},
-          indented: 0
-        };
-        if (parserConfig.globalVars && typeof parserConfig.globalVars == "object")
-          state.globalVars = parserConfig.globalVars;
-        return state;
-      },
-      token: function(stream, state) {
-        if (stream.sol()) {
-          if (!state.lexical.hasOwnProperty("align"))
-            state.lexical.align = false;
-          state.indented = stream.indentation();
-          findFatArrow(stream, state);
-        }
-        if (state.tokenize != tokenComment && stream.eatSpace())
-          return null;
-        var style = state.tokenize(stream, state);
-        if (type == "comment")
-          return style;
-        state.lastType = type == "operator" && (content == "++" || content == "--") ? "incdec" : type;
-        return parseJS(state, style, type, content, stream);
-      },
-      indent: function(state, textAfter) {
-        if (state.tokenize == tokenComment)
-          return CodeMirror.Pass;
-        if (state.tokenize != tokenBase)
-          return 0;
-        var firstChar = textAfter && textAfter.charAt(0),
-            lexical = state.lexical;
-        if (!/^\s*else\b/.test(textAfter))
-          for (var i = state.cc.length - 1; i >= 0; --i) {
-            var c = state.cc[i];
-            if (c == poplex)
-              lexical = lexical.prev;
-            else if (c != maybeelse)
-              break;
-          }
-        if (lexical.type == "stat" && firstChar == "}")
-          lexical = lexical.prev;
-        if (statementIndent && lexical.type == ")" && lexical.prev.type == "stat")
-          lexical = lexical.prev;
-        var type = lexical.type,
-            closing = firstChar == type;
-        if (type == "vardef")
-          return lexical.indented + (state.lastType == "operator" || state.lastType == "," ? lexical.info + 1 : 0);
-        else if (type == "form" && firstChar == "{")
-          return lexical.indented;
-        else if (type == "form")
-          return lexical.indented + indentUnit;
-        else if (type == "stat")
-          return lexical.indented + (isContinuedStatement(state, textAfter) ? statementIndent || indentUnit : 0);
-        else if (lexical.info == "switch" && !closing && parserConfig.doubleIndentSwitch != false)
-          return lexical.indented + (/^(?:case|default)\b/.test(textAfter) ? indentUnit : 2 * indentUnit);
-        else if (lexical.align)
-          return lexical.column + (closing ? 0 : 1);
-        else
-          return lexical.indented + (closing ? 0 : indentUnit);
-      },
-      electricInput: /^\s*(?:case .*?:|default:|\{|\})$/,
-      blockCommentStart: jsonMode ? null : "/*",
-      blockCommentEnd: jsonMode ? null : "*/",
-      lineComment: jsonMode ? null : "//",
-      fold: "brace",
-      closeBrackets: "()[]{}''\"\"``",
-      helperType: jsonMode ? "json" : "javascript",
-      jsonldMode: jsonldMode,
-      jsonMode: jsonMode
-    };
-  });
-  CodeMirror.registerHelper("wordChars", "javascript", /[\w$]/);
-  CodeMirror.defineMIME("text/javascript", "javascript");
-  CodeMirror.defineMIME("text/ecmascript", "javascript");
-  CodeMirror.defineMIME("application/javascript", "javascript");
-  CodeMirror.defineMIME("application/x-javascript", "javascript");
-  CodeMirror.defineMIME("application/ecmascript", "javascript");
-  CodeMirror.defineMIME("application/json", {
-    name: "javascript",
-    json: true
-  });
-  CodeMirror.defineMIME("application/x-json", {
-    name: "javascript",
-    json: true
-  });
-  CodeMirror.defineMIME("application/ld+json", {
-    name: "javascript",
-    jsonld: true
-  });
-  CodeMirror.defineMIME("text/typescript", {
-    name: "javascript",
-    typescript: true
-  });
-  CodeMirror.defineMIME("application/typescript", {
-    name: "javascript",
-    typescript: true
-  });
-});
-
-_removeDefine();
-})();
-(function() {
-var _removeDefine = $__System.get("@@amd-helpers").createDefine();
-(function(mod) {
-  if (typeof exports == "object" && typeof module == "object")
     module.exports = mod();
   else if (typeof define == "function" && define.amd)
-    return define("5", [], mod);
+    return define("3", [], mod);
   else
     this.CodeMirror = mod();
 })(function() {
@@ -13263,67 +12835,43 @@ var _removeDefine = $__System.get("@@amd-helpers").createDefine();
 
 _removeDefine();
 })();
-$__System.register('1', ['2', '3', '4', '5'], function (_export) {
-	//
-	'use strict';
-
-	var beautify, jsonlint, _js, CodeMirror, doc;
-
-	return {
-		setters: [function (_4) {
-			beautify = _4.js_beautify;
-		}, function (_3) {
-			jsonlint = _3['default'];
-		}, function (_2) {
-			_js = _2['default'];
-		}, function (_) {
-			CodeMirror = _['default'];
-		}],
-		execute: function () {
-			doc = document;
-
-			window.app = new ((function () {
-				function Main() {
-					var _this = this;
-
-					babelHelpers.classCallCheck(this, Main);
-
-					var form = doc.forms.main,
-					    code = form.code;
-
-					var editor = CodeMirror.fromTextArea(document.getElementById("code"), {
-						lineNumbers: true,
-						styleActiveLine: true,
-						matchBrackets: true
-					});
-
-					form.addEventListener('submit', function (evt) {
-						evt.preventDefault();
-						editor.setValue(beautify(code.value));
-						try {
-							jsonlint.parse(code.value);
-							_this.notify(true, 'Valid JSON');
-						} catch (e) {
-							_this.notify(false, e);
-						}
-					});
-				}
-
-				babelHelpers.createClass(Main, [{
-					key: 'notify',
-					value: function notify(success, text) {
-						var result = doc.querySelector('#result');
-						result.classList.toggle('success', success);
-						result.classList.toggle('error', !success);
-						result.innerHTML = text;
-					}
-				}]);
-				return Main;
-			})())();
-		}
-	};
+(function() {
+var _removeDefine = $__System.get("@@amd-helpers").createDefine();
+define("1", ["3", "5", "4", "2"], function(CodeMirror, jsonlint, beautify) {
+  'use strict';
+  var doc = document,
+      App = function App() {
+        var form = doc.forms.main,
+            code = form.code,
+            editor = CodeMirror.fromTextArea(doc.getElementById("code"), {
+              lineNumbers: true,
+              styleActiveLine: true,
+              matchBrackets: true
+            });
+        form.addEventListener('submit', function(evt) {
+          evt.preventDefault();
+          editor.setValue(beautify.js_beautify(code.value));
+          try {
+            jsonlint.parse(code.value);
+            this.notify(true, 'Valid JSON');
+          } catch (e) {
+            this.notify(false, e);
+          }
+        });
+      },
+      fn = App.prototype;
+  fn.notify = function(success, text) {
+    var result = doc.getElementById('result');
+    doc.getElementById('result-container').classList.add('shown');
+    result.classList.toggle('success', success);
+    result.classList.toggle('error', !success);
+    result.innerHTML = text;
+  };
+  return window.app = new App();
 });
 
+_removeDefine();
+})();
 })
 (function(factory) {
   factory();

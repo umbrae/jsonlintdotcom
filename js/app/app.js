@@ -1,64 +1,86 @@
-'use strict';
+define([
+	'codemirror',
+	'jsonlint',
+	'js-beautify',
+	'javascript-syntax'
+],
+function(CodeMirror, jsonlint, beautify) {
+	'use strict';
+	var doc = document,
+		App = function App() {
+			var _this = this,
+				form = this.form = doc.forms.main,
+				codeInput = this.form.code,
+				editor = this.editor = CodeMirror.fromTextArea(doc.getElementById("code"), {
+					lineNumbers: true,
+					styleActiveLine: true,
+					matchBrackets: true
+				});
 
-var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
-var _codemirror = require('codemirror');
+			Object.defineProperty(this, 'code', {
+				get: function() {
+					return codeInput.value;
+				},
+				set: function(v) {
+					codeInput.value = v;
+					editor.setValue(v);
+				}
+			});
 
-var _codemirror2 = _interopRequireDefault(_codemirror);
+			this.form.addEventListener('submit', function(evt) {
+				evt.preventDefault();
+				if(this.code.indexOf('http') == 0) {
+					this.fetch(this.code, function(resp) {
+						this.validate(resp);
+					}, function(err) {
+						this.notify(false, err)
+					});
+				} else {
+					this.validate();
+				}
 
-var _javascriptSyntax = require('javascript-syntax');
+			}.bind(this));
+		},
+		fn = App.prototype;
 
-var _javascriptSyntax2 = _interopRequireDefault(_javascriptSyntax);
+	fn.validate = function(code) {
+		this.code = beautify.js_beautify(typeof code == 'undefined' ? this.code : code);
 
-var _jsonlint = require('jsonlint');
+		try {
+			jsonlint.parse(this.code);
+			this.notify(true, 'Valid JSON');
+		} catch (e) {
+			this.notify(false, e);
+		}
+	};
 
-var _jsonlint2 = _interopRequireDefault(_jsonlint);
+	fn.notify = function(success, text) {
+		var result = doc.getElementById('result');
+		doc.getElementById('result-container').classList.add('shown');
+		// ie10 doesn't support 2nd argument in classList.toggle
+		result.classList[success ? 'add' : 'remove']('success');
+		result.classList[!success ? 'add' : 'remove']('error');
+		result.innerHTML = text;
+	};
 
-var _jsBeautify = require('js-beautify');
-
-//
-var doc = document;
-
-window.app = new ((function () {
-	function Main() {
-		var _this = this;
-
-		_classCallCheck(this, Main);
-
-		var form = doc.forms.main,
-		    code = form.code;
-
-		var editor = _codemirror2['default'].fromTextArea(document.getElementById("code"), {
-			lineNumbers: true,
-			styleActiveLine: true,
-			matchBrackets: true
-		});
-
-		form.addEventListener('submit', function (evt) {
-			evt.preventDefault();
-			editor.setValue((0, _jsBeautify.js_beautify)(code.value));
-			try {
-				_jsonlint2['default'].parse(code.value);
-				_this.notify(true, 'Valid JSON');
-			} catch (e) {
-				_this.notify(false, e);
+	fn.fetch = function(url, success, error) {
+		var req = new XMLHttpRequest();
+		req.onreadystatechange = function() {
+			if (req.readyState === XMLHttpRequest.DONE) {
+				if (req.status === 200) {
+					success && success.call(this, req.responseText);
+				} else {
+					error && error.call(this, req.statusText || 'Fetch error')
+				}
 			}
-		});
+		}.bind(this);
+
+		req.open('GET', url);
+		req.send('url=' + encodeURIComponent(url));
 	}
 
-	_createClass(Main, [{
-		key: 'notify',
-		value: function notify(success, text) {
-			var result = doc.querySelector('#result');
-			result.classList.toggle('success', success);
-			result.classList.toggle('error', !success);
-			result.innerHTML = text;
-		}
-	}]);
-
-	return Main;
-})())();
+	return window.app = new App();
+});
