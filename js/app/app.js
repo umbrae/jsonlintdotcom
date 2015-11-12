@@ -12,9 +12,9 @@ function(CodeMirror, jsonlint, beautify, minify) {
 			var _this = this,
 				form = this.form = doc.forms.main,
 				codeInput = this.form.code,
+				query = this.query = parseQuery(),
 				editor;
 
-			this.query = parseQuery();
 
 
 			editor = this.editor = CodeMirror.fromTextArea(codeInput, {
@@ -36,19 +36,27 @@ function(CodeMirror, jsonlint, beautify, minify) {
 
 			this.form.addEventListener('submit', function(evt) {
 				evt.preventDefault();
-				if(this.code.indexOf('http') == 0) {
-					this.fetch(this.code, function(resp) {
-						this.validate(resp);
-					}, function(err) {
-						this.notify(false, err)
-					});
-				} else {
-					this.validate();
-				}
-
+				this.go();
 			}.bind(this));
+
+			if(query.json) {
+				this.code = query.json;
+				this.go();
+			}
 		},
 		fn = App.prototype;
+
+	fn.go = function() {
+		if(this.code.indexOf('http') == 0) {
+			this.fetch(this.code, function(resp) {
+				this.validate(resp);
+			}, function(err) {
+				this.notify(false, err)
+			});
+		} else {
+			this.validate();
+		}
+	}
 
 	fn.comb = function(code) {
 		code = typeof code == 'undefined' ? this.code : code;
