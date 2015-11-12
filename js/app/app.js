@@ -2,22 +2,26 @@ define([
 	'codemirror',
 	'jsonlint',
 	'js-beautify',
+	'lib/minify.json',
 	'javascript-syntax'
 ],
-function(CodeMirror, jsonlint, beautify) {
+function(CodeMirror, jsonlint, beautify, minify) {
 	'use strict';
 	var doc = document,
 		App = function App() {
 			var _this = this,
 				form = this.form = doc.forms.main,
 				codeInput = this.form.code,
-				editor = this.editor = CodeMirror.fromTextArea(doc.getElementById("code"), {
-					lineNumbers: true,
-					styleActiveLine: true,
-					matchBrackets: true
-				});
+				editor;
+
+			this.query = parseQuery();
 
 
+			editor = this.editor = CodeMirror.fromTextArea(codeInput, {
+				lineNumbers: true,
+				styleActiveLine: true,
+				matchBrackets: true
+			});
 
 
 			Object.defineProperty(this, 'code', {
@@ -46,11 +50,25 @@ function(CodeMirror, jsonlint, beautify) {
 		},
 		fn = App.prototype;
 
+	fn.comb = function(code) {
+		code = typeof code == 'undefined' ? this.code : code;
+
+		if(this.query.reformat == 'no') {
+			code = code;
+		} else if(this.query.reformat == 'compress') {
+			code = minify(code) || code;
+		} else {
+			code = beautify.js_beautify(code);
+		}
+
+		return this.code = code;
+	}
+
 	fn.validate = function(code) {
-		this.code = beautify.js_beautify(typeof code == 'undefined' ? this.code : code);
+		code = this.comb(code);
 
 		try {
-			jsonlint.parse(this.code);
+			jsonlint.parse(code);
 			this.notify(true, 'Valid JSON');
 		} catch (e) {
 			this.notify(false, e);
@@ -80,7 +98,23 @@ function(CodeMirror, jsonlint, beautify) {
 
 		req.open('GET', url);
 		req.send('url=' + encodeURIComponent(url));
-	}
+	};
+
+
+	function parseQuery() {
+        var search = location.search,
+			query = {},
+        	a = search.substr(1).split('&'),
+			i, b;
+
+		if(!search) return query;
+        for (i = 0; i < a.length; i++) {
+            b = a[i].split('=');
+            query[decodeURIComponent(b[0])] = decodeURIComponent(b[1] || '');
+        }
+
+        return query;
+    }
 
 	return window.app = new App();
 });
