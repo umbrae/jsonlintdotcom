@@ -28,10 +28,7 @@ function(CodeMirror, jsonlint, beautify, minify) {
 
 			editor.on('change', function() {
 				this.highlightErrorLine(null);
-			}.bind(this))
-
-
-
+			}.bind(this));
 
 			Object.defineProperty(this, 'code', {
 				get: function() {
@@ -44,7 +41,7 @@ function(CodeMirror, jsonlint, beautify, minify) {
 			});
 
 			this.form.addEventListener('submit', function(evt) {
-				evt.preventDefault();console.log(1, this.code);
+				evt.preventDefault();
 				this.go();
 			}.bind(this));
 
@@ -61,7 +58,7 @@ function(CodeMirror, jsonlint, beautify, minify) {
 			}.bind(this));
 
 			[].slice.call(doc.querySelectorAll('[data-ga]')).forEach(function(node) {
-				node.addEventListener('click', function() {console.log(node.getAttribute('data-ga'));
+				node.addEventListener('click', function() {
 					ga('send', 'pageview', '/' + node.getAttribute('data-ga'));
 				});
 			});
@@ -102,13 +99,15 @@ function(CodeMirror, jsonlint, beautify, minify) {
 
 
 	fn.validate = function(code) {
+		var lineMatches;
 		code = this.comb(code);
-		console.log(code);
+
 		try {
 			jsonlint.parse(code);
 			this.notify(true, 'Valid JSON');
 		} catch (e) {
-			var lineMatches = e.message.match(/line ([0-9]*)/);
+			lineMatches = e.message.match(/line ([0-9]*)/);
+
 			if (lineMatches && lineMatches.length > 1) {
 				this.highlightErrorLine(+lineMatches[1]-1);
 			}
@@ -126,7 +125,7 @@ function(CodeMirror, jsonlint, beautify, minify) {
 		result.innerHTML = text;
 	};
 
-	fn.highlightErrorLine = function(line) {console.log(line);
+	fn.highlightErrorLine = function(line) {
 		if(typeof line == 'number') {
 			this.errorLine = line;
 			this.editor.addLineClass(line, 'background', 'line-error');
