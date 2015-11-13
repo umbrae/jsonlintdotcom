@@ -31,6 +31,11 @@ main {
 	border: 1px solid #EEEEEE;
 	margin-bottom: 1em;
 }
+
+.line-error {
+    background-color: #FBE3E4;
+}
+
 button[type="submit"] {
 	font-size: 1.65em;
 	color: #333;

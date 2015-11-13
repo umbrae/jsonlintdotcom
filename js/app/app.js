@@ -26,6 +26,12 @@ function(CodeMirror, jsonlint, beautify, minify) {
 				matchBrackets: true
 			});
 
+			editor.on('change', function() {
+				this.highlightErrorLine(null);
+			}.bind(this))
+
+
+
 
 			Object.defineProperty(this, 'code', {
 				get: function() {
@@ -94,11 +100,16 @@ function(CodeMirror, jsonlint, beautify, minify) {
 
 	fn.validate = function(code) {
 		code = this.comb(code);
-
+		console.log(code);
 		try {
 			jsonlint.parse(code);
 			this.notify(true, 'Valid JSON');
 		} catch (e) {
+			var lineMatches = e.message.match(/line ([0-9]*)/);
+			if (lineMatches && lineMatches.length > 1) {
+				this.highlightErrorLine(+lineMatches[1]-1);
+			}
+
 			this.notify(false, e);
 		}
 	};
@@ -111,6 +122,16 @@ function(CodeMirror, jsonlint, beautify, minify) {
 		result.classList[!success ? 'add' : 'remove']('error');
 		result.innerHTML = text;
 	};
+
+	fn.highlightErrorLine = function(line) {console.log(line);
+		if(typeof line == 'number') {
+			this.errorLine = line;
+			this.editor.addLineClass(line, 'background', 'line-error');
+		} else if(typeof this.errorLine == 'number') {
+			this.editor.removeLineClass(this.errorLine, 'background', 'line-error');
+			this.errorLine = null;
+		}
+	}
 
 	fn.fetch = function(url, success, error) {
 		var req = new XMLHttpRequest();
