@@ -485,3 +485,6 @@ footer aside {
 footer nav {
 	float: right;
 }
+footer nav a {
+	margin-left: 1em;
+}

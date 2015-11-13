@@ -60,8 +60,11 @@ function(CodeMirror, jsonlint, beautify, minify) {
 			  	}
 			}.bind(this));
 
-
-
+			[].slice.call(doc.querySelectorAll('[data-ga]')).forEach(function(node) {
+				node.addEventListener('click', function() {console.log(node.getAttribute('data-ga'));
+					ga('send', 'pageview', '/' + node.getAttribute('data-ga'));
+				});
+			});
 
 			if (query.json) {
 				this.code = query.json;

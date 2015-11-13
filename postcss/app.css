@@ -79,5 +79,8 @@ footer {
 	}
 	nav {
 		float: right;
+        a {
+            margin-left: 1em;
+        }
 	}
 }
