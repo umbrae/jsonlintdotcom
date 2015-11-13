@@ -73,7 +73,8 @@ gulp.task('styles', function () {
 			require('postcss-nested'),
 			require('postcss-cssnext'),
 			require('postcss-calc'),
-			require('postcss-clearfix')
+			require('postcss-clearfix'),
+			require('autoprefixer')({ browsers: ['last 3 versions'] })
 		]).on('error', e => console.error(e)))
         .pipe(gulp.dest('css'));
 });
