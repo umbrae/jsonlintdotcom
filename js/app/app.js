@@ -1,3 +1,6 @@
+/*global
+define
+*/
 define([
 	'codemirror',
 	'jsonlint',
@@ -9,9 +12,8 @@ function(CodeMirror, jsonlint, beautify, minify) {
 	'use strict';
 	var doc = document,
 		App = function App() {
-			var _this = this,
-				form = this.form = doc.forms.main,
-				codeInput = this.form.code,
+			var form = this.form = doc.forms.main,
+				codeInput = form.code,
 				query = this.query = parseQuery(),
 				faq = doc.getElementById('faq'),
 				editor;
@@ -45,7 +47,7 @@ function(CodeMirror, jsonlint, beautify, minify) {
 				faq.classList.toggle('expand');
 			});
 
-			if(query.json) {
+			if (query.json) {
 				this.code = query.json;
 				this.go();
 			}
@@ -53,30 +55,31 @@ function(CodeMirror, jsonlint, beautify, minify) {
 		fn = App.prototype;
 
 	fn.go = function() {
-		if(this.code.indexOf('http') == 0) {
+		if (this.code.indexOf('http') === 0) {
 			this.fetch(this.code, function(resp) {
 				this.validate(resp);
 			}, function(err) {
-				this.notify(false, err)
+				this.notify(false, err);
 			});
 		} else {
 			this.validate();
 		}
-	}
+	};
 
 	fn.comb = function(code) {
 		code = typeof code == 'undefined' ? this.code : code;
 
-		if(this.query.reformat == 'no') {
+		if (this.query.reformat == 'no') {
 			code = code;
-		} else if(this.query.reformat == 'compress') {
+		} else if (this.query.reformat == 'compress') {
 			code = minify(code) || code;
 		} else {
 			code = beautify.js_beautify(code);
 		}
 
 		return this.code = code;
-	}
+	};
+
 
 	fn.validate = function(code) {
 		code = this.comb(code);
@@ -105,7 +108,7 @@ function(CodeMirror, jsonlint, beautify, minify) {
 				if (req.status === 200) {
 					success && success.call(this, req.responseText);
 				} else {
-					error && error.call(this, req.statusText || 'Fetch error')
+					error && error.call(this, req.statusText || 'Fetch error');
 				}
 			}
 		}.bind(this);
@@ -116,19 +119,22 @@ function(CodeMirror, jsonlint, beautify, minify) {
 
 
 	function parseQuery() {
-        var search = location.search,
+		var search = location.search,
 			query = {},
-        	a = search.substr(1).split('&'),
+			a = search.substr(1).split('&'),
 			i, b;
 
-		if(!search) return query;
-        for (i = 0; i < a.length; i++) {
-            b = a[i].split('=');
-            query[decodeURIComponent(b[0])] = decodeURIComponent(b[1] || '');
-        }
+		if (!search) {
+			return query;
+		}
 
-        return query;
-    }
+		for (i = 0; i < a.length; i++) {
+			b = a[i].split('=');
+			query[decodeURIComponent(b[0])] = decodeURIComponent(b[1] || '');
+		}
+
+		return query;
+	}
 
 	return window.app = new App();
 });

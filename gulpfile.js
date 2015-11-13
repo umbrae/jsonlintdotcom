@@ -23,7 +23,7 @@ gulp.task('scripts:watch', () => {
 	gulp.watch(paths.scripts, ['scripts']);
 });*/
 
-gulp.task('scripts:bundle'/*, ['scripts']*/, cb => {
+gulp.task('scripts:bundle' /*, ['scripts']*/ , cb => {
 	let path = require("path");
 	let Builder = require('systemjs-builder');
 	let builder = new Builder();
@@ -31,9 +31,9 @@ gulp.task('scripts:bundle'/*, ['scripts']*/, cb => {
 	builder.loadConfig('js/config.js').then(() => {
 		builder.config({
 			transpiler: 'babel',
-		    babelOptions: {
-		        stage: 0
-		    }
+			babelOptions: {
+				stage: 0
+			}
 		});
 		builder.buildStatic('app/app.js', 'dist/js/app.js')
 			.then(() => {
@@ -55,33 +55,55 @@ gulp.task('scripts:build', ['scripts:bundle'], cb => {
 		rename = require('gulp-rename');
 
 	return gulp.src('./dist/js/app.js')
-    	.pipe(concat('app.js'))
+		.pipe(concat('app.js'))
 		.pipe(gulp.dest('./dist/js'))
 		.pipe(sourcemaps.init())
 		.pipe(uglify())
 		.pipe(rename('app.min.js'))
 		.pipe(sourcemaps.write('.'))
-    	.pipe(gulp.dest('./dist/js'));
+		.pipe(gulp.dest('./dist/js'));
 });
 
 
-gulp.task('styles', function () {
+gulp.task('styles', function() {
 	let postcss = require('gulp-postcss');
-    return gulp.src('postcss/style.css')
-        .pipe(postcss([
+	return gulp.src('postcss/style.css')
+		.pipe(postcss([
 			require('postcss-import'),
 			require('postcss-nested'),
 			require('postcss-cssnext'),
 			require('postcss-calc'),
 			require('postcss-clearfix'),
-			require('autoprefixer')({ browsers: ['last 3 versions'] })
+			require('autoprefixer')({
+				browsers: ['last 3 versions']
+			})
 		]).on('error', e => console.error(e)))
-        .pipe(gulp.dest('css'));
+		.pipe(gulp.dest('css'));
 });
 
-gulp.task('styles:watch', function () {
+gulp.task('styles:watch', function() {
 	gulp.start('styles');
 	gulp.watch('postcss/**/*.css', ['styles']);
+});
+
+gulp.task('scripts:lint', function() {
+	let jshint = require('gulp-jshint');
+
+	return gulp.src(['js/app/**/*.js'])
+		.pipe(jshint({
+			globals: {},
+			curly: true,
+			eqnull: true,
+			undef: true,
+			unused: true,
+			strict: true,
+			shadow: true,
+			browser: true,
+			'-W030': 'Expected an assignment or function call and instead saw an expression',
+			'-W093': 'Did you mean to return a conditional instead of an assignment?'
+		}))
+		.pipe(jshint.reporter('jshint-stylish'))
+		.pipe(jshint.reporter('fail'));
 });
 
 gulp.task('html', () => {
@@ -94,14 +116,14 @@ gulp.task('html', () => {
 gulp.task('deploy:beta', () => {
 	let sftp = require("gulp-sftp");
 	gulp.src('dist/**/*')
-        .pipe(sftp({
-            host: 'beta.jsonlint.com',
-            user: 'root',
+		.pipe(sftp({
+			host: 'beta.jsonlint.com',
+			user: 'root',
 			remotePath: '/var/www/beta.jsonlint.com/site/public_html/'
-        }));
+		}));
 });
 
-gulp.task('default', ['scripts:build', 'html'], () => {
+gulp.task('default', ['scripts:lint', 'scripts:build', 'html'], () => {
 	gulp.src('./css/*').pipe(gulp.dest('./dist/css'));
 	gulp.src('./img/*').pipe(gulp.dest('./dist/img'));
 	gulp.src('./proxy.php').pipe(gulp.dest('./dist'));

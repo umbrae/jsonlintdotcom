@@ -12930,7 +12930,7 @@ define("1", ["3", "6", "5", "4", "2"], function(CodeMirror, jsonlint, beautify, 
       },
       fn = App.prototype;
   fn.go = function() {
-    if (this.code.indexOf('http') == 0) {
+    if (this.code.indexOf('http') === 0) {
       this.fetch(this.code, function(resp) {
         this.validate(resp);
       }, function(err) {
