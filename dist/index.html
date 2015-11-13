@@ -60,6 +60,103 @@
 			   <a href="https://buysellads.com/buy/detail/266667" target="_blank" style="margin-left: 10px;" onclick="ga('send', 'pageview', '/advertise');">Advertise</a>
 			</nav>
 		</footer>
+
+		<atricle id="faq">
+			<h3>
+				FAQ
+			</h3>
+			<hr>
+			<div id="faqAccordion">
+				<h5>
+					What is JSONLint?
+				</h5>
+				<div>
+					<p>
+						JSONLint is a validator and reformatter for <a href="http://www.json.org/">JSON</a>, a lightweight data-interchange format.
+					</p>
+				</div>
+				<h5>
+					Why 'Lint'?
+				</h5>
+				<div>
+					<p>
+						Essentially, I'm just riding on <a href="http://www.jslint.com">JSLint's</a> coattails. The name 'lint' was originally used to find problems in C source files. It's not really valid here because JSON is just a protocol. Shameless? You bet!
+					</p>
+				</div>
+				<h5>
+					Why does it reformat my JSON?
+				</h5>
+				<div>
+					<p>
+						Because your code is ugly! Trust me on this one. What's that you say? It's not? Ok, well then here's <a href="http://www.jsonlint.com/?reformat=no">JSON Lint without the reformatter.</a>
+					</p>
+				</div>
+				<h5>
+					Any secret features?
+				</h5>
+				<div>
+					<p>
+						Sure, a few. You can input a URL and it'll scrape it for JSON and parse that.<br>
+						An example URL to test: <a href="#" onclick="ga('send', 'pageview', '/redditUrlInput'); $('#json_input').val('http://www.reddit.com/r/programming/comments/9szpc/jsonlint_a_handy_json_validator_and_reformatter.json');">http://www.reddit.com/r/programming/comments/9szpc/jsonlint_a_handy_json_validator_and_reformatter.json</a>
+					</p>
+					<p>
+						You can also provide JSON to lint in the URL if you link to JSON Lint with the "json" parameter. <a href="http://www.jsonlint.com?json=%7B%22hello%22%3A%20%22world%22%7D">Here's an example URL to test.</a>
+					</p>
+					<p>
+						Additionally, <a href="http://www.jsonlint.com/?reformat=compress">JSON Lint can also be used as a json compressor if you add ?reformat=compress to the URL.</a>
+					</p>
+				</div>
+				<h5>
+					What are some common errors?
+				</h5>
+				<div>
+					<dl>
+						<dt>
+							<code>Expecting 'STRING'</code>
+						</dt>
+						<dd>
+							You probably have an extra comma at the end of your collection. Something like: <code>{ "a": "b"<span class="highlight">,</span> }</code>
+						</dd>
+						<dt>
+							<code>Expecting 'STRING', 'NUMBER', 'NULL', 'TRUE', 'FALSE', '{', '['</code>
+						</dt>
+						<dd>
+							You probably have an extra comma at the end of your list. Something like: <code>[ "a", "b"<span class="highlight">,</span> ]</code>
+							<br>
+							You also may have not enclosed your collection keys in quotes. Proper format for a collection is: <code>{ "key": "value" }</code>
+						</dd>
+					</dl>
+					<p>
+						Be sure to follow <a href="http://www.json.org/">JSON's syntax</a> properly. For example, <strong>always use double quotes, always quotify your keys, and remove all callback functions</strong>.
+					</p>
+				</div>
+				<h5>
+					A friend and I pasted the same JSON in and got different results. Wat do?
+				</h5>
+				<div>
+					<p>
+						If you and your friend are on different systems (Win/Unix), this is possible due to the way windows handles newlines. Essentially, if you have just newline characters (\n) in your JSON and paste it into JSONLint from a windows machine, it can validate it as valid erroneously since Windows may need a carriage return (\r) as well to detect newlines properly.
+					</p>
+					<p>
+						The solution: Either use direct URL input, or make sure your content's newlines match the architecture your system expects!
+					</p>
+				</div>
+				<h5>
+					Who made this?
+				</h5>
+				<div>
+					<p>
+						<a href="http://www.umbrae.net/">Chris Dary</a> built this. Much is owed to the community (this uses <a href="https://github.com/zaach/jsonlint">Zach Conner's javascript Pure JS JSON parser</a>, for example).
+					</p>
+				</div>
+				<h5>
+					I've got feedback!
+				</h5>
+				<div>
+					Great - hit us up on GitHub.
+				</div>
+			</div>
+		</article>
 	</main>
 
 	<!-- Don't remove lines below! -->

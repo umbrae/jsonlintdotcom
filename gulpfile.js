@@ -90,7 +90,18 @@ gulp.task('html', () => {
 		.pipe(gulp.dest('dist'));
 });
 
+gulp.task('deploy:beta', () => {
+	let sftp = require("gulp-sftp");
+	gulp.src('dist/**/*')
+        .pipe(sftp({
+            host: 'beta.jsonlint.com',
+            user: 'root',
+			remotePath: '/var/www/beta.jsonlint.com/site/public_html/'
+        }));
+});
+
 gulp.task('default', ['scripts:build', 'html'], () => {
 	gulp.src('./css/*').pipe(gulp.dest('./dist/css'));
 	gulp.src('./img/*').pipe(gulp.dest('./dist/img'));
+	gulp.src('./proxy.php').pipe(gulp.dest('./dist'));
 });

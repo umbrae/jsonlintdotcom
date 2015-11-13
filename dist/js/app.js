@@ -1715,6 +1715,60 @@ _removeDefine();
 })();
 (function() {
 var _removeDefine = $__System.get("@@amd-helpers").createDefine();
+define("4", [], function() {
+  return function(json) {
+    var tokenizer = /"|(\/\*)|(\*\/)|(\/\/)|\n|\r/g,
+        in_string = false,
+        in_multiline_comment = false,
+        in_singleline_comment = false,
+        tmp,
+        tmp2,
+        new_str = [],
+        ns = 0,
+        from = 0,
+        lc,
+        rc;
+    ;
+    tokenizer.lastIndex = 0;
+    while (tmp = tokenizer.exec(json)) {
+      lc = RegExp.leftContext;
+      rc = RegExp.rightContext;
+      if (!in_multiline_comment && !in_singleline_comment) {
+        tmp2 = lc.substring(from);
+        if (!in_string) {
+          tmp2 = tmp2.replace(/(\n|\r|\s)*/g, "");
+        }
+        new_str[ns++] = tmp2;
+      }
+      from = tokenizer.lastIndex;
+      if (tmp[0] == "\"" && !in_multiline_comment && !in_singleline_comment) {
+        tmp2 = lc.match(/(\\)*$/);
+        if (!in_string || !tmp2 || (tmp2[0].length % 2) == 0) {
+          in_string = !in_string;
+        }
+        from--;
+        rc = json.substring(from);
+      } else if (tmp[0] == "/*" && !in_string && !in_multiline_comment && !in_singleline_comment) {
+        in_multiline_comment = true;
+      } else if (tmp[0] == "*/" && !in_string && in_multiline_comment && !in_singleline_comment) {
+        in_multiline_comment = false;
+      } else if (tmp[0] == "//" && !in_string && !in_multiline_comment && !in_singleline_comment) {
+        in_singleline_comment = true;
+      } else if ((tmp[0] == "\n" || tmp[0] == "\r") && !in_string && !in_multiline_comment && in_singleline_comment) {
+        in_singleline_comment = false;
+      } else if (!in_multiline_comment && !in_singleline_comment && !(/\n|\r|\s/.test(tmp[0]))) {
+        new_str[ns++] = tmp[0];
+      }
+    }
+    new_str[ns++] = rc;
+    return new_str.join("");
+  };
+});
+
+_removeDefine();
+})();
+(function() {
+var _removeDefine = $__System.get("@@amd-helpers").createDefine();
 (function() {
   var acorn = {};
   (function(exports) {
@@ -3191,7 +3245,7 @@ var _removeDefine = $__System.get("@@amd-helpers").createDefine();
     }
   }
   if (typeof define === "function" && define.amd) {
-    define("4", [], function() {
+    define("5", [], function() {
       return {js_beautify: js_beautify};
     });
   } else if (typeof exports !== "undefined") {
@@ -3205,7 +3259,7 @@ var _removeDefine = $__System.get("@@amd-helpers").createDefine();
 
 _removeDefine();
 })();
-$__System.registerDynamic("5", [], false, function(__require, __exports, __module) {
+$__System.registerDynamic("6", [], false, function(__require, __exports, __module) {
   var _retrieveGlobal = $__System.get("@@global-helpers").prepareGlobal(__module.id, null, null);
   (function() {
     var jsonlint = this["jsonlint"];
@@ -12837,36 +12891,110 @@ _removeDefine();
 })();
 (function() {
 var _removeDefine = $__System.get("@@amd-helpers").createDefine();
-define("1", ["3", "5", "4", "2"], function(CodeMirror, jsonlint, beautify) {
+define("1", ["3", "6", "5", "4", "2"], function(CodeMirror, jsonlint, beautify, minify) {
   'use strict';
   var doc = document,
       App = function App() {
-        var form = doc.forms.main,
-            code = form.code,
-            editor = CodeMirror.fromTextArea(doc.getElementById("code"), {
-              lineNumbers: true,
-              styleActiveLine: true,
-              matchBrackets: true
-            });
-        form.addEventListener('submit', function(evt) {
-          evt.preventDefault();
-          editor.setValue(beautify.js_beautify(code.value));
-          try {
-            jsonlint.parse(code.value);
-            this.notify(true, 'Valid JSON');
-          } catch (e) {
-            this.notify(false, e);
+        var _this = this,
+            form = this.form = doc.forms.main,
+            codeInput = this.form.code,
+            query = this.query = parseQuery(),
+            faq = doc.getElementById('faq'),
+            editor;
+        editor = this.editor = CodeMirror.fromTextArea(codeInput, {
+          lineNumbers: true,
+          styleActiveLine: true,
+          matchBrackets: true
+        });
+        Object.defineProperty(this, 'code', {
+          get: function() {
+            return codeInput.value;
+          },
+          set: function(v) {
+            codeInput.value = v;
+            editor.setValue(v);
           }
         });
+        this.form.addEventListener('submit', function(evt) {
+          evt.preventDefault();
+          this.go();
+        }.bind(this));
+        doc.getElementById('faqButton').addEventListener('click', function(evt) {
+          evt.preventDefault();
+          faq.classList.toggle('expand');
+        });
+        if (query.json) {
+          this.code = query.json;
+          this.go();
+        }
       },
       fn = App.prototype;
+  fn.go = function() {
+    if (this.code.indexOf('http') == 0) {
+      this.fetch(this.code, function(resp) {
+        this.validate(resp);
+      }, function(err) {
+        this.notify(false, err);
+      });
+    } else {
+      this.validate();
+    }
+  };
+  fn.comb = function(code) {
+    code = typeof code == 'undefined' ? this.code : code;
+    if (this.query.reformat == 'no') {
+      code = code;
+    } else if (this.query.reformat == 'compress') {
+      code = minify(code) || code;
+    } else {
+      code = beautify.js_beautify(code);
+    }
+    return this.code = code;
+  };
+  fn.validate = function(code) {
+    code = this.comb(code);
+    try {
+      jsonlint.parse(code);
+      this.notify(true, 'Valid JSON');
+    } catch (e) {
+      this.notify(false, e);
+    }
+  };
   fn.notify = function(success, text) {
     var result = doc.getElementById('result');
     doc.getElementById('result-container').classList.add('shown');
-    result.classList.toggle('success', success);
-    result.classList.toggle('error', !success);
+    result.classList[success ? 'add' : 'remove']('success');
+    result.classList[!success ? 'add' : 'remove']('error');
     result.innerHTML = text;
   };
+  fn.fetch = function(url, success, error) {
+    var req = new XMLHttpRequest();
+    req.onreadystatechange = function() {
+      if (req.readyState === XMLHttpRequest.DONE) {
+        if (req.status === 200) {
+          success && success.call(this, req.responseText);
+        } else {
+          error && error.call(this, req.statusText || 'Fetch error');
+        }
+      }
+    }.bind(this);
+    req.open('GET', url);
+    req.send('url=' + encodeURIComponent(url));
+  };
+  function parseQuery() {
+    var search = location.search,
+        query = {},
+        a = search.substr(1).split('&'),
+        i,
+        b;
+    if (!search)
+      return query;
+    for (i = 0; i < a.length; i++) {
+      b = a[i].split('=');
+      query[decodeURIComponent(b[0])] = decodeURIComponent(b[1] || '');
+    }
+    return query;
+  }
   return window.app = new App();
 });
 
