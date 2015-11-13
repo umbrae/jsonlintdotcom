@@ -1,5 +1,5 @@
 /*global
-define
+define, ga
 */
 define([
 	'codemirror',
@@ -133,7 +133,7 @@ function(CodeMirror, jsonlint, beautify, minify) {
 			this.editor.removeLineClass(this.errorLine, 'background', 'line-error');
 			this.errorLine = null;
 		}
-	}
+	};
 
 	fn.fetch = function(url, success, error) {
 		var req = new XMLHttpRequest();

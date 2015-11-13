@@ -1,3 +1,31 @@
+* {
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+	vertical-align: top;
+}
+body {
+	font-size: 12px;
+	font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+	line-height: 1.5em;
+}
+h1, h2, h3, h4, h5, h6 {
+	color: #111;
+	font-weight: 400;
+}
+h1 {
+	font-size: 3em;
+	line-height: 1;
+	margin-bottom: .1em;
+}
+h3 {
+	font-size: 1.2em;
+	margin-bottom: 10px;
+}
+pre, code, tt {
+	font: 1em 'andale mono', monotype, 'lucida console', monospace;
+	line-height: 1.5;
+}
 /* BASICS */
 
 .CodeMirror {
@@ -326,88 +354,61 @@ div.CodeMirror-dragcursors {
 
 /* Help users use markselection to safely style text background */
 span.CodeMirror-selectedtext { background: none; }
-* {
-	margin: 0;
+#faq {
 	padding: 0;
-	box-sizing: border-box;
-	vertical-align: top;
+	height: 0;
+	overflow: hidden;
+	clear: both;
+	padding: 0 1em;
+	transition: all 0.15s ease-out;
+	display: block;
+	border: 2px solid #CCC;
+	margin-top: 1em;
+	opacity: 0;
 }
-body {
-	font-size: 12px;
-	font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+#faq.expand {
+	padding: 1em 1em;
+	overflow-y: scroll;
+	height: 20em;
+	transition: all 0.25s ease-in;
+	opacity: 1;
 }
-h1, h2, h3, h4, h5, h6 {
-	color: #111;
-	font-weight: 400;
+#faq h5 {
+	font-size: 1em;
+	font-weight: 700;
+	margin-bottom: 1.5em;
 }
-h1 {
-	font-size: 3em;
-	line-height: 1;
-	margin-bottom: .1em;
+#faq p {
+	margin: 0 0 1.5em;
 }
-h3 {
-	font-size: 1.2em;
-	margin-bottom: 10px;
+#faq div {
+	margin-left: 2em;
 }
-
-pre, code, tt {
-    font: 1em 'andale mono', monotype, 'lucida console', monospace;
-    line-height: 1.5;
-}
-
-main {
-	width: 100%;
-	max-width: 950px;
-	margin: 0 auto;
-	padding: 1.5em 0;
-}
-body {
-	font-family: arial, sans-serif;
-	font-family: proxima-nova, "Helvetica Neue", Helvetica, Roboto, Arial, sans-serif;
-	line-height: 1.5em;
-}
-#code, .CodeMirror {
-	width: 100%;
-	height: 400px;
-	border: 1px solid #EEEEEE;
+#faq dd {
 	margin-bottom: 1em;
+	margin-left: 1.5em;
 }
-#result {
-	border: 1px solid transparent;
-	margin: 1.5em 0;
-	padding: .8em;
-}
-#result:empty {
-  display: none;
-}
-#result.error {
-  background: #FBE3E4;
-  color: #D12F19;
-  border-color: #FBC2C4;
-}
-#result.success {
-  background: #E6EFC2;
-  color: #529214;
-  border-color: #C6D880;
-}
-button {
-	font-size: 1.65em;
-	color: #333;
-	padding-left: .5em;
-	padding-right: .5em;
-	font-weight: bold;
+#faq hr {
+	background: #ddd;
+	color: #ddd;
+	clear: both;
+	float: none;
+	width: 100%;
+	height: .1em;
+	border: none;
+	margin: 0 0 1.4em;
 }
 header {
 	height: 90px;
 	margin-bottom: 1.5em;
 }
 header hgroup {
-  float: left;
+	float: left;
 }
 header aside {
-  float: right;
+	float: right;
 }
-a.pro {
+header a.pro {
 	padding: 1px 6px;
 	background: #e1e1e1;
 	color: #06c;
@@ -418,80 +419,72 @@ a.pro {
 	margin: 0;
 	border-radius: 2px;
 }
-footer:after {
-  content: '';
-  display: table;
-  clear: both;
+main {
+	width: 100%;
+	max-width: 950px;
+	margin: 0 auto;
+	padding: 1.5em 0;
 }
-footer {
-	margin-top: 3em;
+#code, .CodeMirror {
+	width: 100%;
+	height: 400px;
+	border: 1px solid #EEEEEE;
+	margin-bottom: 1em;
 }
-footer aside {
-  float: left;
+
+.line-error {
+    background-color: #FBE3E4;
 }
-footer nav {
-  float: right;
+
+button[type="submit"] {
+	font-size: 1.65em;
+	color: #333;
+	padding-left: .5em;
+	padding-right: .5em;
+	font-weight: bold;
 }
 #result-container {
 	display: none;
 	padding-top: 1em;
 }
 #result-container.shown {
-  display: block;
+	display: block;
 }
 #result-container h3 {
-  font-size: 1.5em;
+	font-size: 1.5em;
 }
-
-#faq {
-	padding: 0;
-	height: 0;
-	overflow: hidden;
+#result {
+	border: 1px solid transparent;
+	margin: 1.5em 0;
+	padding: .8em;
+}
+#result:empty {
+	display: none;
+}
+#result.error {
+	background: #FBE3E4;
+	color: #D12F19;
+	border-color: #FBC2C4;
+}
+#result.success {
+	background: #E6EFC2;
+	color: #529214;
+	border-color: #C6D880;
+}
+footer:after {
+	content: '';
+	display: table;
 	clear: both;
-	padding: 0 1em;
-	-webkit-transition: all 0.15s ease-out;
-	transition: all 0.15s ease-out;
-	display: block;
-	border: 2px solid #CCC;
-	margin-top: 1em;
-	opacity: 0;
 }
-
-#faq.expand {
-  padding: 1em 1em;
-  overflow-y: scroll;
-  height: 20em;
-  -webkit-transition: all 0.25s ease-in;
-  transition: all 0.25s ease-in;
-  opacity: 1;
+footer {
+	margin-top: 3em;
 }
-
-#faq h5 {
-  font-size: 1em;
-  font-weight: 700;
-  margin-bottom: 1.5em;
+footer aside {
+	float: left;
 }
-
-#faq p {
-  margin: 0 0 1.5em;
+footer nav {
+	float: right;
 }
-
-#faq div {
-  margin-left: 2em;
-}
-
-#faq dd {
-  margin-bottom: 1em;
-  margin-left: 1.5em;
-}
-
-#faq hr {
-  background: #ddd;
-  color: #ddd;
-  clear: both;
-  float: none;
-  width: 100%;
-  height: .1em;
-  border: none;
-  margin: 0 0 1.4em;
+footer nav a {
+	margin-left: 1em;
 }

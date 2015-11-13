@@ -12895,9 +12895,8 @@ define("1", ["3", "6", "5", "4", "2"], function(CodeMirror, jsonlint, beautify, 
   'use strict';
   var doc = document,
       App = function App() {
-        var _this = this,
-            form = this.form = doc.forms.main,
-            codeInput = this.form.code,
+        var form = this.form = doc.forms.main,
+            codeInput = form.code,
             query = this.query = parseQuery(),
             faq = doc.getElementById('faq'),
             editor;
@@ -12906,9 +12905,12 @@ define("1", ["3", "6", "5", "4", "2"], function(CodeMirror, jsonlint, beautify, 
           styleActiveLine: true,
           matchBrackets: true
         });
+        editor.on('change', function() {
+          this.highlightErrorLine(null);
+        }.bind(this));
         Object.defineProperty(this, 'code', {
           get: function() {
-            return codeInput.value;
+            return editor.getValue();
           },
           set: function(v) {
             codeInput.value = v;
@@ -12922,6 +12924,16 @@ define("1", ["3", "6", "5", "4", "2"], function(CodeMirror, jsonlint, beautify, 
         doc.getElementById('faqButton').addEventListener('click', function(evt) {
           evt.preventDefault();
           faq.classList.toggle('expand');
+        });
+        doc.addEventListener('keyup', function(evt) {
+          if (evt.ctrlKey && evt.keyCode == 13) {
+            this.go();
+          }
+        }.bind(this));
+        [].slice.call(doc.querySelectorAll('[data-ga]')).forEach(function(node) {
+          node.addEventListener('click', function() {
+            ga('send', 'pageview', '/' + node.getAttribute('data-ga'));
+          });
         });
         if (query.json) {
           this.code = query.json;
@@ -12952,11 +12964,16 @@ define("1", ["3", "6", "5", "4", "2"], function(CodeMirror, jsonlint, beautify, 
     return this.code = code;
   };
   fn.validate = function(code) {
+    var lineMatches;
     code = this.comb(code);
     try {
       jsonlint.parse(code);
       this.notify(true, 'Valid JSON');
     } catch (e) {
+      lineMatches = e.message.match(/line ([0-9]*)/);
+      if (lineMatches && lineMatches.length > 1) {
+        this.highlightErrorLine(+lineMatches[1] - 1);
+      }
       this.notify(false, e);
     }
   };
@@ -12966,6 +12983,15 @@ define("1", ["3", "6", "5", "4", "2"], function(CodeMirror, jsonlint, beautify, 
     result.classList[success ? 'add' : 'remove']('success');
     result.classList[!success ? 'add' : 'remove']('error');
     result.innerHTML = text;
+  };
+  fn.highlightErrorLine = function(line) {
+    if (typeof line == 'number') {
+      this.errorLine = line;
+      this.editor.addLineClass(line, 'background', 'line-error');
+    } else if (typeof this.errorLine == 'number') {
+      this.editor.removeLineClass(this.errorLine, 'background', 'line-error');
+      this.errorLine = null;
+    }
   };
   fn.fetch = function(url, success, error) {
     var req = new XMLHttpRequest();
@@ -12987,8 +13013,9 @@ define("1", ["3", "6", "5", "4", "2"], function(CodeMirror, jsonlint, beautify, 
         a = search.substr(1).split('&'),
         i,
         b;
-    if (!search)
+    if (!search) {
       return query;
+    }
     for (i = 0; i < a.length; i++) {
       b = a[i].split('=');
       query[decodeURIComponent(b[0])] = decodeURIComponent(b[1] || '');
