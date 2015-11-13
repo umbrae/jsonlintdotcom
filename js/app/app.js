@@ -29,7 +29,7 @@ function(CodeMirror, jsonlint, beautify, minify) {
 
 			Object.defineProperty(this, 'code', {
 				get: function() {
-					return codeInput.value;
+					return editor.getValue();
 				},
 				set: function(v) {
 					codeInput.value = v;
@@ -38,7 +38,7 @@ function(CodeMirror, jsonlint, beautify, minify) {
 			});
 
 			this.form.addEventListener('submit', function(evt) {
-				evt.preventDefault();
+				evt.preventDefault();console.log(1, this.code);
 				this.go();
 			}.bind(this));
 
@@ -46,6 +46,16 @@ function(CodeMirror, jsonlint, beautify, minify) {
 				evt.preventDefault();
 				faq.classList.toggle('expand');
 			});
+
+			doc.addEventListener('keyup', function(evt) {
+				// Ctrl-Enter pressed
+				if (evt.ctrlKey && evt.keyCode == 13) {
+					this.go();
+			  	}
+			}.bind(this));
+
+
+
 
 			if (query.json) {
 				this.code = query.json;
@@ -62,6 +72,7 @@ function(CodeMirror, jsonlint, beautify, minify) {
 				this.notify(false, err);
 			});
 		} else {
+
 			this.validate();
 		}
 	};
