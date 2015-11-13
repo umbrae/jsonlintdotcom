@@ -71,7 +71,9 @@ gulp.task('styles', function () {
         .pipe(postcss([
 			require('postcss-import'),
 			require('postcss-nested'),
-			require('postcss-cssnext')
+			require('postcss-cssnext'),
+			require('postcss-calc'),
+			require('postcss-clearfix')
 		]).on('error', e => console.error(e)))
         .pipe(gulp.dest('css'));
 });

@@ -13,6 +13,7 @@ function(CodeMirror, jsonlint, beautify, minify) {
 				form = this.form = doc.forms.main,
 				codeInput = this.form.code,
 				query = this.query = parseQuery(),
+				faq = doc.getElementById('faq'),
 				editor;
 
 
@@ -38,6 +39,11 @@ function(CodeMirror, jsonlint, beautify, minify) {
 				evt.preventDefault();
 				this.go();
 			}.bind(this));
+
+			doc.getElementById('faqButton').addEventListener('click', function(evt) {
+				evt.preventDefault();
+				faq.classList.toggle('expand');
+			});
 
 			if(query.json) {
 				this.code = query.json;
