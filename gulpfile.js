@@ -7,12 +7,6 @@ gulp.task('scripts:bundle' /*, ['scripts']*/ , cb => {
 	let builder = new Builder();
 
 	builder.loadConfig('js/config.js').then(() => {
-		builder.config({
-			transpiler: 'babel',
-			babelOptions: {
-				stage: 0
-			}
-		});
 		builder.buildStatic('app/app.js', 'dist/js/app.js')
 			.then(() => {
 				console.log('Build complete');
