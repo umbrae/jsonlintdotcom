@@ -97,5 +97,8 @@ gulp.task('deploy:beta', () => {
 gulp.task('default', ['scripts:lint', 'scripts:build', 'html'], () => {
 	gulp.src('./css/*').pipe(gulp.dest('./dist/css'));
 	gulp.src('./img/*').pipe(gulp.dest('./dist/img'));
-	gulp.src(['./proxy.php', './*.appcache']).pipe(gulp.dest('./dist'));
+	
+	gulp
+		.src(['./proxy.php', './*.appcache', './favicon.ico'])
+		.pipe(gulp.dest('./dist'));
 });
