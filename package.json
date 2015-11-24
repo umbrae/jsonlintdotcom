@@ -2,7 +2,6 @@
   "name": "jsonlintdotcom",
   "version": "0.0.1",
   "description": "The JSON Validator",
-  "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -12,10 +11,11 @@
   },
   "keywords": [
     "jsonlint",
-    "lint"
+    "lint",
+    "json"
   ],
   "author": "",
-  "license": "MIT",
+  "license": "ISC",
   "bugs": {
     "url": "https://github.com/circlecell/jsonlintdotcom/issues"
   },
