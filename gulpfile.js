@@ -1,27 +1,5 @@
 "use strict";
 let gulp = require('gulp');
-let paths = {
-	styles: './sass/**/*.scss',
-	scripts: './js/**/*.js'
-}
-
-/*gulp.task('scripts', () => {
-	let changed = require('gulp-changed'),
-		babel = require('gulp-babel');
-
-	return gulp.src(paths.scripts)
-		.pipe(changed('js'))
-		.pipe(babel({
-			modules: 'common',
-			stage: 0
-		}).on('error', e => console.error(e)))
-		.pipe(gulp.dest('js'));
-});
-
-gulp.task('scripts:watch', () => {
-	gulp.start('scripts');
-	gulp.watch(paths.scripts, ['scripts']);
-});*/
 
 gulp.task('scripts:bundle' /*, ['scripts']*/ , cb => {
 	let path = require("path");
