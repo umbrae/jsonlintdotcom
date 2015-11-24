@@ -24,3 +24,13 @@ sudo apt-get install php5-curl
 ## Useful Gulp tasks
 - ``styles:watch`` runs PostCSS watcher
 - ``default`` build everything (ready-to-deploy application goes to **/dist/** folder)
+
+## Project structure
+- **/postcss/** - CSS source files
+- **/css/** - Compiled CSS files
+- **/js/** - JavaScript files
+- **/js/lib/** - Some JS libraries
+- **/js/app/app.js** - The application
+- **/img/** - Images
+- **/proxy.php** - Proxy script for fetching external resources
+- **/dist/** - Ready-to-deploy files (gitignored)
