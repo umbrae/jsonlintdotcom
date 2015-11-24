@@ -1,6 +1,11 @@
 # jsonlint.com
 Source code for [jsonlint.com](http://jsonlint.com)
 
+[![devDependency Status](https://img.shields.io/david/dev/circlecell/jsonlintdotcom.svg)](https://david-dm.org/circlecell/jsonlintdotcom#info=devDependencies)
+[![Dependency Status](https://img.shields.io/david/circlecell/jsonlintdotcom.svg)](https://david-dm.org/circlecell/jsonlintdotcom)
+[![Issue Stats](http://issuestats.com/github/circlecell/jsonlintdotcom/badge/pr)](http://issuestats.com/github/circlecell/jsonlintdotcom)
+[![Issue Stats](http://issuestats.com/github/circlecell/jsonlintdotcom/badge/issue)](http://issuestats.com/github/circlecell/jsonlintdotcom)
+
 ## Front-end libraraies are used
 - [VanillaJS :)](http://vanilla-js.com/)
 - [CodeMirror](https://www.npmjs.com/package/codemirror)
