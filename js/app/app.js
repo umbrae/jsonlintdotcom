@@ -138,17 +138,22 @@ function(CodeMirror, jsonlint, beautify, minify) {
 		code = this.code;
 
 		try {
-			jsonlint.parse(code);
+			JSON.parse(code.replace(/\\/g, '\\\\'));
 			this.notify(true, 'Valid JSON');
-		} catch (e) {
-			// retrieve line number from error
-			lineMatches = e.message.match(/line ([0-9]*)/);
+		} catch(e) {console.log(e, code);
+			try {
+				jsonlint.parse(code);
+				this.notify(true, 'Valid JSON');
+			} catch (e) {
+				// retrieve line number from error
+				lineMatches = e.message.match(/line ([0-9]*)/);
 
-			if (lineMatches && lineMatches.length > 1) {
-				this.highlightErrorLine(+lineMatches[1]-1);
+				if (lineMatches && lineMatches.length > 1) {
+					this.highlightErrorLine(+lineMatches[1]-1);
+				}
+
+				this.notify(false, e);
 			}
-
-			this.notify(false, e);
 		}
 
 		return this;
