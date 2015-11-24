@@ -12903,7 +12903,8 @@ define("1", ["3", "6", "5", "4", "2"], function(CodeMirror, jsonlint, beautify, 
         editor = this.editor = CodeMirror.fromTextArea(codeInput, {
           lineNumbers: true,
           styleActiveLine: true,
-          matchBrackets: true
+          matchBrackets: true,
+          indentWithTabs: true
         });
         editor.on('change', function() {
           this.highlightErrorLine(null);
@@ -12959,7 +12960,7 @@ define("1", ["3", "6", "5", "4", "2"], function(CodeMirror, jsonlint, beautify, 
     } else if (this.query.reformat == 'compress') {
       code = minify(code) || code;
     } else {
-      code = beautify.js_beautify(code);
+      code = beautify.js_beautify(code, {indent_with_tabs: true});
     }
     return this.code = code;
   };

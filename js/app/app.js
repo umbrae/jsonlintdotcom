@@ -13,57 +13,25 @@ function(CodeMirror, jsonlint, beautify, minify) {
 	var doc = document,
 		App = function App() {
 			var form = this.form = doc.forms.main,
-				codeInput = form.code,
-				query = this.query = parseQuery(),
-				faq = doc.getElementById('faq'),
-				editor;
+				query = this.query = parseQuery();
 
+			this
+				.initEditor()
+				.registerEvents();
 
-
-			editor = this.editor = CodeMirror.fromTextArea(codeInput, {
-				lineNumbers: true,
-				styleActiveLine: true,
-				matchBrackets: true,
-				indentWithTabs: true
-			});
-
-			editor.on('change', function() {
-				this.highlightErrorLine(null);
-			}.bind(this));
-
+			// defines 'code' property
 			Object.defineProperty(this, 'code', {
 				get: function() {
-					return editor.getValue();
+					return this.editor.getValue();
 				},
 				set: function(v) {
-					codeInput.value = v;
-					editor.setValue(v);
+					form.code.value = v;
+					this.editor.setValue(v);
 				}
 			});
 
-			this.form.addEventListener('submit', function(evt) {
-				evt.preventDefault();
-				this.go();
-			}.bind(this));
-
-			doc.getElementById('faqButton').addEventListener('click', function(evt) {
-				evt.preventDefault();
-				faq.classList.toggle('expand');
-			});
-
-			doc.addEventListener('keyup', function(evt) {
-				// Ctrl-Enter is pressed
-				if (evt.ctrlKey && evt.keyCode == 13) {
-					this.go();
-			  	}
-			}.bind(this));
-
-			[].slice.call(doc.querySelectorAll('[data-ga]')).forEach(function(node) {
-				node.addEventListener('click', function() {
-					ga('send', 'pageview', '/' + node.getAttribute('data-ga'));
-				});
-			});
-
+			// if json parameter is given, use it
+			// URL (where JSON is located) is also allowed
 			if (query.json) {
 				this.code = query.json;
 				this.go();
@@ -71,44 +39,109 @@ function(CodeMirror, jsonlint, beautify, minify) {
 		},
 		fn = App.prototype;
 
-	fn.go = function() {
-		if (this.code.indexOf('http') === 0) {
-			this.fetch(this.code, function(resp) {
-				this.validate(resp);
-			}, function(err) {
-				this.notify(false, err);
-			});
-		} else {
+	// registers events
+	fn.registerEvents = function() {
+		// when user types something, remove highlighting from "bad" line
+		this.editor.on('change', function() {
+			this.highlightErrorLine(null);
+		}.bind(this));
 
-			this.validate();
-		}
+		// when user submits form (eg presses "Validate" button), run "go" method
+		this.form.addEventListener('submit', function(evt) {
+			evt.preventDefault();
+			this.go();
+		}.bind(this));
+
+		// when Ctrl-Enter is pressed, run "go" method
+		doc.addEventListener('keyup', function(evt) {
+			if (evt.ctrlKey && evt.keyCode == 13) {
+				this.go();
+		  	}
+		}.bind(this));
+
+		// expands/unexpands faq by clicking #faqButton
+		$('#faqButton').addEventListener('click', function(evt) {
+			evt.preventDefault();
+			$('#faq').classList.toggle('expand');
+		});
+
+		// initializes Google Analytics tracking
+		// when user clicks on [data-ga="blah"], call ga('send', 'pageview', '/blah');
+		$$('[data-ga]').forEach(function(node) {
+			node.addEventListener('click', function() {
+				ga('send', 'pageview', '/' + node.getAttribute('data-ga'));
+			});
+		});
+
+		return this;
 	};
 
+	// initializes CodeMirror editor
+	fn.initEditor = function() {
+		this.editor = CodeMirror.fromTextArea(this.form.code, {
+			lineNumbers: true,
+			styleActiveLine: true,
+			matchBrackets: true,
+			indentWithTabs: true
+		});
+
+		return this;
+	}
+
+	// the main function of this app
+	fn.go = function() {
+		var code = this.code;
+		// if URL is given, fetch data on this URL
+		if (code.indexOf('http') === 0) {
+			this.fetch(code, function(resp) {
+				// if fetching is OK, run validator
+				this.validate(resp);
+			}, function(err) {
+				// if not, show error
+				this.notify(false, err);
+			});
+		// if non-url is given, run validator
+		} else {
+			this.validate();
+		}
+
+		return this;
+	};
+
+	// combs JSON depending on query.reformat value
+	// code argument is optional
 	fn.comb = function(code) {
 		code = typeof code == 'undefined' ? this.code : code;
 
-		if (this.query.reformat == 'no') {
-			code = code;
-		} else if (this.query.reformat == 'compress') {
+		// if reformat==compress, use minifier
+		// if reformat==no, keep code as is
+		// else beautify code
+		if (this.query.reformat == 'compress') {
 			code = minify(code) || code;
-		} else {
+		} else if(this.query.reformat != 'no') {
 			code = beautify.js_beautify(code, {
 				indent_with_tabs: true
 			});
 		}
 
-		return this.code = code;
+		this.code = code;
+
+		return this;
 	};
 
-
+	// validates JSON
+	// code argument is optional
 	fn.validate = function(code) {
 		var lineMatches;
-		code = this.comb(code);
+
+		this.comb(code);
+		code = this.code;
 
 		try {
 			jsonlint.parse(code);
 			this.notify(true, 'Valid JSON');
 		} catch (e) {
+			// retrieve line number from error
 			lineMatches = e.message.match(/line ([0-9]*)/);
 
 			if (lineMatches && lineMatches.length > 1) {
@@ -117,17 +150,24 @@ function(CodeMirror, jsonlint, beautify, minify) {
 
 			this.notify(false, e);
 		}
+
+		return this;
 	};
 
+	// displays success or error message about validation status
 	fn.notify = function(success, text) {
-		var result = doc.getElementById('result');
-		doc.getElementById('result-container').classList.add('shown');
+		var result = $('#result');
+		$('#result-container').classList.add('shown');
 		// ie10 doesn't support 2nd argument in classList.toggle
 		result.classList[success ? 'add' : 'remove']('success');
 		result.classList[!success ? 'add' : 'remove']('error');
 		result.innerHTML = text;
+
+		return this;
 	};
 
+	// highlights given line of code
+	// if null is passed function removes highlighting
 	fn.highlightErrorLine = function(line) {
 		if(typeof line == 'number') {
 			this.errorLine = line;
@@ -136,25 +176,46 @@ function(CodeMirror, jsonlint, beautify, minify) {
 			this.editor.removeLineClass(this.errorLine, 'background', 'line-error');
 			this.errorLine = null;
 		}
+
+		return this;
 	};
 
+	// makes request to external resource via php proxy
 	fn.fetch = function(url, success, error) {
 		var req = new XMLHttpRequest();
 		req.onreadystatechange = function() {
+			var resp;
 			if (req.readyState === XMLHttpRequest.DONE) {
 				if (req.status === 200) {
-					success && success.call(this, req.responseText);
+					resp = JSON.parse(req.responseText);
+
+
+					if(resp.error) {
+						// if proxy returns error call error callback
+						error.call(this, resp.result);
+					} else {
+						// else everything is awesome
+						success.call(this, resp.content);
+					}
 				} else {
-					error && error.call(this, req.statusText || 'Fetch error');
+					// if status is not 200 call error callback
+					error.call(this, req.statusText || 'Unable to connect');
 				}
 			}
 		}.bind(this);
 
-		req.open('GET', url);
+
+		req.open('POST', 'proxy.php');
+		req.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
 		req.send('url=' + encodeURIComponent(url));
+
+		return this;
 	};
 
 
+	//  -- utilites --
+
+	// parses URL
 	function parseQuery() {
 		var search = location.search,
 			query = {},
@@ -173,5 +234,16 @@ function(CodeMirror, jsonlint, beautify, minify) {
 		return query;
 	}
 
+	// selects one node matched given selector
+	function $(selector, ctx) {
+		return (ctx || document).querySelector(selector);
+	};
+
+	// selects all nodes matched given selector
+	function $$(selector, ctx) {
+		return [].slice.call((ctx || document).querySelectorAll(selector));
+	};
+
+	// initializes the application
 	return window.app = new App();
 });
