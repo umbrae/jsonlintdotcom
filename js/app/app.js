@@ -86,7 +86,7 @@ function(CodeMirror, jsonlint, beautify, minify) {
 		});
 
 		return this;
-	}
+	};
 
 	// the main function of this app
 	fn.go = function() {
@@ -237,12 +237,12 @@ function(CodeMirror, jsonlint, beautify, minify) {
 	// selects one node matched given selector
 	function $(selector, ctx) {
 		return (ctx || document).querySelector(selector);
-	};
+	}
 
 	// selects all nodes matched given selector
 	function $$(selector, ctx) {
 		return [].slice.call((ctx || document).querySelectorAll(selector));
-	};
+	}
 
 	// initializes the application
 	return window.app = new App();

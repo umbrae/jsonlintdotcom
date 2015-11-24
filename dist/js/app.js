@@ -12896,45 +12896,16 @@ define("1", ["3", "6", "5", "4", "2"], function(CodeMirror, jsonlint, beautify, 
   var doc = document,
       App = function App() {
         var form = this.form = doc.forms.main,
-            codeInput = form.code,
-            query = this.query = parseQuery(),
-            faq = doc.getElementById('faq'),
-            editor;
-        editor = this.editor = CodeMirror.fromTextArea(codeInput, {
-          lineNumbers: true,
-          styleActiveLine: true,
-          matchBrackets: true,
-          indentWithTabs: true
-        });
-        editor.on('change', function() {
-          this.highlightErrorLine(null);
-        }.bind(this));
+            query = this.query = parseQuery();
+        this.initEditor().registerEvents();
         Object.defineProperty(this, 'code', {
           get: function() {
-            return editor.getValue();
+            return this.editor.getValue();
           },
           set: function(v) {
-            codeInput.value = v;
-            editor.setValue(v);
+            form.code.value = v;
+            this.editor.setValue(v);
           }
-        });
-        this.form.addEventListener('submit', function(evt) {
-          evt.preventDefault();
-          this.go();
-        }.bind(this));
-        doc.getElementById('faqButton').addEventListener('click', function(evt) {
-          evt.preventDefault();
-          faq.classList.toggle('expand');
-        });
-        doc.addEventListener('keyup', function(evt) {
-          if (evt.ctrlKey && evt.keyCode == 13) {
-            this.go();
-          }
-        }.bind(this));
-        [].slice.call(doc.querySelectorAll('[data-ga]')).forEach(function(node) {
-          node.addEventListener('click', function() {
-            ga('send', 'pageview', '/' + node.getAttribute('data-ga'));
-          });
         });
         if (query.json) {
           this.code = query.json;
@@ -12942,9 +12913,43 @@ define("1", ["3", "6", "5", "4", "2"], function(CodeMirror, jsonlint, beautify, 
         }
       },
       fn = App.prototype;
+  fn.registerEvents = function() {
+    this.editor.on('change', function() {
+      this.highlightErrorLine(null);
+    }.bind(this));
+    this.form.addEventListener('submit', function(evt) {
+      evt.preventDefault();
+      this.go();
+    }.bind(this));
+    doc.addEventListener('keyup', function(evt) {
+      if (evt.ctrlKey && evt.keyCode == 13) {
+        this.go();
+      }
+    }.bind(this));
+    $('#faqButton').addEventListener('click', function(evt) {
+      evt.preventDefault();
+      $('#faq').classList.toggle('expand');
+    });
+    $$('[data-ga]').forEach(function(node) {
+      node.addEventListener('click', function() {
+        ga('send', 'pageview', '/' + node.getAttribute('data-ga'));
+      });
+    });
+    return this;
+  };
+  fn.initEditor = function() {
+    this.editor = CodeMirror.fromTextArea(this.form.code, {
+      lineNumbers: true,
+      styleActiveLine: true,
+      matchBrackets: true,
+      indentWithTabs: true
+    });
+    return this;
+  };
   fn.go = function() {
-    if (this.code.indexOf('http') === 0) {
-      this.fetch(this.code, function(resp) {
+    var code = this.code;
+    if (code.indexOf('http') === 0) {
+      this.fetch(code, function(resp) {
         this.validate(resp);
       }, function(err) {
         this.notify(false, err);
@@ -12952,21 +12957,22 @@ define("1", ["3", "6", "5", "4", "2"], function(CodeMirror, jsonlint, beautify, 
     } else {
       this.validate();
     }
+    return this;
   };
   fn.comb = function(code) {
     code = typeof code == 'undefined' ? this.code : code;
-    if (this.query.reformat == 'no') {
-      code = code;
-    } else if (this.query.reformat == 'compress') {
+    if (this.query.reformat == 'compress') {
       code = minify(code) || code;
-    } else {
+    } else if (this.query.reformat != 'no') {
       code = beautify.js_beautify(code, {indent_with_tabs: true});
     }
-    return this.code = code;
+    this.code = code;
+    return this;
   };
   fn.validate = function(code) {
     var lineMatches;
-    code = this.comb(code);
+    this.comb(code);
+    code = this.code;
     try {
       jsonlint.parse(code);
       this.notify(true, 'Valid JSON');
@@ -12977,13 +12983,15 @@ define("1", ["3", "6", "5", "4", "2"], function(CodeMirror, jsonlint, beautify, 
       }
       this.notify(false, e);
     }
+    return this;
   };
   fn.notify = function(success, text) {
-    var result = doc.getElementById('result');
-    doc.getElementById('result-container').classList.add('shown');
+    var result = $('#result');
+    $('#result-container').classList.add('shown');
     result.classList[success ? 'add' : 'remove']('success');
     result.classList[!success ? 'add' : 'remove']('error');
     result.innerHTML = text;
+    return this;
   };
   fn.highlightErrorLine = function(line) {
     if (typeof line == 'number') {
@@ -12993,20 +13001,29 @@ define("1", ["3", "6", "5", "4", "2"], function(CodeMirror, jsonlint, beautify, 
       this.editor.removeLineClass(this.errorLine, 'background', 'line-error');
       this.errorLine = null;
     }
+    return this;
   };
   fn.fetch = function(url, success, error) {
     var req = new XMLHttpRequest();
     req.onreadystatechange = function() {
+      var resp;
       if (req.readyState === XMLHttpRequest.DONE) {
         if (req.status === 200) {
-          success && success.call(this, req.responseText);
+          resp = JSON.parse(req.responseText);
+          if (resp.error) {
+            error.call(this, resp.result);
+          } else {
+            success.call(this, resp.content);
+          }
         } else {
-          error && error.call(this, req.statusText || 'Fetch error');
+          error.call(this, req.statusText || 'Unable to connect');
         }
       }
     }.bind(this);
-    req.open('GET', url);
+    req.open('POST', 'proxy.php');
+    req.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
     req.send('url=' + encodeURIComponent(url));
+    return this;
   };
   function parseQuery() {
     var search = location.search,
@@ -13022,6 +13039,12 @@ define("1", ["3", "6", "5", "4", "2"], function(CodeMirror, jsonlint, beautify, 
       query[decodeURIComponent(b[0])] = decodeURIComponent(b[1] || '');
     }
     return query;
+  }
+  function $(selector, ctx) {
+    return (ctx || document).querySelector(selector);
+  }
+  function $$(selector, ctx) {
+    return [].slice.call((ctx || document).querySelectorAll(selector));
   }
   return window.app = new App();
 });
