@@ -140,7 +140,7 @@ function(CodeMirror, jsonlint, beautify, minify) {
 		try {
 			JSON.parse(code.replace(/\\/g, '\\\\'));
 			this.notify(true, 'Valid JSON');
-		} catch(e) {console.log(e, code);
+		} catch(_e) {
 			try {
 				jsonlint.parse(code);
 				this.notify(true, 'Valid JSON');
