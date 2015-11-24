@@ -99,7 +99,6 @@ gulp.task('scripts:lint', function() {
 			strict: true,
 			shadow: true,
 			browser: true,
-			'-W030': 'Expected an assignment or function call and instead saw an expression',
 			'-W093': 'Did you mean to return a conditional instead of an assignment?'
 		}))
 		.pipe(jshint.reporter('jshint-stylish'))
