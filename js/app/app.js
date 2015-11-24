@@ -23,7 +23,8 @@ function(CodeMirror, jsonlint, beautify, minify) {
 			editor = this.editor = CodeMirror.fromTextArea(codeInput, {
 				lineNumbers: true,
 				styleActiveLine: true,
-				matchBrackets: true
+				matchBrackets: true,
+				indentWithTabs: true
 			});
 
 			editor.on('change', function() {
@@ -51,7 +52,7 @@ function(CodeMirror, jsonlint, beautify, minify) {
 			});
 
 			doc.addEventListener('keyup', function(evt) {
-				// Ctrl-Enter pressed
+				// Ctrl-Enter is pressed
 				if (evt.ctrlKey && evt.keyCode == 13) {
 					this.go();
 			  	}
@@ -91,7 +92,9 @@ function(CodeMirror, jsonlint, beautify, minify) {
 		} else if (this.query.reformat == 'compress') {
 			code = minify(code) || code;
 		} else {
-			code = beautify.js_beautify(code);
+			code = beautify.js_beautify(code, {
+				indent_with_tabs: true
+			});
 		}
 
 		return this.code = code;
