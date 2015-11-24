@@ -16,10 +16,10 @@ Source code for [jsonlint.com](http://jsonlint.com)
 
 ## Project structure
 - **/postcss/** - CSS source files
-- **/css/** - Compiled css files
+- **/css/** - Compiled CSS files
 - **/js/** - JavaScript files
-- **/js/lib/** - Libraries
+- **/js/lib/** - Some JS libraries
 - **/js/app/app.js** - The application
 - **/img/** - Images
 - **/proxy.php** - Proxy script for fetching external resources
-- **/dist/** - Ready-to-deploy files
+- **/dist/** - Ready-to-deploy files (gitignored)

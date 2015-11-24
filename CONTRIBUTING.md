@@ -1,18 +1,25 @@
 # Contributing
 
 To run this app locally you need:
-* Fork & clone this repo
-* Install NodeJS and NPM
-* install Gulp globally
-* Run ``npm install`` to install all dependencies
 
-From then everything should work.
+- Fork & clone this repo
+- Install NodeJS and NPM
+- install Gulp globally
+- Run ``npm install`` to install all dependencies
+- Open **/index.html** with any webserver
 
-To use peoxy.php you need to unstall ``php5-curl``
+
+After your changes you need to:
+
+- Run ``gulp``
+- Check is everything OK (**/dist/** is created and **/dist/index.html** works fine)
+- Commit your changes
+- Push & create pull request
+
+To use **/proxy.php** you need to install ``php5-curl`` (and PHP of course)
 ```
 sudo apt-get install php5-curl
 ```
-
 
 ## Useful Gulp tasks
 - ``styles:watch`` runs PostCSS watcher
