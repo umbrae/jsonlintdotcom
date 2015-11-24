@@ -6,7 +6,8 @@ define([
 	'jsonlint',
 	'js-beautify',
 	'lib/minify.json',
-	'javascript-syntax'
+	'javascript-syntax',
+	'lib/classlist-polyfill'
 ],
 function(CodeMirror, jsonlint, beautify, minify) {
 	'use strict';

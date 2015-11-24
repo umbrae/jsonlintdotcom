@@ -420,6 +420,7 @@ header a.pro {
 	border-radius: 2px;
 }
 main {
+	display: block;
 	width: 100%;
 	max-width: 950px;
 	margin: 0 auto;

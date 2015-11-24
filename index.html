@@ -161,10 +161,14 @@
 
 	<!-- Don't remove lines below! -->
 	<!-- build:js js/app.js -->
-	<script src="js/lib/system.js"></script>
+	<script src="//rawgit.com/systemjs/systemjs/master/dist/system-polyfills.js"></script>
+	<script src="//rawgit.com/systemjs/systemjs/master/dist/system.js"></script>
 	<script src="js/config.js"></script>
 	<script>
-		System.import('app/app.js');
+	setTimeout(function() {
+		System['import']('app/app.js');
+	}, 1000);
+
 	</script>
 	<!-- /build -->
 
