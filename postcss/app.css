@@ -19,6 +19,7 @@ header {
 		border-radius: 2px;
 	}
 }
+
 main {
 	display: block;
 	width: 100%;
@@ -26,6 +27,7 @@ main {
 	margin: 0 auto;
 	padding: 1.5em 0;
 }
+
 #code, .CodeMirror {
 	width: 100%;
 	height: 400px;
@@ -44,6 +46,7 @@ button[type="submit"] {
 	padding-right: .5em;
 	font-weight: bold;
 }
+
 #result-container {
 	display: none;
 	padding-top: 1em;
@@ -54,6 +57,7 @@ button[type="submit"] {
 		font-size: 1.5em;
 	}
 }
+
 #result {
 	border: 1px solid transparent;
 	margin: 1.5em 0;
@@ -72,6 +76,7 @@ button[type="submit"] {
 		border-color: #C6D880;
 	}
 }
+
 footer {
 	margin-top: 3em;
 	clear: fix;
