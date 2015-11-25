@@ -30,7 +30,7 @@
 <body>
 	<main>
 		<header>
-			<hgroup>
+			<div id="headings">
 				<h1 id="headerText">
 					JSONLint
 				</h1>
@@ -39,7 +39,7 @@
 				</h3>
 
 				<a href="http://pro.jsonlint.com" class="pro" target="_blank">Try PRO →</a>
-			</hgroup>
+			</div>
 			<aside><div id="bsap_1303970" class="bsarocks bsap_8ef90d658dffbd98fbb5e857333a6b78"></div></aside>
 		</header>
 		<form name="main">
@@ -61,7 +61,7 @@
 			</nav>
 		</footer>
 
-		<atricle id="faq">
+		<article id="faq">
 			<h3>
 				FAQ
 			</h3>
@@ -165,10 +165,7 @@
 	<script src="//rawgit.com/systemjs/systemjs/master/dist/system.js"></script>
 	<script src="js/config.js"></script>
 	<script>
-	setTimeout(function() {
 		System['import']('app/app.js');
-	}, 1000);
-
 	</script>
 	<!-- /build -->
 

@@ -402,7 +402,7 @@ header {
 	height: 90px;
 	margin-bottom: 1.5em;
 }
-header hgroup {
+header .headings {
 	float: left;
 }
 header aside {

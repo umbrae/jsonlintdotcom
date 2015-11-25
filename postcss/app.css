@@ -1,7 +1,7 @@
 header {
 	height: 90px;
 	margin-bottom: 1.5em;
-	hgroup {
+	.headings {
 		float: left;
 	}
 	aside {
