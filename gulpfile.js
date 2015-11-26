@@ -88,16 +88,26 @@ gulp.task('deploy:beta', () => {
 	let sftp = require("gulp-sftp");
 	gulp.src('dist/**/*')
 		.pipe(sftp({
-			host: 'beta.jsonlint.com',
+			host: 'jsonlint.com',
 			user: 'root',
 			remotePath: '/var/www/beta.jsonlint.com/site/public_html/'
+		}));
+});
+
+gulp.task('deploy:production', () => {
+	let sftp = require("gulp-sftp");
+	gulp.src('dist/**/*')
+		.pipe(sftp({
+			host: 'jsonlint.com',
+			user: 'root',
+			remotePath: '/var/www/jsonlint.com/site/public_html/'
 		}));
 });
 
 gulp.task('default', ['scripts:lint', 'scripts:build', 'html'], () => {
 	gulp.src('./css/*').pipe(gulp.dest('./dist/css'));
 	gulp.src('./img/*').pipe(gulp.dest('./dist/img'));
-	
+
 	gulp
 		.src(['./proxy.php', './*.appcache', './favicon.ico'])
 		.pipe(gulp.dest('./dist'));
