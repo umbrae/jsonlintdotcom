@@ -176,7 +176,7 @@ function(CodeMirror, jsonlint, beautify, minify) {
 	// if null is passed function removes highlighting
 	fn.highlightErrorLine = function(line) {
 		if(typeof line == 'number') {
-			this.errorLine = this.editor.addLineClass(line, 'background', 'line-error');;
+			this.errorLine = this.editor.addLineClass(line, 'background', 'line-error');
 		} else if(this.errorLine) {
 			this.editor.removeLineClass(this.errorLine, 'background', 'line-error');
 			this.errorLine = null;
