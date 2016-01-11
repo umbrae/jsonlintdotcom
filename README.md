@@ -9,7 +9,7 @@ Source code for [jsonlint.com](http://jsonlint.com)
 [![Issue Stats](http://issuestats.com/github/circlecell/jsonlintdotcom/badge/pr)](http://issuestats.com/github/circlecell/jsonlintdotcom)
 [![Issue Stats](http://issuestats.com/github/circlecell/jsonlintdotcom/badge/issue)](http://issuestats.com/github/circlecell/jsonlintdotcom)
 
-## Front-end libraraies are used
+## Front-end libraries are used
 - [VanillaJS :)](http://vanilla-js.com/)
 - [CodeMirror](https://www.npmjs.com/package/codemirror)
 - [jsonlint](https://www.npmjs.com/package/jsonlint)
