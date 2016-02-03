@@ -53,6 +53,12 @@ function(CodeMirror, jsonlint, beautify, minify) {
 			this.go();
 		}.bind(this));
 
+		// when user clicks "Clear" button, assign empty string to the "code" property
+		this.form.addEventListener('reset', function(evt) {
+			evt.preventDefault();
+			this.code = '';
+		}.bind(this));
+
 		// when Ctrl-Enter is pressed, run "go" method
 		doc.addEventListener('keyup', function(evt) {
 			if (evt.ctrlKey && evt.keyCode == 13) {

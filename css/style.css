@@ -440,7 +440,7 @@ main {
     background-color: #FBE3E4;
 }
 
-button[type="submit"] {
+button[type="submit"], button[type="reset"] {
 	font-size: 1.65em;
 	color: #333;
 	padding-left: .5em;
@@ -448,14 +448,24 @@ button[type="submit"] {
 	font-weight: bold;
 }
 
+button[type="reset"] {
+	float: right;
+}
+
+
+
 #result-container {
 	display: none;
 	padding-top: 1em;
 }
 
+
+
 #result-container.shown {
 	display: block;
 }
+
+
 
 #result-container h3 {
 	font-size: 1.5em;

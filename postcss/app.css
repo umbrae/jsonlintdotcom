@@ -40,13 +40,21 @@ main {
     background-color: #FBE3E4;
 }
 
-button[type="submit"] {
-	font-size: 1.65em;
-	color: #333;
-	padding-left: .5em;
-	padding-right: .5em;
-	font-weight: bold;
+button {
+	&[type="submit"], &[type="reset"] {
+		font-size: 1.65em;
+		color: #333;
+		padding-left: .5em;
+		padding-right: .5em;
+		font-weight: bold;
+	}
+
+	&[type="reset"] {
+		float: right;
+	}
 }
+
+
 
 #result-container {
 	display: none;
