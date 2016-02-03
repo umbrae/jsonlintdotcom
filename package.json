@@ -1,0 +1,48 @@
+{
+  "name": "jsonlintdotcom",
+  "version": "0.0.1",
+  "description": "The JSON Validator",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/circlecell/jsonlintdotcom.git"
+  },
+  "keywords": [
+    "jsonlint",
+    "lint",
+    "json"
+  ],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/circlecell/jsonlintdotcom/issues"
+  },
+  "homepage": "https://github.com/circlecell/jsonlintdotcom#readme",
+  "devDependencies": {
+    "autoprefixer": "^6.1.0",
+    "gulp": "^3.9.0",
+    "gulp-changed": "^1.3.0",
+    "gulp-concat": "^2.6.0",
+    "gulp-htmlprocessor": "^0.1.1",
+    "gulp-jshint": "^1.12.0",
+    "gulp-postcss": "^6.0.1",
+    "gulp-rename": "^1.2.2",
+    "gulp-sftp": "^0.1.5",
+    "gulp-sourcemaps": "^1.6.0",
+    "gulp-uglify": "^1.4.1",
+    "jshint-stylish": "^2.0.1",
+    "postcss-calc": "^5.0.0",
+    "postcss-clearfix": "^0.2.0",
+    "postcss-cssnext": "^2.2.0",
+    "postcss-import": "^7.1.3",
+    "postcss-nested": "^1.0.0",
+    "systemjs-builder": "^0.14.8"
+  },
+  "dependencies": {
+    "codemirror": "^5.8.0",
+    "js-beautify": "^1.5.10",
+    "jsonlint": "^1.6.2"
+  }
+}

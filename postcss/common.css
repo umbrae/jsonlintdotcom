@@ -1,0 +1,28 @@
+* {
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+	vertical-align: top;
+}
+body {
+	font-size: 12px;
+	font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+	line-height: 1.5em;
+}
+h1, h2, h3, h4, h5, h6 {
+	color: #111;
+	font-weight: 400;
+}
+h1 {
+	font-size: 3em;
+	line-height: 1;
+	margin-bottom: .1em;
+}
+h3 {
+	font-size: 1.2em;
+	margin-bottom: 10px;
+}
+pre, code, tt {
+	font: 1em 'andale mono', monotype, 'lucida console', monospace;
+	line-height: 1.5;
+}
