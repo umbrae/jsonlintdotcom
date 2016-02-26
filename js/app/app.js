@@ -184,6 +184,7 @@ function(CodeMirror, jsonlint, beautify, minify) {
 	fn.highlightErrorLine = function(line) {
 		if(typeof line == 'number') {
 			this.errorLine = this.editor.addLineClass(line, 'background', 'line-error');
+			this.editor.setCursor(line);
 		} else if(this.errorLine) {
 			this.editor.removeLineClass(this.errorLine, 'background', 'line-error');
 			this.errorLine = null;
