@@ -89,7 +89,8 @@ function(CodeMirror, jsonlint, beautify, minify) {
 			lineNumbers: true,
 			styleActiveLine: true,
 			matchBrackets: true,
-			indentWithTabs: true
+			indentWithTabs: true,
+			autofocus: true
 		});
 
 		return this;
