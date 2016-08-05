@@ -8,7 +8,9 @@
     "rules": {
         "indent": ["error", 4],
         "no-var": "error",
-        "comma-dangle": 0
+        "comma-dangle": 0,
+        "import/no-extraneous-dependencies": 0,
+        "import/no-unresolved": 0
     },
     "env": {
         "browser": true

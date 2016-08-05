@@ -4,7 +4,6 @@ import OpenBrowserPlugin from 'open-browser-webpack-plugin';
 import path from 'path';
 
 const { NODE_ENV } = process.env;
-
 const entry = [];
 const plugins = [];
 
@@ -16,7 +15,7 @@ if (NODE_ENV === 'development') {
     }));
 }
 
-entry.push('./js/app/app.js');
+entry.push('./js/index');
 plugins.push(new CopyWebpackPlugin([
 	{ from: 'css', to: 'css' },
     { from: 'img', to: 'img' },
@@ -40,7 +39,7 @@ module.exports = {
     module: {
         loaders: [{
             test: /.js?$/,
-            loaders: ['babel'],
+            loaders: ['babel', 'eslint'],
             include: path.resolve('js/')
         }]
     },
