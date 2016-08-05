@@ -1,4 +1,7 @@
 language: node_js
+branches:
+  only:
+  - next
 node_js:
 - '6'
 before_install:
