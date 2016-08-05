@@ -57,7 +57,7 @@ module.exports = new class Application {
 
         // when Ctrl-Enter is pressed, run "go" method
         doc.addEventListener('keyup', evt => {
-			const ENTER_KEY = 13;
+            const ENTER_KEY = 13;
             if (evt.ctrlKey && evt.keyCode === ENTER_KEY) {
                 this.go();
             }
