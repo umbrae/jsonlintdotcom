@@ -1,0 +1,16 @@
+{
+    "parser": "babel-eslint",
+    "extends": [
+        "plugin:import/errors",
+        "plugin:import/warnings",
+        "airbnb"
+    ],
+    "rules": {
+        "indent": ["error", 4],
+        "no-var": "error",
+        "comma-dangle": 0
+    },
+    "env": {
+        "browser": true
+    }
+}
