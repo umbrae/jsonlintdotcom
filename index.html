@@ -1,22 +1,14 @@
 <!DOCTYPE html>
 <html manifest="manifest.appcache">
 <head>
+	<!--<script type="text/javascript" src="http://s.servedby-buysellads.com/266667.js"></script>-->
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<meta name="description" content="JSON Lint is a web based validator and reformatter for JSON, a lightweight data-interchange format.">
 	<title>
         JSONLint - The JSON Validator.
     </title>
-	<link rel="stylesheet" href="css/style.css">
-	<script type="text/javascript">
-    (function(){
-      var bsa = document.createElement('script');
-         bsa.type = 'text/javascript';
-         bsa.async = true;
-         bsa.src = '//s3.buysellads.com/ac/bsa.js';
-      (document.getElementsByTagName('head')[0]||document.getElementsByTagName('body')[0]).appendChild(bsa);
-    })();
-    </script>
+	<link rel="stylesheet" href="css/style.css?1464364652">
     <script>
     	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
     	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -24,6 +16,27 @@
     	})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
     	ga('create', 'UA-69209117-1', 'auto');
     	ga('send', 'pageview');
+    </script>
+    <script type='text/javascript'>
+      var googletag = googletag || {};
+      googletag.cmd = googletag.cmd || [];
+      (function() {
+        var gads = document.createElement('script');
+        gads.async = true;
+        gads.type = 'text/javascript';
+        var useSSL = 'https:' == document.location.protocol;
+        gads.src = (useSSL ? 'https:' : 'http:') +
+          '//www.googletagservices.com/tag/js/gpt.js';
+        var node = document.getElementsByTagName('script')[0];
+        node.parentNode.insertBefore(gads, node);
+      })();
+    </script>
+    <script type='text/javascript'>
+      googletag.cmd.push(function() {
+        googletag.defineSlot('/3533890/Test', [728, 90], 'div-gpt-ad-1468936444454-0').addService(googletag.pubads());
+        googletag.pubads().enableSingleRequest();
+        googletag.enableServices();
+      });
     </script>
 </head>
 
@@ -40,12 +53,34 @@
 
 				<a href="http://pro.jsonlint.com" class="pro" target="_blank">Try PRO →</a>
 			</div>
-			<aside><div id="bsap_1303970" class="bsarocks bsap_8ef90d658dffbd98fbb5e857333a6b78"></div></aside>
+			<aside>
+				<!--<div id="bsa_1303970" data-serve="1303970" style="height: 90px;width: 728px;;"><script type='text/javascript'>_bsajs.drop('bsa_1303970');</script></div>-->
+				<!-- /3533890/Test -->
+				<div id='div-gpt-ad-1468936444454-0' style='height:90px; width:728px;'>
+				<script type='text/javascript'>
+				googletag.cmd.push(function() { googletag.display('div-gpt-ad-1468936444454-0'); });
+				</script>
+				</div>
+			</aside>
 		</header>
 		<form name="main">
 			<textarea id="code" name="code"></textarea>
-			<button type="submit" data-ga="validate">Validate</button>
-			<button type="reset" data-ga="clear">Clear</button>
+			<div style="clear: both;width: 100%;display: block;"></div>
+			<div class="validate thirty">
+				<button type="submit" data-ga="validate">Validate JSON</button>
+				<button type="reset" data-ga="clear">Clear</button>
+			</div>
+			<div class="seventy">
+				<div style="clear: both;width: 100%;height: 10px;display: block;"></div>
+				<div class="fourty pad">
+					<div class="ads">this is an AD &rarr;</div>
+				</div>
+				<div class="sixty pad">
+					<div id="textcta"></div>
+					<script src="include.php" type="text/javascript"></script>
+				</div>
+			</div>
+			<div style="clear: both;width: 100%;display: block;"></div>
 		</form>
 		<section id="result-container">
 			<h3>Results</h3>
@@ -153,14 +188,21 @@
 	</main>
 
 	<!-- Don't remove lines below! -->
-	<!-- build:js js/app.js -->
-	<script src="//rawgit.com/systemjs/systemjs/master/dist/system-polyfills.js"></script>
-	<script src="//rawgit.com/systemjs/systemjs/master/dist/system.js"></script>
-	<script src="js/config.js"></script>
+	<script src="js/app.js"></script>
+
 	<script>
-		System['import']('app/app.js');
+	(function() {
+		setTimeout(function () {
+			var div = document.getElementById('div-gpt-ad-1464356486655-0');
+			if(div.offsetWidth === 0 || div.offsetHeight === 0) {
+			//if(div.innerHTML == '') {
+				var newdiv = document.createElement('div');
+					newdiv.innerHTML = '<div style="clear: both;width: 100%;height: 10px;display: block;"></div><div class="fourty pad"><div class="ads">this is an AD →</div></div><div class="sixty pad"><a href="http://bit.ly/23cf3tp" class="cta" data-ga="textad" target="_blank"><img src="https://pbs.twimg.com/profile_images/615675308243488768/_d8TRzzL_400x400.png" style="float: left;width: 60px;border: 1px solid #e1e1e1; border-radius: 2px;margin: 0 10px 0 0;"><strong>Backup your code in the cloud!</strong><br>Host unlimited private projects, for free with BitBucket.<div style="clear: both;width: 100%;display: block;"></div></a></div>';
+				div.parentNode.insertBefore(newdiv, div.nextSibling);
+			}
+		}, 1000);
+	})();
 	</script>
-	<!-- /build -->
 
 </body>
 </html>

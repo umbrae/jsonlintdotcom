@@ -8,6 +8,7 @@ body {
 	font-size: 12px;
 	font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
 	line-height: 1.5em;
+	background: #fafbfc;
 }
 h1, h2, h3, h4, h5, h6 {
 	color: #111;
@@ -28,11 +29,60 @@ pre, code, tt {
 }
 /* BASICS */
 
+.seventy{
+	float: left;
+	width: 728px;
+}
+.sixty{
+	float: left;
+	width: 60%;
+}
+.fifty{
+	float: left;
+	width: 50%;
+}
+	.fifty.pad{
+		padding: 0 10px;
+	}
+.fourty{
+	float: left;
+	width: 40%;
+}
+.thirty{
+	float: left;
+	width: 23%;
+}
+
+.validate{
+	padding: 28px 0;
+}
+.ads{
+	color: #ababab;
+	font-size: 12px;
+	padding: 20px 20px 0;
+	text-align: right;
+}
+.cta{
+	padding: 3px 6px;
+	display: block;
+	font-size: 13px;
+	text-decoration: none;
+	border-radius: 2px;
+	color: #3a3b3c;
+}
+	.cta:hover{
+		background: rgba(0,0,0,.05);
+	}
+	.cta strong{
+		color: #3a3b3c;
+	}
+
 .CodeMirror {
   /* Set height, width, borders, and global font properties here */
   font-family: monospace;
   height: 300px;
   color: black;
+  border-radius: 2px;
 }
 
 /* PADDING */
@@ -404,6 +454,7 @@ header {
 }
 header aside {
 	float: right;
+	width: 728px;
 }
 header a.pro {
 	padding: 1px 6px;
@@ -432,7 +483,7 @@ main {
 #code, .CodeMirror {
 	width: 100%;
 	height: 400px;
-	border: 1px solid #EEEEEE;
+	border: 1px solid #e1e1e1;
 	margin-bottom: 1em;
 }
 
@@ -440,32 +491,48 @@ main {
     background-color: #FBE3E4;
 }
 
-button[type="submit"], button[type="reset"] {
-	font-size: 1.65em;
+button[type="submit"] {
+	font-size: 1.40em;
 	color: #333;
-	padding-left: .5em;
-	padding-right: .5em;
-	font-weight: bold;
+	padding: 5px 10px;
+	font-weight: normal;
+	border-radius: 2px;
+	border: 1px solid #e1e1e1;
+	box-shadow: 1px 1px #c1c1c1;
+	background: #fff;
 }
-
+	button[type="submit"]:hover {
+		cursor: pointer;
+	}
+	button[type="submit"]:active {
+		box-shadow: -1px -1px #c1c1c1;
+	}
 button[type="reset"] {
-	float: right;
+	font-size: 1.40em;
+	color: #333;
+	padding: 5px 10px;
+	font-weight: normal;
+	border-radius: 2px;
+	border: 1px solid #e1e1e1;
+	box-shadow: 1px 1px #c1c1c1;
+	background: #f1f1f1;
+	margin: 0 0 0 10px;
 }
-
-
+	button[type="reset"]:hover {
+		cursor: pointer;
+	}
+	button[type="reset"]:active {
+		box-shadow: -1px -1px #c1c1c1;
+	}
 
 #result-container {
 	display: none;
 	padding-top: 1em;
 }
 
-
-
 #result-container.shown {
 	display: block;
 }
-
-
 
 #result-container h3 {
 	font-size: 1.5em;
