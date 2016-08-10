@@ -1,8 +1,6 @@
-## How to run and make changes
+## How to run dev server and bundle the app
 
-Prerequirements: NodeJS 6+, NPM 3+.
-
-Install needed deps via ``npm install`` (it also compiles browser version of UglifyJS).
+Prerequirements: NodeJS 6+, NPM 3+. Install needed deps via ``npm install``.
 
 To run development server you need to run ``npm run develop`` and open [http://localhost:8106](http://localhost:8106).
 
