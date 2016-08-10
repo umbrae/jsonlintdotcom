@@ -4,14 +4,15 @@
   "description": "The JSON Validator",
   "private": true,
   "scripts": {
-    "test": "npm run lint",
+    "test": "npm run lint && npm run stylelint",
     "bundle": "npm run clean && NODE_ENV=production webpack",
     "develop": "NODE_ENV=development webpack-dev-server --port 8106",
     "check-updates": "ncu",
     "clean": "rimraf dist",
     "upgrade": "npm run check-updates -- --upgradeAll && npm install",
     "lint": "eslint . --ext .js --cache --ignore-pattern '**/node_modules/**' --ignore-pattern '**/dist/**'",
-    "deploy": "pm2 deploy ecosystem.json production"
+    "deploy": "pm2 deploy ecosystem.json production",
+    "stylelint": "stylelint css/style.css"
   },
   "repository": {
     "type": "git",
@@ -53,6 +54,8 @@
     "rimraf": "^2.5.4",
     "script-loader": "^0.7.0",
     "style-loader": "^0.13.1",
+    "stylelint": "^7.1.0",
+    "stylelint-config-standard": "^12.0.0",
     "webpack": "^1.13.1",
     "webpack-dev-server": "^1.14.1",
     "webpack-split-by-path": "^0.1.0"
