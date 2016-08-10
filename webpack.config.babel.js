@@ -4,6 +4,8 @@ import OpenBrowserPlugin from 'open-browser-webpack-plugin';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
 import SplitByPathPlugin from 'webpack-split-by-path';
 import path from 'path';
+import { argv } from 'optimist';
+import 'babel-polyfill';
 
 const { NODE_ENV } = process.env;
 const entry = {
@@ -24,13 +26,30 @@ const plugins = [
     new SplitByPathPlugin([{
         name: 'vendor',
         path: path.join(__dirname, 'node_modules/'),
-    }])
+    }]),
+    function saveChunksPlugin() {
+        this.plugin('emit', (compilation, callback) => {
+            const chunks = [];
+            for (const { files: [jsName] } of compilation.chunks) {
+                chunks.push(jsName);
+            }
+            const chunksJSON = JSON.stringify(chunks);
+            // eslint-disable-next-line no-param-reassign
+            compilation.assets['chunks.json'] = {
+                source: () => chunksJSON,
+                size: () => chunksJSON.length
+            };
+            callback();
+        });
+    }
 ];
 
 if (NODE_ENV === 'development') {
-    entry.app.push('webpack-dev-server/client?http://localhost:8101');
+    const { port } = argv;
+
+    entry.app.push(`webpack-dev-server/client?http://localhost:${port}`);
     plugins.push(new OpenBrowserPlugin({
-        url: 'http://localhost:8101',
+        url: `http://localhost:${port}`,
         ignoreErrors: true
     }));
 }
@@ -40,7 +59,7 @@ let chunkFilename;
 
 if (NODE_ENV === 'development') {
     filename = 'js/[name].js';
-    chunkFilename = 'static/js/[id].[name].chunk.js';
+    chunkFilename = 'js/[id].[name].chunk.js';
 } else {
     filename = 'js/[name]-[chunkhash].js';
     chunkFilename = 'js/[id]-[chunkhash].[name].chunk.js';
