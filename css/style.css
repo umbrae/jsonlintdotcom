@@ -4,12 +4,14 @@
     box-sizing: border-box;
     vertical-align: top;
 }
+
 body {
     font-size: 12px;
     font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
     line-height: 1.5em;
     background: #fafbfc;
 }
+
 h1,
 h2,
 h3,
@@ -19,55 +21,65 @@ h6 {
     color: #111;
     font-weight: 400;
 }
+
 h1 {
     font-size: 3em;
     line-height: 1;
-    margin-bottom: .1em;
+    margin-bottom: 0.1em;
 }
+
 h3 {
     font-size: 1.2em;
     margin-bottom: 10px;
 }
+
 pre,
 code,
 tt {
     font: 1em 'andale mono', monotype, 'lucida console', monospace;
     line-height: 1.5;
 }
-/* BASICS */
 
 .seventy {
     float: left;
     width: 728px;
 }
+
 .sixty {
     float: left;
     width: 60%;
 }
+
 .fifty {
     float: left;
     width: 50%;
 }
+
 .fifty.pad {
     padding: 0 10px;
 }
+
 .fourty {
     float: left;
     width: 40%;
 }
+
 .thirty {
     float: left;
     width: 23%;
 }
+
 .validate {
     padding: 28px 0;
 }
+
 .ads {
     color: #ababab;
     font-size: 12px;
     padding: 20px 20px 0;
     text-align: right;
 }
+
 .cta {
     padding: 3px 6px;
     display: block;
@@ -76,12 +88,15 @@ tt {
     border-radius: 2px;
     color: #3a3b3c;
 }
+
 .cta:hover {
-    background: rgba(0, 0, 0, .05);
+    background: rgba(0, 0, 0, 0.05);
 }
+
 .cta strong {
     color: #3a3b3c;
 }
+
 #faq {
     padding: 0;
     height: 0;
@@ -94,46 +109,55 @@ tt {
     margin-top: 1em;
     opacity: 0;
 }
+
 #faq.expand {
-    padding: 1em 1em;
+    padding: 1em;
     overflow-y: scroll;
     height: 20em;
     transition: all 0.25s ease-in;
     opacity: 1;
 }
+
 #faq h5 {
     font-size: 1em;
     font-weight: 700;
     margin-bottom: 1.5em;
 }
+
 #faq p {
     margin: 0 0 1.5em;
 }
+
 #faq div {
     margin-left: 2em;
 }
+
 #faq dd {
     margin-bottom: 1em;
     margin-left: 1.5em;
 }
+
 #faq hr {
     background: #ddd;
     color: #ddd;
     clear: both;
     float: none;
     width: 100%;
-    height: .1em;
+    height: 0.1em;
     border: none;
     margin: 0 0 1.4em;
 }
+
 header {
     height: 90px;
     margin-bottom: 1.5em;
 }
+
 header aside {
     float: right;
     width: 728px;
 }
+
 header a.pro {
     padding: 1px 6px;
     background: #e1e1e1;
@@ -145,9 +169,11 @@ header a.pro {
     margin: 0;
     border-radius: 2px;
 }
+
 #headings {
     float: left;
 }
+
 main {
     display: block;
     width: 100%;
@@ -155,11 +181,13 @@ main {
     margin: 0 auto;
     padding: 1.5em 0;
 }
+
 .CodeMirror-gutters {
     /* something gone wrong with gutter after update, setting its min height manually */
 
-    min-height: 400px!important;
+    min-height: 400px !important;
 }
+
 #code,
 .CodeMirror {
     width: 100%;
@@ -167,11 +195,13 @@ main {
     border: 1px solid #e1e1e1;
     margin-bottom: 1em;
 }
+
 .line-error {
     background-color: #FBE3E4;
 }
+
 button[type="submit"] {
-    font-size: 1.40em;
+    font-size: 1.4em;
     color: #333;
     padding: 5px 10px;
     font-weight: normal;
@@ -180,14 +210,17 @@ button[type="submit"] {
     box-shadow: 1px 1px #c1c1c1;
     background: #fff;
 }
+
 button[type="submit"]:hover {
     cursor: pointer;
 }
+
 button[type="submit"]:active {
     box-shadow: -1px -1px #c1c1c1;
 }
+
 button[type="reset"] {
-    font-size: 1.40em;
+    font-size: 1.4em;
     color: #333;
     padding: 5px 10px;
     font-weight: normal;
@@ -197,54 +230,68 @@ button[type="reset"] {
     background: #f1f1f1;
     margin: 0 0 0 10px;
 }
+
 button[type="reset"]:hover {
     cursor: pointer;
 }
+
 button[type="reset"]:active {
     box-shadow: -1px -1px #c1c1c1;
 }
+
 #result-container {
     display: none;
     padding-top: 1em;
 }
+
 #result-container.shown {
     display: block;
 }
+
 #result-container h3 {
     font-size: 1.5em;
 }
+
 #result {
     border: 1px solid transparent;
     margin: 1.5em 0;
-    padding: .8em;
+    padding: 0.8em;
 }
+
 #result:empty {
     display: none;
 }
+
 #result.error {
     background: #FBE3E4;
     color: #D12F19;
     border-color: #FBC2C4;
 }
+
 #result.success {
     background: #E6EFC2;
     color: #529214;
     border-color: #C6D880;
 }
-footer:after {
+
+footer::after {
     content: '';
     display: table;
     clear: both;
 }
+
 footer {
     margin-top: 3em;
 }
+
 footer aside {
     float: left;
 }
+
 footer nav {
     float: right;
 }
+
 footer nav a {
     margin-left: 1em;
 }
