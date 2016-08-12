@@ -96,9 +96,10 @@ module.exports = new class Application {
     // the main function of this app
     go() {
         const code = this.code;
+        const trimmedCode = code.trim();
         // if URL is given, fetch data on this URL
-        if (code.indexOf('http') === 0) {
-            fetchExternal(code,
+        if (trimmedCode.indexOf('http') === 0) {
+            fetchExternal(trimmedCode,
                 resp => this.validate(resp), // if fetching is OK, run validator
                 err => this.notify(false, err) // if not, show an error
             );
