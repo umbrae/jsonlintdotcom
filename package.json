@@ -4,6 +4,7 @@
   "description": "The JSON Validator",
   "private": true,
   "scripts": {
+    "install": "napa douglascrockford/JSON-js:json2",
     "test": "npm run lint && npm run stylelint",
     "bundle": "npm run clean && NODE_ENV=production webpack",
     "develop": "NODE_ENV=development webpack-dev-server --port 8106",
@@ -48,6 +49,7 @@
     "eslint-plugin-react": "^6.1.2",
     "exports-loader": "^0.6.3",
     "html-webpack-plugin": "^2.22.0",
+    "napa": "^2.3.0",
     "npm-check-updates": "^2.8.0",
     "open-browser-webpack-plugin": "0.0.2",
     "optimist": "^0.6.1",

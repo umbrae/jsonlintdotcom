@@ -1,12 +1,14 @@
 /* global ga */
 import CodeMirror from 'codemirror/lib/codemirror';
 import jsonlint from 'exports?jsonlint!jsonlint/web/jsonlint';
+import jsonParse from 'exports?json_parse!json2/json_parse';
 import beautify from 'js-beautify/js/lib/beautify';
 import minify from 'jsonminify';
 import $ from 'balajs';
 import 'codemirror/mode/javascript/javascript';
 import fetchExternal from './fetch-external';
 import parseQuery from './parse-query';
+
 
 const doc = document;
 
@@ -133,30 +135,38 @@ module.exports = new class Application {
     }
 
     // validates JSON
-    // code argument is optional
+    // givenCode argument is optional
     validate(givenCode) {
         let lineMatches;
 
         this.reformat(givenCode);
+
         const { code } = this;
 
         try {
-            JSON.parse(code);
-            this.notify(true, 'Valid JSON');
-        } catch (_e) {
+            jsonlint.parse(code);
+
             try {
-                jsonlint.parse(code);
+                // use another parser to check for repeated properties and bad hidden chars
+                jsonParse(code);
+
                 this.notify(true, 'Valid JSON');
             } catch (e) {
-                // retrieve line number from error
-                lineMatches = e.message.match(/line ([0-9]*)/);
+                // e.at contains char number, converting it to line number
+                const lineNumber = code.substring(0, e.at).split('\n').length - 1;
 
-                if (lineMatches && lineMatches.length > 1) {
-                    this.highlightErrorLine(+lineMatches[1] - 1);
-                }
-
-                this.notify(false, e);
+                this.highlightErrorLine(lineNumber);
+                this.notify(false, `${e.name}: ${e.message}`);
             }
+        } catch (e) {
+            // retrieve line number from error string
+            lineMatches = e.message.match(/line ([0-9]*)/);
+
+            if (lineMatches && lineMatches.length > 1) {
+                this.highlightErrorLine(+lineMatches[1] - 1);
+            }
+
+            this.notify(false, e);
         }
 
         return this;
