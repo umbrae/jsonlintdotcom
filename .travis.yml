@@ -1,7 +1,7 @@
 language: node_js
 branches:
   only:
-  - next
+  - master
 node_js:
 - '6'
 before_install:
@@ -19,4 +19,4 @@ deploy:
   skip_cleanup: true
   script: npm run deploy
   on:
-    branch: next
+    branch: master
