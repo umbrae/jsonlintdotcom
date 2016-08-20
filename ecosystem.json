@@ -3,7 +3,7 @@
     "production" : {
       "user" : "deployer",
       "host" : "192.241.157.86",
-      "ref"  : "origin/next",
+      "ref"  : "origin/master",
       "repo" : "git@github.com:circlecell/jsonlintdotcom.git",
       "path" : "/var/web/jsonlint.com",
       "ssh_options": ["StrictHostKeyChecking=no", "PasswordAuthentication=no"],
