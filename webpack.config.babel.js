@@ -73,6 +73,7 @@ entry.app.push(
 plugins.push(new CopyWebpackPlugin([
 	{ from: 'css', to: 'css' },
     { from: 'img', to: 'img' },
+    { from: 'assets', to: 'assets' },
     { from: 'proxy.php' },
     { from: 'buysellads.php' },
     { from: 'include.php' },

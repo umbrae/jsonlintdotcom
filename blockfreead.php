@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 include('./buysellads.php');
 
@@ -14,5 +14,5 @@ if(isset($ad['ads'][0]['pixel']))
 $output .= '<div style="clear: both;width: 100%;display: block;"></div></a>';
 ?>
 (function(){
-document.getElementById('textcta').innerHTML = "<?php echo addslashes($output); ?>";
+var blockFreeAd = "<?php echo addslashes($output); ?>";
 })();
