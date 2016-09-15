@@ -12,7 +12,7 @@ import parseQuery from './parse-query';
 
 const doc = document;
 
-module.exports = new class Application {
+class Application {
     constructor() {
         const form = this.form = doc.forms.main;
         const query = this.query = parseQuery();
@@ -197,4 +197,6 @@ module.exports = new class Application {
 
         return this;
     }
-};
+}
+
+module.exports = new Application();
