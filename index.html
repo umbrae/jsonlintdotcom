@@ -79,7 +79,7 @@
 			<script>
 				window.onload = function() {
 					var dummyAds = document.getElementById('adsense');
-					if (!dummyAds || getComputedStyle(dummyAds).display === 'block') {
+					if (!dummyAds || getComputedStyle(dummyAds).display !== 'block') {
 						document.querySelector('#aside').innerHTML = blockFreeAd;
 					}
 				}
