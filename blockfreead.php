@@ -14,5 +14,5 @@ if(isset($ad['ads'][0]['pixel']))
 $output .= '<div style="clear: both;width: 100%;display: block;"></div></a>';
 ?>
 (function(){
-var blockFreeAd = "<?php echo addslashes($output); ?>";
+window.blockFreeAd = "<?php echo addslashes($output); ?>";
 })();
