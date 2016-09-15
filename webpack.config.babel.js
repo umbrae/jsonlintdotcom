@@ -76,7 +76,7 @@ plugins.push(new CopyWebpackPlugin([
     { from: 'assets', to: 'assets' },
     { from: 'proxy.php' },
     { from: 'buysellads.php' },
-    { from: 'include.php' },
+    { from: 'blockfreead.php' },
     { from: 'favicon.ico' }
 ]));
 
