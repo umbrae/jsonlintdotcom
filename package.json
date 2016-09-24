@@ -13,7 +13,7 @@
     "upgrade": "npm run check-updates -- --upgradeAll && npm install",
     "lint": "eslint . --ext .js --cache --ignore-pattern '**/node_modules/**' --ignore-pattern '**/dist/**'",
     "deploy": "pm2 deploy ecosystem.json production",
-    "stylelint": "stylelint css/style.css"
+    "stylelint": "stylelint static/css/style.css"
   },
   "repository": {
     "type": "git",
