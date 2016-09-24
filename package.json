@@ -6,7 +6,7 @@
   "scripts": {
     "install": "napa douglascrockford/JSON-js:json2",
     "test": "npm run lint && npm run stylelint",
-    "bundle": "npm run clean && NODE_ENV=production webpack",
+    "build": "npm run clean && NODE_ENV=production webpack",
     "develop": "NODE_ENV=development webpack-dev-server --port 8106",
     "check-updates": "ncu",
     "clean": "rimraf dist",
@@ -55,6 +55,7 @@
     "optimist": "^0.6.1",
     "rimraf": "^2.5.4",
     "script-loader": "^0.7.0",
+    "string-replace-loader": "^1.0.5",
     "style-loader": "^0.13.1",
     "stylelint": "^7.1.0",
     "stylelint-config-standard": "^12.0.0",

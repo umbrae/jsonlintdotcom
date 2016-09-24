@@ -40,15 +40,7 @@
       });
     </script>
 	<script src="blockfreead.php" type="text/javascript"></script>
-	<script>
-	if (false && 'serviceWorker' in navigator) {
-		navigator.serviceWorker.register('assets/service-worker.js').then(function() {
-			console.log('CLIENT: service worker registration complete.');
-		}, function(err) {
-			console.error(err);
-		});
-	}
-	</script>
+	<script src="register-service-worker"></script>
 
 </head>
 
@@ -75,7 +67,7 @@
 				</script>
 				</div>
 			</aside>
-			<script src="assets/dummy-ads.js"></script>
+			<script src="dummy-ads.js"></script>
 			<script>
 				window.onload = function() {
 					var dummyAds = document.getElementById('adsense');

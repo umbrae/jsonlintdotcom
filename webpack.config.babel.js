@@ -71,11 +71,7 @@ entry.app.push(
 );
 
 plugins.push(new CopyWebpackPlugin([
-	{ from: 'css', to: 'css' },
-    { from: 'img', to: 'img' },
-    { from: 'assets', to: 'assets' },
-    { from: '*.php' },
-    { from: 'favicon.ico' }
+	{ from: 'static', to: '.' },
 ]));
 
 module.exports = {
