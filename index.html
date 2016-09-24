@@ -10,6 +10,13 @@
     </title>
 	<link rel="stylesheet" href="css/codemirror.css">
 	<link rel="stylesheet" href="css/style.css">
+	<script>
+		// use hashbang instead of location.search
+		if(location.search) {
+			location.hash = location.search.substring(1);
+			location.search = '';
+		}
+	</script>
     <script>
     	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
     	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -151,10 +158,10 @@
 						An example URL to test: <a href="/?json=http%3A%2F%2Fwww.reddit.com%2Fr%2Fprogramming%2Fcomments%2F9szpc%2Fjsonlint_a_handy_json_validator_and_reformatter.json" data-ga="redditUrlInput">http://www.reddit.com/r/programming/comments/9szpc/jsonlint_a_handy_json_validator_and_reformatter.json</a>
 					</p>
 					<p>
-						You can also provide JSON to lint in the URL if you link to JSON Lint with the "json" parameter. <a href="http://www.jsonlint.com?json=%7B%22hello%22%3A%20%22world%22%7D">Here's an example URL to test.</a>
+						You can also provide JSON to lint in the URL if you link to JSON Lint with the "json" parameter of location hash. <a href="#json=%7B%22hello%22%3A%20%22world%22%7D">Here's an example URL to test.</a>
 					</p>
 					<p>
-						Additionally, <a href="http://www.jsonlint.com/?reformat=compress">JSON Lint can also be used as a json compressor if you add ?reformat=compress to the URL.</a>
+						Additionally, <a href="#reformat=compress">JSON Lint can also be used as a json compressor if you add #reformat=compress to the URL.</a>
 					</p>
 				</div>
 				<h5>

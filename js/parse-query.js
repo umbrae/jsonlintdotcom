@@ -1,10 +1,10 @@
 // parses URL
 export default function parseQuery() {
-    const search = location.search;
+    const { hash } = location;
     const query = {};
-    const parts = search.substr(1).split('&');
+    const parts = hash.replace('#', '').split('&');
 
-    if (!search) {
+    if (!hash) {
         return query;
     }
 

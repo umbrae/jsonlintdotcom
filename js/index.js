@@ -41,6 +41,16 @@ class Application {
 
     // registers events
     registerEvents() {
+        // listen to changes at location.hash
+        window.addEventListener('hashchange', () => {
+            const query = this.query = parseQuery();
+            if (query.json) {
+                this.code = query.json;
+            }
+
+            this.go();
+        });
+
         // when user types something, remove highlighting from "bad" line
         this.editor.on('change', () => this.highlightErrorLine(null));
 
