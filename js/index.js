@@ -9,7 +9,6 @@ import 'codemirror/mode/javascript/javascript';
 import fetchExternal from './fetch-external';
 import parseQuery from './parse-query';
 
-
 const doc = document;
 
 class Application {
