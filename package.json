@@ -4,7 +4,6 @@
   "description": "The JSON Validator",
   "private": true,
   "scripts": {
-    "install": "napa douglascrockford/JSON-js:json2",
     "test": "npm run lint && npm run stylelint",
     "build": "npm run clean && NODE_ENV=production webpack",
     "develop": "NODE_ENV=development webpack-dev-server --port 8106",
@@ -67,7 +66,7 @@
     "balajs": "^0.1.9",
     "codemirror": "^5.17.0",
     "js-beautify": "^1.6.3",
-    "jsonlint": "^1.6.2",
+    "jsonlint-mod": "^1.7.0",
     "jsonminify": "^0.4.1"
   }
 }

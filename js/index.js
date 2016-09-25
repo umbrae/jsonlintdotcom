@@ -1,7 +1,6 @@
 /* global ga */
 import CodeMirror from 'codemirror/lib/codemirror';
-import jsonlint from 'exports?jsonlint!jsonlint/web/jsonlint';
-import jsonParse from 'exports?json_parse!json2/json_parse';
+import jsonlint from 'jsonlint-mod';
 import beautify from 'js-beautify/js/lib/beautify';
 import minify from 'jsonminify';
 import $ from 'balajs';
@@ -154,19 +153,7 @@ class Application {
 
         try {
             jsonlint.parse(code);
-
-            try {
-                // use another parser to check for repeated properties and bad hidden chars
-                jsonParse(code);
-
-                this.notify(true, 'Valid JSON');
-            } catch (e) {
-                // e.at contains char number, converting it to line number
-                const lineNumber = code.substring(0, e.at).split('\n').length - 1;
-
-                this.highlightErrorLine(lineNumber);
-                this.notify(false, `${e.name}: ${e.message}`);
-            }
+            this.notify(true, 'Valid JSON');
         } catch (e) {
             // retrieve line number from error string
             lineMatches = e.message.match(/line ([0-9]*)/);
