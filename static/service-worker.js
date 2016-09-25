@@ -1,5 +1,5 @@
 /* eslint-disable no-console */
-self.addEventListener('install', event => {
+self.addEventListener('install', (event) => {
     console.log('WORKER: install event in progress.');
     event.waitUntil(
         caches
@@ -21,7 +21,7 @@ self.addEventListener('install', event => {
     );
 });
 
-self.addEventListener('fetch', event => {
+self.addEventListener('fetch', (event) => {
     console.log('WORKER: fetch event in progress.');
 
     if (event.request.method !== 'GET') {

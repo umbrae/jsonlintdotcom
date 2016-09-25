@@ -71,7 +71,7 @@ entry.app.push(
 );
 
 plugins.push(new CopyWebpackPlugin([
-	{ from: 'static', to: '.' },
+    { from: 'static', to: '.' },
 ]));
 
 module.exports = {

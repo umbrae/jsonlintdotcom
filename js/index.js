@@ -54,19 +54,19 @@ class Application {
         this.editor.on('change', () => this.highlightErrorLine(null));
 
         // when user submits form (eg presses "Validate" button), call "go" method
-        this.form.addEventListener('submit', evt => {
+        this.form.addEventListener('submit', (evt) => {
             evt.preventDefault();
             this.go();
         });
 
         // when user clicks "Clear" button, assign empty string to the "code" property
-        this.form.addEventListener('reset', evt => {
+        this.form.addEventListener('reset', (evt) => {
             evt.preventDefault();
             this.code = '';
         });
 
         // when Ctrl-Enter is pressed, run "go" method
-        doc.addEventListener('keyup', evt => {
+        doc.addEventListener('keyup', (evt) => {
             const ENTER_KEY = 13;
             if (evt.ctrlKey && evt.keyCode === ENTER_KEY) {
                 this.go();
@@ -74,17 +74,17 @@ class Application {
         });
 
         // expands/unexpands faq by clicking #faqButton
-        $.one('#faqButton').addEventListener('click', evt => {
+        $.one('#faqButton').addEventListener('click', (evt) => {
             evt.preventDefault();
             $.one('#faq').classList.toggle('expand');
         });
 
         // initializes Google Analytics tracking
         // when user clicks on [data-ga="blah"], call ga('send', 'pageview', '/blah');
-        $('[data-ga]').forEach(node => {
+        for (const node of $('[data-ga]')) {
             node.addEventListener('click', () =>
                 ga('send', 'pageview', `/${node.getAttribute('data-ga')}`));
-        });
+        }
 
         return this;
     }
