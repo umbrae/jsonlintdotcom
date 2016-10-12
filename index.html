@@ -11,11 +11,31 @@
 	<link rel="stylesheet" href="css/codemirror.css">
 	<link rel="stylesheet" href="css/style.css">
 	<script>
-		// use hashbang instead of location.search
-		if(location.search) {
-			location.hash = location.search.substring(1);
-			location.search = '';
+	(function() {
+		var otherParams = '';
+		function parseParams(params) {
+			var splittedParams = params.split('&');
+			splittedParams.forEach(function(item) {
+				var keyValue = item.split('=');
+				if(keyValue[0] === 'json') {
+					localStorage.onloadJSONParameter = decodeURIComponent(keyValue[1]);
+				} else {
+					otherParams += item + '&';
+				}
+			});
 		}
+
+		if(location.search) {
+			parseParams(location.search.substr(1))
+		}
+
+		if(location.hash) {
+			parseParams(location.hash.substr(1))
+		}
+
+		// remove the last &
+		document.location.href = '/#' + otherParams.substr(0, otherParams.length - 1);
+	})();
 	</script>
     <script>
     	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){

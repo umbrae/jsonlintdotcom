@@ -1,4 +1,4 @@
-/* global ga */
+/* global ga,paramJSON */
 import CodeMirror from 'codemirror/lib/codemirror';
 import jsonlint from 'jsonlint-mod';
 import beautify from 'js-beautify/js/lib/beautify';
@@ -32,8 +32,13 @@ class Application {
 
         // if json parameter is given, use it
         // URL (where JSON is located) is also allowed
-        if (query.json) {
-            this.code = query.json;
+
+        const paramJSON = typeof localStorage.onloadJSONParameter !== 'undefined'
+            ? localStorage.onloadJSONParameter : query.json;
+
+        if (paramJSON) {
+            this.code = paramJSON;
+            localStorage.removeItem('onloadJSONParameter');
             this.go();
         }
     }
