@@ -12,29 +12,30 @@
 	<link rel="stylesheet" href="css/style.css">
 	<script>
 	(function() {
-		var otherParams = '';
+		var otherParams = [];
 		function parseParams(params) {
 			var splittedParams = params.split('&');
+			var onloadJSONParameter;
 			splittedParams.forEach(function(item) {
 				var keyValue = item.split('=');
 				if(keyValue[0] === 'json') {
-					localStorage.onloadJSONParameter = decodeURIComponent(keyValue[1]);
+					onloadJSONParameter = decodeURIComponent(keyValue[1]);
 				} else {
-					otherParams += item + '&';
+					otherParams.push(item);
 				}
 			});
+
+			if(onloadJSONParameter) {
+				localStorage.onloadJSONParameter = onloadJSONParameter;
+				// remove the last &
+				document.location.search = otherParams.join('&');
+			}
+
 		}
 
 		if(location.search) {
-			parseParams(location.search.substr(1))
+			parseParams(location.search.substr(1));
 		}
-
-		if(location.hash) {
-			parseParams(location.hash.substr(1))
-		}
-
-		// remove the last &
-		document.location.href = '/#' + otherParams.substr(0, otherParams.length - 1);
 	})();
 	</script>
     <script>
@@ -166,7 +167,7 @@
 				</h5>
 				<div>
 					<p>
-						Because your code is ugly! Trust me on this one. What's that you say? It's not? Ok, well then here's <a href="http://www.jsonlint.com/?reformat=no">JSON Lint without the reformatter.</a>
+						Because your code is ugly! Trust me on this one. What's that you say? It's not? Ok, well then here's <a href="/?reformat=no">JSON Lint without the reformatter.</a>
 					</p>
 				</div>
 				<h5>
@@ -178,10 +179,10 @@
 						An example URL to test: <a href="/?json=http%3A%2F%2Fwww.reddit.com%2Fr%2Fprogramming%2Fcomments%2F9szpc%2Fjsonlint_a_handy_json_validator_and_reformatter.json" data-ga="redditUrlInput">http://www.reddit.com/r/programming/comments/9szpc/jsonlint_a_handy_json_validator_and_reformatter.json</a>
 					</p>
 					<p>
-						You can also provide JSON to lint in the URL if you link to JSON Lint with the "json" parameter of location hash. <a href="#json=%7B%22hello%22%3A%20%22world%22%7D">Here's an example URL to test.</a>
+						You can also provide JSON to lint in the URL if you link to JSON Lint with the "json" parameter. <a href="/?json=%7B%22hello%22%3A%20%22world%22%7D">Here's an example URL to test.</a>
 					</p>
 					<p>
-						Additionally, <a href="#reformat=compress">JSON Lint can also be used as a json compressor if you add #reformat=compress to the URL.</a>
+						Additionally, <a href="/?reformat=compress">JSON Lint can also be used as a json compressor if you add ?reformat=compress to the URL.</a>
 					</p>
 				</div>
 				<h5>
