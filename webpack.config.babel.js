@@ -86,14 +86,11 @@ module.exports = {
         libraryTarget: 'var'
     },
     module: {
-        loaders: [{
+        rules: [{
             test: /.js?$/,
-            loaders: ['babel', 'eslint'],
+            use: ['babel-loader'],
             include: path.resolve('js/')
         }]
     },
-    devtool: 'source-map',
-    eslint: {
-        configFile: '.eslintrc.json'
-    }
+    devtool: 'source-map'
 };
