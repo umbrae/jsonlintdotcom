@@ -350,7 +350,7 @@ li>a:only-child:after {
 }
 
 .ad.top {
-    margin: 30px 0;
+    margin: 30px 0 10px;
 }
 
 .ad.bottom {
