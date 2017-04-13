@@ -4,7 +4,7 @@
   "description": "The JSON Validator",
   "private": true,
   "scripts": {
-    "test": "npm run lint && npm run stylelint",
+    "test": "npm run lint",
     "build": "npm run clean && NODE_ENV=production webpack",
     "develop": "NODE_ENV=development webpack-dev-server --port 8106",
     "check-updates": "ncu",
