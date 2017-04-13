@@ -78,19 +78,6 @@ class Application {
             }
         });
 
-        // expands/unexpands faq by clicking #faqButton
-        $.one('#faqButton').addEventListener('click', (evt) => {
-            evt.preventDefault();
-            $.one('#faq').classList.toggle('expand');
-        });
-
-        // initializes Google Analytics tracking
-        // when user clicks on [data-ga="blah"], call ga('send', 'pageview', '/blah');
-        for (const node of $('[data-ga]')) {
-            node.addEventListener('click', () =>
-                ga('send', 'pageview', `/${node.getAttribute('data-ga')}`));
-        }
-
         return this;
     }
 
