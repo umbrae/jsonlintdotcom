@@ -350,7 +350,7 @@ li>a:only-child:after {
 }
 
 .ad.top {
-    margin: 30px 0 10px;
+    margin: 30px 0;
 }
 
 .ad.bottom {
@@ -475,10 +475,11 @@ button[type="reset"]:active {
     background-color: #E6EBF0;
     background-color: hsl(210, 25%, 92%);
     flex-flow: row nowrap;
+    display: none;
 }
 
 .partner {
-    display: flex;
+    display: block;
     flex-direction: column;
     width: 100%;
     padding: 0 15px 15px;
