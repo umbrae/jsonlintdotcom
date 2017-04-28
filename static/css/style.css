@@ -1,4 +1,4 @@
-@import url(http://fonts.googleapis.com/css?family=Open+Sans:400,700);
+@import url(https://fonts.googleapis.com/css?family=Open+Sans:400,700);
 
 * {
     margin: 0;
@@ -243,6 +243,19 @@ nav ul li {
     border-left: 1px solid #f0f0f0;
     border-right: 1px solid #f0f0f0;
 }
+
+nav ul li.pro-button{    background: #1E8BC3;
+    border-left: none;
+    border-right: none;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 1px 0 0;
+    color: #fff;
+    border-radius: 2px;
+    margin: 6px 15px;}
+
+nav ul li.pro-button a{color:#fff}
+nav ul li.pro-button:hover a{background:#555}
 
 nav a {
     display: block;
@@ -575,7 +588,7 @@ button[type="reset"]:active {
     }
 }
 
-@media all and (max-width: 420px) {
+@media all and (max-width: 460px) {
     .sub-title,
     .tagline-title {
         display: none
