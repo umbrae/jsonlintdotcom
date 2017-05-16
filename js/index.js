@@ -1,4 +1,3 @@
-/* global ga,paramJSON */
 import CodeMirror from 'codemirror/lib/codemirror';
 import jsonlint from 'jsonlint-mod';
 import beautify from 'js-beautify/js/lib/beautify';
