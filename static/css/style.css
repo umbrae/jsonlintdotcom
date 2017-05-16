@@ -59,22 +59,27 @@ tt {
 }
 
 .memberful-button {
-  float: right
+    float: right;
+    margin-top: 17px;
 }
 
 .memberful-button a {
-  background: #1E8BC3;
-  padding: 6px 15px 8px;
-  color: #fff;
-  border-radius: 1px;
-  margin: 10px 0 0;
-  text-decoration: none;
-  font-size: 14px;
-  font-weight: 600;
+    background: #1E8BC3;
+    padding: 10px 15px 11px;
+    color: #fff;
+    border-radius: 1px;
+    margin: 0;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 600;
 }
 
 .memberful-button a:hover{
-  background:#555;
+    background:#555;
+}
+
+@media only screen and (max-width:540px) {
+    .memberful-button {display:none}
 }
 
 
