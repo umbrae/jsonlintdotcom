@@ -58,6 +58,26 @@ tt {
     padding: 8px 0;
 }
 
+.memberful-button {
+  float: right
+}
+
+.memberful-button a {
+  background: #1E8BC3;
+  padding: 6px 15px 8px;
+  color: #fff;
+  border-radius: 1px;
+  margin: 10px 0 0;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.memberful-button a:hover{
+  background:#555;
+}
+
+
 .info {
     display: block;
     padding: 0 0 30px;
