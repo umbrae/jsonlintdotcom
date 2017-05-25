@@ -135,10 +135,10 @@
         <form name="main">
             <textarea id="code" name="code" style="display: none;"></textarea>
             <div class="validate">
-                <button type="submit">Validate JSON</button>
-                <button type="reset">Clear</button>
+                <button type="submit" data-ga="validate">Validate JSON</button>
+                <button type="reset" data-ga="clear">Clear</button>
                 <div class="memberful-button">
-                    <a href="https://jsonlint.memberful.com/checkout?plan=21158">Support JSONLint for $2/Month</a>
+                    <a href="https://jsonlint.memberful.com/checkout?plan=21158" data-ga="support">Support JSONLint for $2/Month</a>
                 </div>
             </div>
         </form>
@@ -191,7 +191,7 @@
             <p class="heading">Different Results</p>
             <p>If you use a Windows computer you may end up with different results. This is possibly due to the way Windows handles newlines. Essentially, if you have just newline characters <code>(\n)</code> in your JSON and paste it into JSONLint from a Windows computer, it may validate it as valid erroneously since Windows may need a carriage return <code>(\r)</code> as well to detect newlines properly. As a solution, either use direct URL input, or make sure your content's newlines match the architecture your system expects!</p>
             <p class="heading">Credits</p>
-            <p>Maintained by <a href="https://github.com/finom/" target="_blank">Andrey Gubanov</a>. Thanks to <a href="http://www.crockford.com/" target="_blank">Douglas Crockford</a> of JSON and JS Lint, and <a href="http://zaa.ch/" target="_blank">Zach Carter</a>, who built a <a href="https://github.com/zaach/jsonlint">pure JavaScript implementation</a>. You can download the <a href="https://www.github.com/circlecell/jsonlintdotcom" target="_blank">JSONLint source code on GitHub</a>.</p>
+            <p>Maintained by <a href="https://github.com/finom/" target="_blank">Andrey Gubanov</a>. Thanks to <a href="http://www.crockford.com/" target="_blank">Douglas Crockford</a> of JSON and JS Lint, and <a href="http://zaa.ch/" target="_blank">Zach Carter</a>, who built a <a href="https://github.com/zaach/jsonlint">pure JavaScript implementation</a>. You can download the <a href="https://www.github.com/circlecell/jsonlintdotcom" target="_blank" data-ga="sourceLink">JSONLint source code on GitHub</a>.</p>
         </div>
         <div class="ad bottom">
             <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
@@ -204,7 +204,7 @@
         </main>
         <footer>
             &copy; 2017 JSONLint.com &mdash;
-            <a href="https://www.buysellads.com/buy/detail/266667/zone/1303970" target="_blank">Advertise Here</a>
+            <a href="https://www.buysellads.com/buy/detail/266667/zone/1303970" target="_blank" data-ga="advertise">Advertise Here</a>
         </footer>
 </body>
 

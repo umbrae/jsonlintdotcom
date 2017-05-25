@@ -77,6 +77,13 @@ class Application {
             }
         });
 
+        // initializes Google Analytics tracking
+        // when user clicks on [data-ga="blah"], call ga('send', 'pageview', '/blah');
+        for (const node of $('[data-ga]')) {
+            node.addEventListener('click', () => // eslint-disable-line no-loop-func
+                ga('send', 'pageview', `/${node.getAttribute('data-ga')}`)); // eslint-disable-line no-undef
+        }
+
         return this;
     }
 
