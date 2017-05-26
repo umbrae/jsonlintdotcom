@@ -3,6 +3,7 @@ import CopyWebpackPlugin from 'copy-webpack-plugin';
 import OpenBrowserPlugin from 'open-browser-webpack-plugin';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
 import SplitByPathPlugin from 'webpack-split-by-path';
+import UglifyJSPlugin from 'uglifyjs-webpack-plugin';
 import path from 'path';
 import { argv } from 'optimist';
 import 'babel-polyfill';
@@ -73,6 +74,10 @@ entry.app.push(
 plugins.push(new CopyWebpackPlugin([
     { from: 'static', to: '.' },
 ]));
+
+if (NODE_ENV === 'production') {
+    plugins.push(new UglifyJSPlugin());
+}
 
 module.exports = {
     entry,
