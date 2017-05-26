@@ -3,7 +3,7 @@ import CopyWebpackPlugin from 'copy-webpack-plugin';
 import OpenBrowserPlugin from 'open-browser-webpack-plugin';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
 import SplitByPathPlugin from 'webpack-split-by-path';
-import UglifyJSPlugin from 'uglifyjs-webpack-plugin';
+import BabiliPlugin from 'babili-webpack-plugin';
 import path from 'path';
 import { argv } from 'optimist';
 import 'babel-polyfill';
@@ -76,7 +76,7 @@ plugins.push(new CopyWebpackPlugin([
 ]));
 
 if (NODE_ENV === 'production') {
-    plugins.push(new UglifyJSPlugin());
+    plugins.push(new BabiliPlugin());
 }
 
 module.exports = {
