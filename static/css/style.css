@@ -540,66 +540,75 @@ button[type="reset"]:active {
     font-size: 1.3em;
 }
 
-.bsa-cpc #_default_ {
-    position: relative;
-    display: flex;
-    font-size: 14px;
-    line-height: 1.5;
+footer {
+  padding-bottom: 3.5em !important;
 }
 
-.bsa-cpc .default-ad {
-    display: none;
+.bsa-cpc-inline #_default_ {
+  padding: .4em 1em .6em;
+  background-color: hsla(0, 0%, 20%, .97);
+  z-index: 10;
+  text-align: center;
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  line-height: 1.5;
 }
 
-.bsa-cpc ._default_ {
-    position: relative;
-    display: block;
-    overflow: hidden;
-    margin: 0 1em;
-    padding: 1em;
-    width: 50%;
-    background-color: #fff;
-    line-height: 1.5;
+.bsa-cpc-inline .default-ad {
+  display: none;
 }
 
-.bsa-cpc a {
-    color: inherit;
-    text-decoration: none;
-    transition: background-color .15s ease-in-out;
+.bsa-cpc-inline ._default_ {
+  display: inline;
+  overflow: hidden;
+  line-height: 1.5;
 }
 
-.bsa-cpc a:hover {
-    background-color: #1E8BC3;
-    color: #fff;
+.bsa-cpc-inline ._default_ > * {
+  vertical-align: middle;
 }
 
-.bsa-cpc .default-image img {
-    display: block;
-    float: left;
-    margin-right: 10px;
-    width: 36px;
+.bsa-cpc-inline a {
+  color: #fff;
+  text-decoration: none;
 }
 
-.bsa-cpc .default-title,
-.bsa-cpc .default-description {
-    display: block;
-    margin-left: 46px;
-    max-width: calc(100% - 36px);
+.bsa-cpc-inline a:hover {
+  color: #ddd;
 }
 
-.bsa-cpc .default-title {
-    font-weight: 600;
+.bsa-cpc-inline .default-image {
+  display: none;
 }
 
-@media only screen and (min-width: 320px) and (max-width: 759px) {
-    .bsa-cpc #_default_ {
-        flex-wrap: wrap;
-    }
-    .bsa-cpc ._default_ {
-        margin: .2em 1em;
-        width: 100%;
-    }
+.bsa-cpc-inline .default-title:after {
+  content: " — ";
 }
+
+.bsa-cpc-inline .default-title,
+.bsa-cpc-inline .default-description {
+  display: inline;
+}
+
+.bsa-cpc-inline .default-title {
+  position: relative;
+  margin-left: 8px;
+}
+
+.bsa-cpc-inline .default-title:before {
+  position: relative;
+  top: -1px;
+  left: -8px;
+  padding: 2px 5px 3px;
+  background-color: #1e8bc3;
+  color: #ffffff;
+  content: "Sponsor";
+  text-transform: uppercase;
+  font-size: 11px;
+  font-family: Verdana, sans-serif;
+}
+
 
 @media all and (max-width: 775px) {
     .description-title {
