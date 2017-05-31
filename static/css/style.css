@@ -16,13 +16,6 @@ body {
     line-height: 26px;
 }
 
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {}
-
 h3 {
     font-size: 1.2em;
     margin-bottom: 10px;
@@ -142,60 +135,6 @@ li code {
     color: #3a3b3c;
 }
 
-#faq {
-    height: 0;
-    overflow: hidden;
-    clear: both;
-    padding: 0 1em;
-    transition: all 0.15s ease-out;
-    display: block;
-    border: 2px solid #CCC;
-    margin-top: 1em;
-    opacity: 0;
-}
-
-#faq.expand {
-    padding: 1em;
-    overflow-y: scroll;
-    height: 20em;
-    transition: all 0.25s ease-in;
-    opacity: 1;
-}
-
-#faq h5 {
-    font-size: 1em;
-    font-weight: 700;
-    margin-bottom: 1.5em;
-}
-
-#faq p {
-    margin: 0 0 1.5em;
-}
-
-#faq div {
-    margin-left: 2em;
-}
-
-#faq dd {
-    margin-bottom: 1em;
-    margin-left: 1.5em;
-}
-
-#faq hr {
-    background: #ddd;
-    color: #ddd;
-    clear: both;
-    float: none;
-    width: 100%;
-    height: 0.1em;
-    border: none;
-    margin: 0 0 1.4em;
-}
-
-.toggle,
-[id^=drop] {
-    display: none;
-}
 
 header {
     width: 100%;
@@ -251,6 +190,25 @@ nav:after {
     clear: both;
 }
 
+
+nav ul li.pro-button{    background: #1E8BC3;
+    border-left: none;
+    border-right: none;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 1px 0 0;
+    color: #fff;
+    border-radius: 2px;
+    margin: 6px 15px;}
+
+nav ul li.pro-button a{color:#fff}
+nav ul li.pro-button:hover a{background:#555}
+
+.toggle,
+[id^=drop] {
+    display: none;
+}
+
 nav ul {
     float: right;
     margin: 0;
@@ -268,19 +226,6 @@ nav ul li {
     border-left: 1px solid #f0f0f0;
     border-right: 1px solid #f0f0f0;
 }
-
-nav ul li.pro-button{    background: #1E8BC3;
-    border-left: none;
-    border-right: none;
-    font-size: 10px;
-    font-weight: 600;
-    padding: 1px 0 0;
-    color: #fff;
-    border-radius: 2px;
-    margin: 6px 15px;}
-
-nav ul li.pro-button a{color:#fff}
-nav ul li.pro-button:hover a{background:#555}
 
 nav a {
     display: block;
@@ -306,12 +251,13 @@ nav ul li:hover>ul {
 }
 
 nav ul ul li {
-    width: 320px;
+    width: 240px;
     float: none;
     display: list-item;
     position: relative;
     border-bottom: 1px solid #f0f0f0;
     padding: 7px 0;
+    line-height: 20px;
 }
 
 nav ul ul li.jscompress {
@@ -330,6 +276,10 @@ nav ul ul li.dns {
     border-left: 5px solid #26A65B;
 }
 
+nav ul ul li.comp {
+    border-left: 5px solid #3498DB;
+}
+
 nav ul ul li.keygen {
     border-left: 5px solid #EB9532;
 }
@@ -340,6 +290,10 @@ nav ul ul ul li {
     left: 300px;
 }
 
+.tagline-title {
+    font-size: 11px
+}
+
 li>a:only-child:after {
     content: '';
 }
@@ -348,8 +302,8 @@ li>a:only-child:after {
     position: relative;
     display: inline-block;
     width: 0.8em;
-    height: 0.65em;
-    margin: 9px 10px 0 0;
+    height: 0.8em;
+    margin: 7px 10px 0 0;
     border-top: 0.1em solid #333;
     border-bottom: 0.1em solid #333;
 }
@@ -357,7 +311,7 @@ li>a:only-child:after {
 .three-lines:before {
     content: "";
     position: absolute;
-    top: 0.25em;
+    top: 0.3em;
     left: 0;
     width: 100%;
     border-top: 0.1em solid #333;
@@ -583,7 +537,7 @@ footer {
 }
 
 .bsa-cpc-inline .default-title:after {
-  content: " — ";
+  content: " — ";
 }
 
 .bsa-cpc-inline .default-title,
@@ -617,17 +571,19 @@ footer {
     .more-dev {
         display: none
     }
-    .three-lines {
-        margin: 9px 0 0 0
-    }
+  .three-lines {
+	margin:7px 5px
+	}
 }
 
 @media all and (max-width: 460px) {
-    .sub-title,
-    .tagline-title {
+    .sub-title{
         display: none
     }
-    nav ul ul li {
-        width: 180px
+}
+
+@media all and (max-width: 360px) {
+    .more-tools{
+        display: none
     }
 }
