@@ -10,7 +10,7 @@
     "clean": "rimraf dist",
     "upgrade": "ncu --upgradeAll && npm5 install",
     "lint": "eslint . --ext .js --cache --ignore-pattern '**/node_modules/**' --ignore-pattern '**/dist/**'",
-    "deploy": "pm2 deploy ecosystem.json production",
+    "deploy": "pm2 deploy ecosystem.json production --force",
     "stylelint": "stylelint static/css/style.css"
   },
   "repository": {
