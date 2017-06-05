@@ -121,6 +121,10 @@ class Application {
             gutters: ['CodeMirror-linenumbers', 'CodeMirror-foldgutter']
         });
 
+        this.editor.addKeyMap({
+            'Ctrl-Enter': () => this.go()
+        });
+
         return this;
     }
 
