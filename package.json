@@ -4,11 +4,11 @@
   "description": "The JSON Validator",
   "private": true,
   "scripts": {
-    "test": "npm5 run lint",
-    "build": "npm5 run clean && NODE_ENV=production webpack",
+    "test": "npm run lint",
+    "build": "npm run clean && NODE_ENV=production webpack",
     "develop": "NODE_ENV=development webpack-dev-server --port 8106",
     "clean": "rimraf dist",
-    "upgrade": "ncu --upgradeAll && npm5 install",
+    "upgrade": "ncu --upgradeAll && npm install",
     "lint": "eslint . --ext .js --cache --ignore-pattern '**/node_modules/**' --ignore-pattern '**/dist/**'",
     "deploy": "pm2 deploy ecosystem.json production --force",
     "stylelint": "stylelint static/css/style.css"
@@ -65,7 +65,7 @@
     "balajs": "^1.0.6",
     "codemirror": "^5.26.0",
     "js-beautify": "^1.6.14",
-    "jsonlint-mod": "^1.7.0",
+    "jsonlint-mod": "^1.7.2",
     "jsonminify": "^0.4.1"
   }
 }
