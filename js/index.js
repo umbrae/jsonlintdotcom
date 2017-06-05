@@ -3,7 +3,18 @@ import jsonlint from 'jsonlint-mod';
 import beautify from 'js-beautify/js/lib/beautify';
 import minify from 'jsonminify';
 import $ from 'balajs';
+
 import 'codemirror/mode/javascript/javascript';
+import 'codemirror/addon/fold/foldcode';
+import 'codemirror/addon/fold/foldgutter';
+import 'codemirror/addon/fold/brace-fold';
+
+import 'codemirror/lib/codemirror.css';
+import 'codemirror/addon/fold/foldgutter.css';
+
+import '../css/style.css';
+
+
 import fetchExternal from './fetch-external';
 import parseQuery from './parse-query';
 
@@ -95,7 +106,9 @@ class Application {
             matchBrackets: true,
             indentWithTabs: true,
             autofocus: true,
-            mode: 'javascript'
+            mode: 'javascript',
+            foldGutter: true,
+            gutters: ['CodeMirror-linenumbers', 'CodeMirror-foldgutter']
         });
 
         return this;

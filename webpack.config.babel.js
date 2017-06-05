@@ -2,8 +2,8 @@
 import CopyWebpackPlugin from 'copy-webpack-plugin';
 import OpenBrowserPlugin from 'open-browser-webpack-plugin';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
-import SplitByPathPlugin from 'webpack-split-by-path';
 import BabiliPlugin from 'babili-webpack-plugin';
+import ExtractTextPlugin from 'extract-text-webpack-plugin';
 import path from 'path';
 import { argv } from 'optimist';
 import 'babel-polyfill';
@@ -16,33 +16,10 @@ const entry = {
 const plugins = [
     new HtmlWebpackPlugin({
         template: 'index.html',
-        chunksSortMode: (a, b) => {
-            const order = ['manifest', 'vendor', 'app'];
-            const nameA = a.names[0];
-            const nameB = b.names[0];
-
-            return order.indexOf(nameA) - order.indexOf(nameB);
-        }
     }),
-    new SplitByPathPlugin([{
-        name: 'vendor',
-        path: path.join(__dirname, 'node_modules/'),
-    }]),
-    function saveChunksPlugin() {
-        this.plugin('emit', (compilation, callback) => {
-            const chunks = [];
-            for (const { files: [jsName] } of compilation.chunks) {
-                chunks.push(jsName);
-            }
-            const chunksJSON = JSON.stringify(chunks);
-            // eslint-disable-next-line no-param-reassign
-            compilation.assets['chunks.json'] = {
-                source: () => chunksJSON,
-                size: () => chunksJSON.length
-            };
-            callback();
-        });
-    }
+    new ExtractTextPlugin({
+        filename: 'css/style.css',
+    }),
 ];
 
 if (NODE_ENV === 'development') {
@@ -68,7 +45,7 @@ if (NODE_ENV === 'development') {
 
 entry.app.push(
     'babel-polyfill',
-    './js/index'
+    './js/index',
 );
 
 plugins.push(new CopyWebpackPlugin([
@@ -95,6 +72,17 @@ module.exports = {
             test: /.js?$/,
             use: ['babel-loader'],
             include: path.resolve('js/')
+        }, {
+            test: /\.css$/,
+            use: ExtractTextPlugin.extract({
+                fallback: 'style-loader',
+                use: ['css-loader']
+            }),
+            include: /node_modules/
+        }, {
+            test: /\.css$/,
+            use: ['style-loader', 'css-loader'],
+            exclude: /node_modules/
         }]
     },
     devtool: 'source-map'
