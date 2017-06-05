@@ -372,6 +372,10 @@ main {
     min-height: 400px !important;
 }
 
+.CodeMirror-dialog input {
+    vertical-align: middle;
+}
+
 #code,
 .CodeMirror {
     width: 100%;

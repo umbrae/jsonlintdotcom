@@ -77,12 +77,7 @@ module.exports = {
             use: ExtractTextPlugin.extract({
                 fallback: 'style-loader',
                 use: ['css-loader']
-            }),
-            include: /node_modules/
-        }, {
-            test: /\.css$/,
-            use: ['style-loader', 'css-loader'],
-            exclude: /node_modules/
+            })
         }]
     },
     devtool: 'source-map'

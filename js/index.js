@@ -5,16 +5,26 @@ import minify from 'jsonminify';
 import $ from 'balajs';
 
 import 'codemirror/mode/javascript/javascript';
+
+// Fold
 import 'codemirror/addon/fold/foldcode';
 import 'codemirror/addon/fold/foldgutter';
 import 'codemirror/addon/fold/brace-fold';
-
-import 'codemirror/lib/codemirror.css';
 import 'codemirror/addon/fold/foldgutter.css';
 
+// Search
+import 'codemirror/addon/dialog/dialog.css';
+import 'codemirror/addon/search/matchesonscrollbar.css';
+import 'codemirror/addon/dialog/dialog.js';
+import 'codemirror/addon/search/searchcursor.js';
+import 'codemirror/addon/search/search.js';
+import 'codemirror/addon/scroll/annotatescrollbar.js';
+import 'codemirror/addon/search/matchesonscrollbar.js';
+import 'codemirror/addon/search/jump-to-line.js';
+
+import 'codemirror/lib/codemirror.css';
+
 import '../css/style.css';
-
-
 import fetchExternal from './fetch-external';
 import parseQuery from './parse-query';
 
