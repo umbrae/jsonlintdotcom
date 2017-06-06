@@ -4,8 +4,6 @@ branches:
   - master
 node_js:
 - '7'
-install:
-- npm install
 before_install:
 - npm install -g npm
 - openssl aes-256-cbc -K $encrypted_2c4c9a008ff2_key -iv $encrypted_2c4c9a008ff2_iv
