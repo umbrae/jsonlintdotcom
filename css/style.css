@@ -502,69 +502,103 @@ footer {
   padding-bottom: 3.5em !important;
 }
 
-.bsa-cpc-inline #_default_ {
-  padding: .4em 1em .6em;
-  background-color: hsla(0, 0%, 20%, .97);
-  z-index: 10;
-  text-align: center;
-  position: fixed;
-  bottom: 0;
-  width: 100%;
-  line-height: 1.5;
-}
+/* ====================================== */
 
-.bsa-cpc-inline .default-ad {
+.bsa-ad {
   display: none;
+  margin: 2em 0 1em;
+  padding: 1.5em 1em;
+  background-color: hsl(210, 25%, 92%);
+  border-radius: 3px;
+  flex-flow: row nowrap;
 }
 
-.bsa-cpc-inline ._default_ {
-  display: inline;
-  overflow: hidden;
+.partner {
+  display: flex;
+  flex-direction: column;
+  width: 44%;
+  justify-content: center;
+}
+
+.partner p {
+  margin-bottom: .3em;
   line-height: 1.5;
+  font-size: 1.5em;
 }
 
-.bsa-cpc-inline ._default_ > * {
-  vertical-align: middle;
-}
-
-.bsa-cpc-inline a {
+.partner strong {
   color: #fff;
-  text-decoration: none;
+  background-color: #1E8BC3;
+  border-radius: 3px;
+  padding: .1em .3em;
 }
 
-.bsa-cpc-inline a:hover {
-  color: #ddd;
+.partner sub {
+  font-weight: 200;
+  font-size: 1.3em;
 }
 
-.bsa-cpc-inline .default-image {
+.bsa-cpc #_default_ {
+  position: relative;
+  display: flex;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.bsa-cpc .default-ad {
   display: none;
 }
 
-.bsa-cpc-inline .default-title:after {
-  content: " — ";
-}
-
-.bsa-cpc-inline .default-title,
-.bsa-cpc-inline .default-description {
-  display: inline;
-}
-
-.bsa-cpc-inline .default-title {
+.bsa-cpc ._default_ {
   position: relative;
-  margin-left: 8px;
+  display: block;
+  overflow: hidden;
+  margin: 0 1em;
+  padding: 1em;
+  width: 50%;
+  border-radius: 3px;
+  background-color: #fff;
+  line-height: 1.5;
 }
 
-.bsa-cpc-inline .default-title:before {
-  position: relative;
-  top: -1px;
-  left: -8px;
-  padding: 2px 5px 3px;
-  background-color: #1e8bc3;
-  color: #ffffff;
-  content: "Sponsor";
-  text-transform: uppercase;
-  font-size: 11px;
-  font-family: Verdana, sans-serif;
+.bsa-cpc a {
+  color: inherit;
+  text-decoration: none;
+  transition: background-color .15s ease-in-out;
+}
+
+.bsa-cpc a:hover {
+  color: #fff;
+  background-color: #1E8BC3;
+}
+
+.bsa-cpc .default-image img {
+  display: block;
+  float: left;
+  margin-right: 10px;
+  width: 36px;
+  border-radius: 7.5%;
+}
+
+.bsa-cpc .default-title,
+.bsa-cpc .default-description {
+  display: block;
+  margin-left: 46px;
+  max-width: calc(100% - 36px);
+}
+
+.bsa-cpc .default-title {
+  font-weight: 600;
+}
+
+@media only screen and (min-width: 320px) and (max-width: 759px) {
+  .bsa-cpc #_default_ {
+    flex-wrap: wrap;
+  }
+  .bsa-cpc ._default_ {
+    margin: .2em 1em;
+    width: 100%;
+  }
 }
 
 

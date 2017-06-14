@@ -142,18 +142,29 @@
             <pre id="result" class="error"></pre>
         </section>
         <!-- bsa-cpc -->
+        <div class="bsa-ad">
+          <div class="partner">
+            <p>JSONLint <strong>Partners</strong></p>
+            <sub>Check out their products!</sub>
+          </div>
+          <div class="bsa-cpc"></div>
+        </div>
         <script src="//m.servedby-buysellads.com/monetization.js" type="text/javascript"></script>
-
         <script>
-          (function(){
-            if(typeof _bsa !== 'undefined' && _bsa) {
+        (function() {
+          if (typeof _bsa !== 'undefined' && _bsa) {
             _bsa.init('default', 'CVADT27Y', 'placement:jsonlintcom', {
-              target: '.bsa-cpc-inline',
+              target: '.bsa-cpc',
               align: 'horizontal',
               disable_css: 'true'
             });
-              }
-          })();
+          }
+        })();
+        window.onload = function() {
+          if (document.getElementsByClassName("_default_").length > 0) {
+            document.getElementsByClassName("bsa-ad")[0].style.display = "block";
+          }
+        }
         </script>
         <!-- /bsa-cpc -->
         <div class="info">
