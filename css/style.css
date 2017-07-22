@@ -284,6 +284,10 @@ nav ul ul li.keygen {
     border-left: 5px solid #EB9532;
 }
 
+nav ul ul li.jsvalidate {
+	border-left: 5px solid #FFCF4B;
+}
+
 nav ul ul ul li {
     position: relative;
     top: -60px;
