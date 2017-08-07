@@ -413,7 +413,7 @@ button[type="submit"]:hover {
 
 button[type="submit"]:active {}
 
-button[type="reset"] {
+button[type="reset"], button.copy {
     background-color: #f0f0f0;
     padding: 10px 15px;
     text-decoration: none;
@@ -432,6 +432,16 @@ button[type="reset"]:hover {
 }
 
 button[type="reset"]:active {
+}
+
+button.copy {
+  float: right;
+}
+
+@media all and (min-width: 541px) {
+  button.copy {
+    display: none;
+  }
 }
 
 #result-container {
@@ -604,7 +614,6 @@ footer {
     width: 100%;
   }
 }
-
 
 @media all and (max-width: 775px) {
     .description-title {

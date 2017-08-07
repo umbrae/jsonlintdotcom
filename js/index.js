@@ -2,6 +2,7 @@ import CodeMirror from 'codemirror/lib/codemirror';
 import jsonlint from 'jsonlint-mod';
 import beautify from 'js-beautify/js/lib/beautify';
 import minify from 'jsonminify';
+import Clipboard from 'clipboard';
 import $ from 'balajs';
 
 import 'codemirror/mode/javascript/javascript';
@@ -65,6 +66,8 @@ class Application {
 
     // registers events
     registerEvents() {
+        const copyButton = $.one('.copy');
+
         // listen to changes at location.hash
         window.addEventListener('hashchange', () => {
             const query = this.query = parseQuery();
@@ -98,12 +101,18 @@ class Application {
             }
         });
 
+        copyButton.addEventListener('click', evt => evt.preventDefault());
+
         // initializes Google Analytics tracking
         // when user clicks on [data-ga="blah"], call ga('send', 'pageview', '/blah');
         for (const node of $('[data-ga]')) {
             node.addEventListener('click', () => // eslint-disable-line no-loop-func
                 ga('send', 'pageview', `/${node.getAttribute('data-ga')}`)); // eslint-disable-line no-undef
         }
+
+        new Clipboard(copyButton, {
+            text: () => this.code
+        });
 
         return this;
     }
