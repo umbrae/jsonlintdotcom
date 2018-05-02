@@ -78,6 +78,27 @@
       })();
     </script>
 
+    <script src="//cdnjs.cloudflare.com/ajax/libs/cookieconsent2/3.0.3/cookieconsent.min.js"></script>
+    <script>
+    window.addEventListener("load", function(){
+    window.cookieconsent.initialise({
+      "palette": {
+        "popup": {
+          "background": "#edeff5",
+          "text": "#444444"
+        },
+        "button": {
+          "background": "#1E8BC3",
+          "text": "#ffffff"
+        }
+      },
+      "content": {
+        "message": "By using JSONLint.com you accept our use of cookies and agree to our",
+        "link": "privacy policy.",
+        "href": "https://jsonlint.com/privacy-policy.html"
+      }
+    })});
+    </script>
 </head>
 
 <body>
@@ -202,8 +223,11 @@
         </div>
         </main>
         <footer>
-            &copy; 2017 JSONLint.com &mdash;
+            &copy; 2017 JSONLint.com
+            &mdash;
             <a href="https://www.buysellads.com/buy/detail/266667/zone/1303970" target="_blank" data-ga="advertise">Advertise Here</a>
+            &mdash;
+            <a href="privacy-policy.html" target="_blank">Privacy</a>
         </footer>
        <script>
             (function(){
