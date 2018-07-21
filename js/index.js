@@ -209,7 +209,7 @@ class Application {
         // ie10 doesn't support 2nd argument in classList.toggle
         result.classList[success ? 'add' : 'remove']('success');
         result.classList[!success ? 'add' : 'remove']('error');
-        result.innerHTML = text;
+        result.textContent = text;
 
         return this;
     }
