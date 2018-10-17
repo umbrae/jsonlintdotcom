@@ -2,7 +2,6 @@
 import CopyWebpackPlugin from 'copy-webpack-plugin';
 import OpenBrowserPlugin from 'open-browser-webpack-plugin';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
-import BabiliPlugin from 'babili-webpack-plugin';
 import MiniCssExtractPlugin from 'mini-css-extract-plugin';
 import path from 'path';
 import { argv } from 'optimist';
@@ -51,10 +50,6 @@ entry.app.push(
 plugins.push(new CopyWebpackPlugin([
     { from: 'static', to: '.' },
 ]));
-
-if (NODE_ENV === 'production') {
-    plugins.push(new BabiliPlugin());
-}
 
 module.exports = {
     entry,

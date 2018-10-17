@@ -5,7 +5,7 @@
   "private": true,
   "scripts": {
     "test": "npm run lint",
-    "build": "npm run clean && NODE_ENV=production webpack",
+    "build": "npm run clean && NODE_ENV=production webpack --mode=production",
     "dev": "NODE_ENV=development webpack-dev-server --port 8106",
     "clean": "rimraf dist",
     "upgrade": "ncu --upgradeAll && npm i",
@@ -37,7 +37,6 @@
     "@babel/register": "^7.0.0",
     "babel-eslint": "^10.0.1",
     "babel-loader": "^8.0.4",
-    "babili-webpack-plugin": "^0.1.2",
     "copy-webpack-plugin": "^4.5.3",
     "css-loader": "^1.0.0",
     "eslint": "^5.7.0",
