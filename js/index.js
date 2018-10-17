@@ -26,10 +26,11 @@ import 'codemirror/addon/search/jump-to-line';
 import 'codemirror/lib/codemirror.css';
 
 import '../css/style.css';
+import '../css/carbonads.css';
 import fetchExternal from './fetch-external';
 import parseQuery from './parse-query';
 
-const doc = document;
+const doc = window.document;
 
 class Application {
     constructor() {
@@ -54,12 +55,12 @@ class Application {
         // if json parameter is given, use it
         // URL (where JSON is located) is also allowed
 
-        const paramJSON = typeof localStorage.onloadJSONParameter !== 'undefined'
-            ? localStorage.onloadJSONParameter : query.json;
+        const paramJSON = typeof window.localStorage.onloadJSONParameter !== 'undefined'
+            ? window.localStorage.onloadJSONParameter : query.json;
 
         if (paramJSON) {
             this.code = paramJSON;
-            localStorage.removeItem('onloadJSONParameter');
+            window.localStorage.removeItem('onloadJSONParameter');
             this.go();
         }
     }
@@ -106,8 +107,7 @@ class Application {
         // initializes Google Analytics tracking
         // when user clicks on [data-ga="blah"], call ga('send', 'pageview', '/blah');
         for (const node of $('[data-ga]')) {
-            node.addEventListener('click', () => // eslint-disable-line no-loop-func
-                ga('send', 'pageview', `/${node.getAttribute('data-ga')}`)); // eslint-disable-line no-undef
+            node.addEventListener('click', () => ga('send', 'pageview', `/${node.getAttribute('data-ga')}`)); // eslint-disable-line no-undef, no-loop-func
         }
 
         new Clipboard(copyButton, {
@@ -139,11 +139,12 @@ class Application {
 
     // the main function of this app
     go() {
-        const code = this.code;
+        const { code } = this;
         const trimmedCode = code.trim();
         // if URL is given, fetch data on this URL
         if (trimmedCode.indexOf('http') === 0) {
-            fetchExternal(trimmedCode,
+            fetchExternal(
+                trimmedCode,
                 resp => this.validate(resp), // if fetching is OK, run validator
                 err => this.notify(false, err) // if not, show an error
             );

@@ -13,7 +13,7 @@
         "no-multi-assign": 0,
         "no-new": 0
     },
-    "env": {
-        "browser": true
+    "globals": {
+      "window": true
     }
 }

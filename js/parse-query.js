@@ -1,6 +1,6 @@
 // parses URL
 export default function parseQuery() {
-    const { search } = location;
+    const { search } = window.location;
     const query = {};
     const parts = search.replace('?', '').split('&');
 

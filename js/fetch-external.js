@@ -1,8 +1,8 @@
 // makes request to external resource via php proxy
 export default function fetchExternal(url, success, error) {
-    const req = new XMLHttpRequest();
+    const req = new window.XMLHttpRequest();
     req.onreadystatechange = () => {
-        if (req.readyState === XMLHttpRequest.DONE) {
+        if (req.readyState === window.XMLHttpRequest.DONE) {
             if (req.status === 200) {
                 const resp = JSON.parse(req.responseText);
                 if (resp.error) {

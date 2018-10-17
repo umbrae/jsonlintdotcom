@@ -3,10 +3,10 @@ import CopyWebpackPlugin from 'copy-webpack-plugin';
 import OpenBrowserPlugin from 'open-browser-webpack-plugin';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
 import BabiliPlugin from 'babili-webpack-plugin';
-import ExtractTextPlugin from 'extract-text-webpack-plugin';
+import MiniCssExtractPlugin from 'mini-css-extract-plugin';
 import path from 'path';
 import { argv } from 'optimist';
-import 'babel-polyfill';
+import '@babel/polyfill';
 
 const { NODE_ENV } = process.env;
 const entry = {
@@ -17,7 +17,7 @@ const plugins = [
     new HtmlWebpackPlugin({
         template: 'index.html',
     }),
-    new ExtractTextPlugin({
+    new MiniCssExtractPlugin({
         filename: 'css/style.css',
     }),
 ];
@@ -44,7 +44,7 @@ if (NODE_ENV === 'development') {
 }
 
 entry.app.push(
-    'babel-polyfill',
+    '@babel/polyfill',
     './js/index',
 );
 
@@ -74,10 +74,10 @@ module.exports = {
             include: path.resolve('js/')
         }, {
             test: /\.css$/,
-            use: ExtractTextPlugin.extract({
-                fallback: 'style-loader',
-                use: ['css-loader']
-            })
+            use: [
+                { loader: MiniCssExtractPlugin.loader },
+                { loader: 'css-loader' }
+            ]
         }]
     },
     devtool: 'source-map'
