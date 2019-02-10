@@ -92,6 +92,7 @@ class Application {
         this.form.addEventListener('reset', (evt) => {
             evt.preventDefault();
             this.code = '';
+            $.one('#result-container').classList.remove('shown');
         });
 
         // when Ctrl-Enter is pressed, run "go" method
