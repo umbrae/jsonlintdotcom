@@ -3,7 +3,7 @@ branches:
   only:
   - master
 node_js:
-- '11'
+- '12'
 before_install:
 - openssl aes-256-cbc -K $encrypted_2c4c9a008ff2_key -iv $encrypted_2c4c9a008ff2_iv
   -in deploy_rsa.enc -out deploy_rsa -d
