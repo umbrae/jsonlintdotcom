@@ -374,6 +374,7 @@ main {
 .CodeMirror-gutters {
     /* something gone wrong with gutter after update, setting its min height manually */
     min-height: 400px !important;
+    min-height: calc(100vh - 350px) !important;
 }
 
 .CodeMirror-dialog input {
@@ -384,6 +385,8 @@ main {
 .CodeMirror {
     width: 100%;
     height: 380px;
+    height: calc(100vh - 440px);
+    min-height: 380px;
     border: 1px solid #e1e1e1;
     margin-bottom: 1em;
     font-size: 14px;
