@@ -103,7 +103,7 @@ class Application {
             }
         });
 
-        copyButton.addEventListener('click', evt => evt.preventDefault());
+        copyButton.addEventListener('click', (evt) => evt.preventDefault());
 
         // initializes Google Analytics tracking
         // when user clicks on [data-ga="blah"], call ga('send', 'pageview', '/blah');
@@ -146,8 +146,8 @@ class Application {
         if (trimmedCode.indexOf('http') === 0) {
             fetchExternal(
                 trimmedCode,
-                resp => this.validate(resp), // if fetching is OK, run validator
-                err => this.notify(false, err) // if not, show an error
+                (resp) => this.validate(resp), // if fetching is OK, run validator
+                (err) => this.notify(false, err) // if not, show an error
             );
         } else {
             // if non-url is given, run validator
