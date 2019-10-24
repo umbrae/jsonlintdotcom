@@ -49,7 +49,7 @@
     "mini-css-extract-plugin": "^0.8.0",
     "napa": "^3.0.0",
     "npm": "^6.12.0",
-    "npm-check-updates": "^3.1.24",
+    "npm-check-updates": "^3.1.25",
     "open-browser-webpack-plugin": "0.0.5",
     "optimist": "^0.6.1",
     "rimraf": "^3.0.0",
@@ -59,14 +59,14 @@
     "stylelint": "^11.1.1",
     "stylelint-config-standard": "^19.0.0",
     "uglifyjs-webpack-plugin": "^2.2.0",
-    "webpack": "^4.41.1",
+    "webpack": "^4.41.2",
     "webpack-cli": "^3.3.9",
-    "webpack-dev-server": "^3.8.2"
+    "webpack-dev-server": "^3.9.0"
   },
   "dependencies": {
     "balajs": "^1.0.7",
     "clipboard": "^2.0.4",
-    "codemirror": "^5.49.0",
+    "codemirror": "^5.49.2",
     "js-beautify": "^1.10.2",
     "jsonlint-mod": "^1.7.5",
     "jsonminify": "^0.4.1"
