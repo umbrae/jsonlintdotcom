@@ -7,7 +7,8 @@ const carbonScriptSrc = {
     'jsoncompare.com': '//cdn.carbonads.com/carbon.js?serve=CE7D5KJY&placement=jsoncomparecom',
     'validatejavascript.com': '//cdn.carbonads.com/carbon.js?serve=CE7D5K7E&placement=validatejavascriptcom',
     'randomkeygen.com': null,
-}[window.location.host];
+    localhost: null,
+}[window.location.hostname];
 
 if (carbonScriptSrc) {
     window.fetch(new window.Request('https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js', { method: 'HEAD', mode: 'no-cors' })).catch(() => {
@@ -18,6 +19,6 @@ if (carbonScriptSrc) {
     });
 }
 
-if (typeof carbonScriptSrc === 'undefined' && window.location.hostname !== 'localhost') {
+if (typeof carbonScriptSrc === 'undefined') {
     throw new Error('carbonScriptSrc is undefined');
 }
