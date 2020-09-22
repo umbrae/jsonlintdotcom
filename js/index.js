@@ -231,4 +231,4 @@ class Application {
     }
 }
 
-module.exports = new Application();
+export default new Application();
