@@ -522,7 +522,7 @@ footer {
 /* ====================================== */
 
 .bsa-ad {
-  display: none;
+  display: block;
   margin: 2em 0 1em;
   padding: 1.5em 1em;
   background-color: hsl(210, 25%, 92%);
