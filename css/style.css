@@ -75,8 +75,16 @@ tt {
     .memberful-button {display:none}
 }
 
-@media(max-width: 1400px) { 
-    .sidebar-id { display: none; } 
+.sidebar-ad {
+    display: block;
+    position: fixed;
+    top: 191px;
+    left: calc(50% + 565px);
+}
+@media(max-width: 1750px) {
+    .sidebar-ad {
+        display: none !important;
+    }
 }
 
 .info {
