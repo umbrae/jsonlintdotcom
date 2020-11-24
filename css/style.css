@@ -75,6 +75,9 @@ tt {
     .memberful-button {display:none}
 }
 
+@media(max-width: 1400px) { 
+    .sidebar-id { display: none; } 
+}
 
 .info {
     display: block;
