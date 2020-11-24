@@ -77,7 +77,7 @@ tt {
 
 .sidebar-ad {
     display: block;
-    position: fixed!important;
+    position: fixed !important;
     top: 191px;
     left: calc(50% + 565px);
 }
