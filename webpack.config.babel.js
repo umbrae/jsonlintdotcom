@@ -1,6 +1,5 @@
 /* eslint import/no-extraneous-dependencies: ["error", {"devDependencies": true}] */
 import CopyWebpackPlugin from 'copy-webpack-plugin';
-import OpenBrowserPlugin from 'open-browser-webpack-plugin';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
 import MiniCssExtractPlugin from 'mini-css-extract-plugin';
 import path from 'path';
@@ -25,10 +24,6 @@ if (NODE_ENV === 'development') {
     const { port } = argv;
 
     entry.app.push(`webpack-dev-server/client?http://localhost:${port}`);
-    plugins.push(new OpenBrowserPlugin({
-        url: `http://localhost:${port}`,
-        ignoreErrors: true
-    }));
 }
 
 let filename;
@@ -57,6 +52,9 @@ module.exports = {
     entry,
     plugins,
     context: __dirname,
+    devServer: {
+        open: true,
+    },
     output: {
         filename,
         chunkFilename,
