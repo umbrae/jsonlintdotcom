@@ -164,24 +164,24 @@
         </script>
         <!-- /bsa-cpc -->
         <div class="info">
-            <p class="heading">About JSONLint?</p>
+            <h2>About JSONLint?</h2>
             <p>JSONLint is a validator and reformatter for JSON, a lightweight data-interchange format. Copy and paste, directly type, or input a URL in the editor above and let JSONLint tidy and validate your messy JSON code.</p>
-            <p class="heading">Tips & Tricks</p>
+            <h2>Tips & Tricks</h2>
             <ul>
                 <li>You can directly input a URL into the editor and JSONLint will scrape it for JSON and parse it.</li>
                 <li>You can provide JSON to lint in the URL if you link to JSONLint with the <code>"json"</code> parameter. Here's an <a href="http://jsonlint.com/?json=%7B%22hello%22:%20%22world%22%7D" target="_blank">example URL to test</a>.</li>
                 <li>JSONLint can also be used as a JSON compressor if you add <a href="?reformat=compress"><code>?reformat=compress</code></a> to the URL.</li>
             </ul>
-            <p class="heading">Common Errors</p>
+            <h2>Common Errors</h2>
             <ul>
                 <li>Expecting <code>'STRING'</code> - You probably have an extra comma at the end of your collection. Something like <code>{ "a": "b", }</code></li>
                 <li>Expecting <code>'STRING'</code>, <code>'NUMBER'</code>, <code>'NULL'</code>, <code>'TRUE'</code>, <code>'FALSE'</code>, <code>'{'</code>, <code>'['</code> - You probably have an extra comma at the end of your list. Something like: <code>["a", "b", ]</code></li>
                 <li>Enclosing your collection keys in quotes. Proper format for a collection is <code>{ "key": "value" }</code></li>
                 <li>Make sure you follow <a href="http://www.json.org/" target="_blank">JSON's syntax</a> properly. For example, always use double quotes, always quotify your keys, and remove all callback functions.</li>
             </ul>
-            <p class="heading">Different Results</p>
+            <h2>Different Results</h2>
             <p>If you use a Windows computer you may end up with different results. This is possibly due to the way Windows handles newlines. Essentially, if you have just newline characters <code>(\n)</code> in your JSON and paste it into JSONLint from a Windows computer, it may validate it as valid erroneously since Windows may need a carriage return <code>(\r)</code> as well to detect newlines properly. As a solution, either use direct URL input, or make sure your content's newlines match the architecture your system expects!</p>
-            <p class="heading">Credits</p>
+            <h2>Credits</h2>
             <p>Maintained by CircleCell. Thanks to <a href="http://www.crockford.com/" target="_blank">Douglas Crockford</a> of JSON and JS Lint, and <a href="http://zaa.ch/" target="_blank">Zach Carter</a>, who built a <a href="https://github.com/zaach/jsonlint">pure JavaScript implementation</a>. You can download the <a href="https://www.github.com/circlecell/jsonlintdotcom" target="_blank" data-ga="sourceLink">JSONLint source code on GitHub</a>.</p>
         </div>
         <div class="ad bottom"><!-- nothing --></div>
