@@ -235,20 +235,21 @@
         <div class="ad bottom"><!-- nothing --></div>
         </main>
         <footer>
-            &copy; <script type="text/javascript">document.write(new Date().getFullYear());</script> JSONLint.com &mdash;
+            &copy; <span id="copy-year">2021</span> JSONLint.com &mdash;
             <a href="https://www.buysellads.com/buy/detail/266667/zone/1303970" target="_blank" data-ga="advertise">Advertise Here</a>
             &mdash;
             <a href="privacy-policy.html" target="_blank">Privacy</a>
         </footer>
        <script>
-            (function(){
+         document.querySelector('#copy-year').textContent = new Date().getFullYear(); // make sure that copywright year is up to date
+          (function(){
             if(typeof _bsa !== 'undefined' && _bsa) {
             // format, zoneKey, segment:value, options
             _bsa.init('flexbar', 'C6ADVKE', 'placement:jsonlint', {
             align: 'fixedtop'
             });
             }
-            })();
+          })();
         </script>
 </body>
 
