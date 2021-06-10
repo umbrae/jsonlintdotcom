@@ -241,7 +241,7 @@
             <a href="privacy-policy.html" target="_blank">Privacy</a>
         </footer>
        <script>
-         document.querySelector('#copy-year').textContent = new Date().getFullYear(); // make sure that copywright year is up to date
+         document.querySelector('#copy-year').textContent = new Date().getFullYear(); // make sure that copyright year is up to date
           (function(){
             if(typeof _bsa !== 'undefined' && _bsa) {
             // format, zoneKey, segment:value, options
@@ -251,6 +251,22 @@
             }
           })();
         </script>
-</body>
+        <script type="application/ld+json">
+          {
+            "@context": "http://schema.org",
+            "@type": "WebSite",
+            "url": "https://jsonlint.com/"
+          }
+        </script>
+
+        <script type="application/ld+json">
+          {
+              "@context": "http://schema.org",
+              "@type": "WebPage",
+              "name": "JSON Lint",
+              "description": "JSON Online Validator and Formatter"
+          }
+        </script>
+      </body>
 
 </html>
