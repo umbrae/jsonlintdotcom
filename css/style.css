@@ -78,11 +78,6 @@ tt {
     top: 187px;
     left: calc(5% + 1130px);
 }
-@media(max-width: 1550px) {
-    .sidebar-ad {
-        display: none !important;
-    }
-}
 
 .info {
     display: block;
