@@ -76,7 +76,7 @@ tt {
     display: block;
     position: fixed !important;
     top: 187px;
-    left: calc(50% + 1130px);
+    left: calc(5% + 1130px);
 }
 @media(max-width: 1550px) {
     .sidebar-ad {
