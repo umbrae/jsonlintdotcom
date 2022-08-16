@@ -336,23 +336,24 @@ li>a:only-child:after {
     text-align: left;
 }
 
-.ad.top img,
-.ad.bottom img {
+.top-container,
+.bottom-container {
+    display: block;
+    text-align: center;
+}
+
+.top-container img,
+.bottom-container img {
     max-width: 100%;
     height: auto;
     margin: 0 auto;
 }
 
-.ad {
-    display: block;
-    text-align: center;
-}
-
-.ad.top {
+.top-container {
     margin: 30px 0;
 }
 
-.ad.bottom {
+.bottom-container {
     margin: 30px 0;
 }
 
