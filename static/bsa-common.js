@@ -1,5 +1,5 @@
 // code below shows ads even if adblock is turned on
-window.document.querySelector('.ad.top').appendChild(window.document.createElement('div')).id = 'carbon-block';
+window.document.querySelector('.top-container').appendChild(window.document.createElement('div')).id = 'carbon-block';
 
 const carbonScriptSrc = {
     'jsonlint.com': '//cdn.carbonads.com/carbon.js?serve=CK7DK23U&placement=jsonlintcom',
