@@ -205,7 +205,7 @@
                 <li>Expecting <code>'STRING'</code> - You probably have an extra comma at the end of your collection. Something like <code>{ "a": "b", }</code></li>
                 <li>Expecting <code>'STRING'</code>, <code>'NUMBER'</code>, <code>'NULL'</code>, <code>'TRUE'</code>, <code>'FALSE'</code>, <code>'{'</code>, <code>'['</code> - You probably have an extra comma at the end of your list. Something like: <code>["a", "b", ]</code></li>
                 <li>Enclosing your collection keys in quotes. Proper format for a collection is <code>{ "key": "value" }</code></li>
-                <li>Make sure you follow <a href="http://www.json.org/" target="_blank">JSON's syntax</a> properly. For example, always use double quotes, always quotify your keys, and remove all callback functions.</li>
+                <li>Make sure you follow <a href="http://www.json.org/" target="_blank" title="Visit JSON.org to learn more">JSON's syntax</a> properly. For example, always use double quotes, always quotify your keys, and remove all callback functions.</li>
             </ul>
             <h2>Different Results</h2>
             <p>If you use a Windows computer you may end up with different results. This is possibly due to the way Windows handles newlines. Essentially, if you have just newline characters <code>(\n)</code> in your JSON and paste it into JSONLint from a Windows computer, it may validate it as valid erroneously since Windows may need a carriage return <code>(\r)</code> as well to detect newlines properly. As a solution, either use direct URL input, or make sure your content's newlines match the architecture your system expects!</p>
